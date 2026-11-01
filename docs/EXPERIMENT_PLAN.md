@@ -1,3 +1,5 @@
+> **HISTORICAL PLAN — SUPERSEDED FOR ACTIVE EXECUTION (proposed 2026-11-01).** This original OAM-TCD released-weight A/B/C comparison is retained for traceability, **not an instruction to train or to use the noncommercial Restor checkpoint**. The revised direction is **SatlasPretrain `Aerial_SwinB_SI` + newly initialized segmentation head + verified OAM-TCD CC BY 4.0 source data**, optimized for practical GSI ~0.5–0.6m canopy inference; a Swin scratch control is not required. See [Project Charter](PROJECT_CHARTER.md) and [ADR](decisions/ADR_20261101_SATLAS_FIRST.md). Its earlier detailed resampling/group-split/label-QA methodology remains useful only where consistent with the new direction. A **new active implementation plan** will be authored separately after architecture and data inputs are reviewed; do not run this historical plan as-is.
+
 # Experiment Plan — canopy adaptation to 50 cm
 
 Status: proposed baseline; no completed Phase 1 training or validated accuracy claim.
