@@ -23,6 +23,8 @@
 - Exact head semantics, package compatibility, crop/GSD choices, freeze policy, threshold, license notices and compute budget are **open design details**, to be settled by the smallest informative checks.
 - If blocked by memory, licensing, dataset quality or GSI model quality, diagnose and propose a bounded fallback rather than launch an open-ended architecture contest.
 
+**Agreed initial model composition:** official `Aerial_SwinB_SI` pretrained Swin-v2 Base backbone + pretrained FPN + official U-Net-style semantic segmentation head newly initialized for two classes (background, Tree/Canopy), starting with official cross-entropy loss. Confirm loader API, normalization, shapes, ignore-index semantics and successful forward/backward smoke; measure GPU memory before choosing fine-tuning scope. Do not develop a custom decoder unless a specific blocker warrants it.
+
 ## Non-negotiable principles
 
 1. **Milestone first; avoid premature validation burden.** **M1** is completion of SatlasPretrain-initialized fine-tuning with verified OAM-TCD CC BY-only data, basic OAM-TCD validation, a saved checkpoint and successful canopy-mask inference. **M2** is qualitative inspection on several existing GSI scenes, followed by problem-driven work only if needed. Do **not** require new GSI GT, predefined Japanese accuracy thresholds, exhaustive comparisons or nationwide validation for M1/M2. Visual plausibility must not be reported as quantified accuracy.
