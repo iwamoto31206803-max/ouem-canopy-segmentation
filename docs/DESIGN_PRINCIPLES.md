@@ -7,7 +7,7 @@
 
 - **Build a usable component, not conduct comparative research.** Develop a reproducible RGB semantic canopy model suitable for OUEM's simplified 3D canopy pipeline using Japanese GSI aerial imagery at roughly **0.5–0.6 m/pixel**. Aim for **practically adequate** accuracy and license clarity rather than maximal published metrics.
 - This repository owns source-data and label preparation, trained canopy model, fixed inference normalization/semantics, provenance, QA and technical evaluation.
-- OUEM owns imagery acquisition, CRS/georeferencing, large-area tiling, vectorization, CHM/height and simplified 3D geometry, shade/thermal and landscape analyses.
+- OUEM owns imagery acquisition, CRS/georeferencing, large-area tiling, vectorization, **joining the canopy mask with point-cloud data to produce height-distribution/3D canopy data**, and subsequent shade/thermal/landscape evaluation and its effectiveness assessment. This repository is accepted on **2D canopy-mask quality, stable inference and spatial handoff**, not on downstream point-cloud height accuracy or environmental simulation outcomes.
 - Single-tree identification is **not a requirement**. CHM-assisted segmentation is **not** a prerequisite.
 - The user does **not** plan to publish or redistribute learned weights or a resulting model. Future **internal/commercial inference** is the use case; changes in deployment scope require separate rights review.
 
