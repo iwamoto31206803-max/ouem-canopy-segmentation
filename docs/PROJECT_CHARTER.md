@@ -19,6 +19,9 @@ Produce a **practical, maintainable, and commercially plausible** RGB canopy sem
 - **Model distribution:** **no public release or redistribution** of the trained OUEM model/checkpoint is planned. Intended future usage includes **internal fine-tuning and potentially commercial inference**. No rights claim is made for a different deployment or redistribution scope.
 - **Not in initial scope:** instance/single-tree delineation, scientific pretraining-vs-scratch ablations, exhaustive model search, direct use of ImageNet images for commercial training, new large-scale Japanese annotation, or nationwide-performance claims.
 
+
+**Target GSD decision (deferred):** Do not lock the fine-tuning target to 0.5m or 0.6m yet. Before implementing M1 resampling, inspect the existing GSI GeoTIFF CRS, pixel spacing in ground units, source tile zoom and reprojection/resampling chain. Distinguish Web Mercator pixel spacing from local ground resolution and from source-photo native detail. Choose one practical OAM-TCD training GSD on that evidence; no mandatory 0.5m-versus-0.6m experiment.
+
 ## 3. Preferred construction route (engineering decision, not a demonstrated result)
 
 Use the Ai2 **SatlasPretrain aerial single-image RGB checkpoint `Aerial_SwinB_SI`** as the preferred initialization. Start with the **official pretrained backbone + optional pretrained FPN**, attach a **new binary segmentation head/decoder** consistent with official library semantics, then fine-tune using the **OAM-TCD CC BY 4.0** imagery and verified binary Tree/Canopy masks, transformed to approximate GSI resolution.
