@@ -22,7 +22,7 @@
 
 ## Non-negotiable principles
 
-1. **Usability over publishable comparisons.** Define a bounded success criterion from OUEM workflow needs: canopy coverage area bias, missed trees/canopy, building/shadow false positives, landscape failure cases, acceptable processing cost and reproducibility. **No arbitrary fixed IoU requirement is claimed yet.** Accuracy may not be claimed from an attractive map alone.
+1. **Milestone first; avoid premature validation burden.** **M1** is completion of SatlasPretrain-initialized fine-tuning with verified OAM-TCD CC BY-only data, basic OAM-TCD validation, a saved checkpoint and successful canopy-mask inference. **M2** is qualitative inspection on several existing GSI scenes, followed by problem-driven work only if needed. Do **not** require new GSI GT, predefined Japanese accuracy thresholds, exhaustive comparisons or nationwide validation for M1/M2. Visual plausibility must not be reported as quantified accuracy.
 2. **Explicit evidence levels.** Design choice ≠ successful model import ≠ synthetic smoke ≠ real-data train ≠ source-domain validation ≠ independent Japan/GSI evaluation ≠ operational suitability. Track each separately; do not invent PASS.
 3. **No data leakage.** Split by `oam_id`/source scene group. Keep official OAM-TCD holdout out of development tuning. Keep GT54 independent and **verify label suitability** before using its land-cover map as canopy GT.
 4. **Input-label integrity.** Verify source license at the record level and panoptic IDs/categories. Explicitly map Tree + Canopy positive, with background/void handling and uniform masks preserved unchanged; never edit (0,0) for a loader shortcut.
@@ -35,7 +35,7 @@
 
 ## Change / acceptance discipline
 
-- First accept the **mission and Satlas-first architecture direction** in documentation. Then commission minimal implementation compatibility review. Do not treat this documentation PR as license G0/P1 data QA or numerical accuracy PASS.
+- First accept the **mission and Satlas-first architecture direction** in documentation. Then commission minimal implementation compatibility review and progress to **M1 fine-tuning completion**, followed by **M2 lightweight GSI visual review**. Do not treat this documentation PR as license G0/P1 data QA or numerical accuracy PASS. More demanding GSI GT/quantitative evaluation is **deferred until a demonstrated need**, not assumed as an initial milestone.
 - Prior historical G0/G1/G2/G3 research gates remain **records**, not requirements to run three competing models. See the current D0–D5 engineering stages in the [Project Charter](PROJECT_CHARTER.md).
 - Requirements changes should state source/evidence, what they supersede, intended operational consequences, responsible repository and reversibility.
 - Record validated results, limitations and failure modes; no accuracy or commercial-deployment statement without appropriate evidence.
