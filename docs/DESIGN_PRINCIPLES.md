@@ -11,6 +11,9 @@
 - Single-tree identification is **not a requirement**. CHM-assisted segmentation is **not** a prerequisite.
 - The user does **not** plan to publish or redistribute learned weights or a resulting model. Future **internal/commercial inference** is the use case; changes in deployment scope require separate rights review.
 
+
+- **Defer the numeric target GSD.** Before M1 data preprocessing, inspect existing GSI GeoTIFF CRS, ground pixel size, source tile zoom, and reprojection/resampling. Do not equate EPSG:3857 nominal pixel spacing with Japanese ground resolution or original-photo native resolution. Select a pragmatic training GSD after this check; do not pre-plan a 0.5m/0.6m comparison.
+
 ## Preferred engineering route
 
 **Prioritize:** Ai2 `Aerial_SwinB_SI` SatlasPretrain checkpoint -> official compatible pretrained backbone and potentially FPN -> newly initialized binary segmentation head -> Fine-tuning with **verified CC BY 4.0 OAM-TCD** labels and approximately GSI-scaled inputs -> verify on real GSI images -> handoff to OUEM.
