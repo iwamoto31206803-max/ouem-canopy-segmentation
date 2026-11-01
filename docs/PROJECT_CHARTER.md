@@ -8,7 +8,7 @@ Produce a **practical, maintainable, and commercially plausible** RGB canopy sem
 
 **This is engineering for a usable OUEM component, not a research project aimed at demonstrating the best architecture or quantifying pretraining benefit.** Aim for **good-enough accuracy, good-enough licensing clarity, reproducibility, affordability, and an operational handoff**. The project does not require perfect segmentation, single-tree detection, a paper, a state-of-the-art benchmark, or exhaustive model comparisons.
 
-**Milestone discipline (confirmed 2026-11-01):** The immediate milestone is to **complete a working SatlasPretrain + OAM-TCD CC BY 4.0 fine-tuning workflow** and generate canopy masks. Do not impose GSI reference-label creation, independent Japanese quantitative accuracy thresholds, exhaustive benchmarking or downstream environmental validation on this first milestone. Next, inspect predictions **visually across several existing GSI environments**; decide further action only from observed problems. A successful training workflow is not evidence of nationwide or production-grade accuracy. Quantitative Japan/GSI evaluation may be added later if a concrete need emerges.
+**Milestone discipline (confirmed 2026-11-01):** The immediate milestone is to **complete a working SatlasPretrain + OAM-TCD CC BY 4.0 fine-tuning workflow** and generate canopy masks. Do not impose GSI reference-label creation, independent Japanese quantitative accuracy thresholds, exhaustive benchmarking or downstream environmental validation on this first milestone. Next, inspect predictions **visually across several existing GSI environments**; decide further action only from observed problems. A successful training workflow is not evidence of nationwide or production-grade accuracy. Quantitative Japan/GSI evaluation may be added later if a concrete need emerges. Independent target-domain labels are needed for numerical GSI accuracy claims, **not** for M1 or M2 completion.
 
 ## 2. Fixed scope / boundaries
 
@@ -24,16 +24,16 @@ Produce a **practical, maintainable, and commercially plausible** RGB canopy sem
 
 ## 3. Preferred construction route (engineering decision, not a demonstrated result)
 
-Use the Ai2 **SatlasPretrain aerial single-image RGB checkpoint `Aerial_SwinB_SI`** as the preferred initialization. Start with the **official pretrained backbone + optional pretrained FPN**, attach a **new binary segmentation head/decoder** consistent with official library semantics, then fine-tune using the **OAM-TCD CC BY 4.0** imagery and verified binary Tree/Canopy masks, transformed to approximate GSI resolution.
+Use the Ai2 **SatlasPretrain aerial single-image RGB checkpoint `Aerial_SwinB_SI`** as the preferred initialization. Start with the **official pretrained backbone + pretrained FPN as the initial choice**, attach a **new two-class semantic segmentation head** consistent with official library semantics, then fine-tune using the **OAM-TCD CC BY 4.0** imagery and verified binary Tree/Canopy masks, transformed to approximate GSI resolution.
 
-The exact head selection, dimensions, valid-mask/loss semantics, whether FPN is beneficial, fine-tuning freeze policy and optimization settings **remain to be inspected and tested**. This document does not prescribe a finished implementation or guarantee a training run.
+The initial head choice is official `Head.SEGMENT` with two output classes. Target shapes, valid-mask/loss semantics, FPN loading, fine-tuning freeze policy and optimization settings **remain to be verified**. Change the FPN/head only for an observed blocker. This document does not prescribe a finished implementation or guarantee a training run.
 
 The initial path is deliberately **one engineering candidate**, not a three-arm research study:
 - **Preferred:** Satlas-pretrained Swin-v2 Base + binary semantic head + OAM-TCD CC BY-only fine-tuning.
 - **Fallback only if blocked:** evaluate a smaller independently permissible model, changed decoder/learning setup, or additional licensed Japanese samples according to measured blocker. A Swin-v2 Base scratch comparator is **not required**.
 - Previous released Restor OAM-TCD pretrained checkpoints remain **excluded from a commercial-candidate weight chain** under currently documented noncommercial/restricted terms. The **OAM-TCD labels/data remain central**.
 
-**M1 architecture decision (confirmed):** Prefer the official SatlasPretrain `Aerial_SwinB_SI` pretrained backbone and FPN with the official U-Net-style semantic segmentation head, freshly initialized for two output classes (background and Tree/Canopy). Start with the official cross-entropy setup. Verify exact input normalization, tensor shapes, pretrained FPN loading, target/ignore-label semantics, and a forward/backward smoke test before committing to a full training run. Fine-tuning freeze policy and batch/patch sizes depend on measured GPU capacity; custom decoders are deferred unless the official path fails.
+**M1 architecture decision (confirmed):** Prefer the official SatlasPretrain `Aerial_SwinB_SI` pretrained backbone and FPN with the official `Head.SEGMENT` semantic head, freshly initialized for two output classes (background and Tree/Canopy). Start with official cross-entropy and class-index targets, verifying shape and void/ignore behavior in a smoke test. The official implementation combines FPN/upsampling with a simple convolutional segmentation head; do not assume a generic U-Net decoder. Verify exact input normalization, tensor shapes, pretrained FPN loading, target/ignore-label semantics, and a forward/backward smoke test before committing to a full training run. Fine-tuning freeze policy and batch/patch sizes depend on measured GPU capacity; custom decoders are deferred unless the official path fails.
 
 ## 4. What is established versus what is open
 
@@ -43,7 +43,7 @@ The initial path is deliberately **one engineering candidate**, not a three-arm 
 | Satlas pretrained checkpoint | Ai2 lists `Aerial_SwinB_SI` for ~0.5–2m RGB and explicitly designates its pretrained weights **ODC-BY**; loader code Apache-2.0 | Exact downloaded artifact SHA/revision; actual model import, input/output, dependencies and GPU memory |
 | Upstream ImageNet | Published Satlas training path initializes a torchvision Swin-v2 Base ImageNet checkpoint; original ImageNet data access has noncommercial terms | Legal treatment of downstream checkpoint rights and weight-specific conditions; commercial production review |
 | OAM-TCD | Provider publishes a CC BY-only partition and label lineage; original study used high-resolution imagery and pretrained baselines | Actual chosen revision/rows, raw image and panoptic mask verification, attribution completeness, data quality at target resolution |
-| Preprocessing | ~10cm→50cm controlled 5x degradation is documented; area RGB and fractional-mask aggregation planned | Whether initial operational training should target ~0.5m, ~0.6m or both; best crop/grid policy; resampling/label boundary impact |
+| Preprocessing | Earlier ~10cm→50cm controlled 5x degradation is historical reference; area RGB and fractional-mask aggregation are candidate techniques | Choose one initial GSD after checking actual GSI imagery/grid, plus crop/grid and label boundary handling; no mandatory 0.5m/0.6m comparison |
 | Evaluation | Tree IoU/F1, precision, recall, canopy area bias, shadows/roads/buildings, small canopies and edge quality are meaningful | Quantified minimum acceptable performance, independent Japanese GT availability, inference throughput and OUEM downstream tolerance |
 | Geographic evaluation | Earlier GSI visual trials at Hanamigawa / Aobanomori exist | No numeric GSI accuracy claim; **GT54 land-cover labels are not automatically valid canopy GT** and GT54 must not be tuned on |
 
@@ -63,7 +63,7 @@ Research evidence lives in `docs/research/` including the merged P0/PR #7 proven
 ### D2 — CC BY-only data QA
 - Pin OAM-TCD source/revision, per-row licenses and credits, exact Tree/Canopy mapping and background/void handling.
 - Verify actual RGB/mask pairing and grid alignment, deterministic `oam_id`-group split, source/output hashes, and no holdout/GT54 leakage.
-- Choose and document one **initial** target-resolution transform; keep 5x (~0.5m) from the previous plan as a defensible starting point, not a physically exact 0.6m equivalence.
+- Choose and document one **initial** target-resolution transform; retain the previous 5x (~0.5m) recipe as historical reference only; do not select 0.5m or 0.6m before inspecting the existing GSI imagery and resampling chain.
 
 **Training-data scale decision (confirmed):** Start with a small licensed, correctly paired OAM-TCD subset for pipeline and overfit/smoke checks. After those checks pass, use the eligible **verified CC BY 4.0** OAM-TCD training data broadly rather than arbitrarily restricting to the initial sample. Keep `oam_id`-grouped validation separate, and preserve designated holdout data. Scale training only after compute feasibility is measured; broad usage does not override record-level license or label QA.
 
