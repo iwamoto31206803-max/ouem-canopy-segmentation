@@ -9,7 +9,7 @@
 
 Earlier design targeted an experimental answer: whether fine-tuning a released Restor canopy SegFormer on synthetic 50cm imagery recovered quality versus unfine-tuned weights. Subsequent investigation identified noncommercial/restricted released Restor checkpoints for the desired business pathway, while the user's actual goal is not a paper or a controlled ablation. They want a broadly usable 2D canopy layer for OUEM's GSI-based 3D/thermal/landscape workflows, with **practically sufficient** accuracy and **reasonably documented commercial-use rights**. A perfect benchmark and image-by-image nationwide proof are not entry requirements.
 
-SatlasPretrain publishes an aerial RGB single-image Swin-v2 Base checkpoint trained for ~0.5–2m/px, with an Ai2 **ODC-BY checkpoint designation**. Ai2's loader is Apache-2.0 and supports optional pretrained FPN and newly initialized segmentation heads. OAM-TCD contributes specialist labels: use **CC BY 4.0 subset only**, verify actual records and annotations. Training on approximately GSI-scaled OAM-TCD images is a plausible, **not yet validated**, engineering approach.
+SatlasPretrain publishes an aerial RGB single-image Swin-v2 Base checkpoint trained for ~0.5–2m/px, with an Ai2 **ODC-BY checkpoint designation**. Ai2's loader is Apache-2.0 and supports pretrained FPN as the initial choice and newly initialized segmentation heads. OAM-TCD contributes specialist labels: use **CC BY 4.0 subset only**, verify actual records and annotations. Training on approximately GSI-scaled OAM-TCD images is a plausible, **not yet validated**, engineering approach.
 
 ## Decision
 
