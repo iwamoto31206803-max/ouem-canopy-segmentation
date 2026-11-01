@@ -6,7 +6,7 @@ Engineering repository for a **practical RGB tree-canopy semantic-segmentation c
 
 ## Current direction: SatlasPretrain-first (design proposal)
 
-- Preferred initialization: Ai2 SatlasPretrain aerial RGB single-image **`Aerial_SwinB_SI`** (Swin-v2 Base, with optional pretrained FPN).
+- Preferred initialization: Ai2 SatlasPretrain aerial RGB single-image **`Aerial_SwinB_SI`** (Swin-v2 Base, with pretrained FPN as the initial choice).
 - Supervision: **OAM-TCD CC BY 4.0-only** RGB/Tree+Canopy segmentation labels, after revision and per-record license/annotation QA.
 - Fine-tuning target: imagery resampled to approximately **GSI's 0.5–0.6m/px** scale; exact training grid/resampling to be fixed before training.
 - Output: binary semantic canopy probabilities/masks and reproducible model input/output contract; **not individual-tree delineation**.
@@ -24,7 +24,7 @@ This is a **preferred candidate and design direction**, **not** a trained or val
 5. [Prior experiment plan — historical / superseded](docs/EXPERIMENT_PLAN.md)
 6. [Research evidence, provenance and license investigations](docs/research/)
 
-**Status:** Design rebase in progress (2026-11-01). The first PR is **documentation-only**. Before training, perform official model/head loading QA, verify the exact OAM-TCD CC BY training records and transforms, and establish viable GPU and evaluation conditions. Old research decisions remain informative but are not controlling when explicitly superseded by the charter and ADR.
+**Status:** Design rebase in progress (2026-11-01). The first PR is **documentation-only**. Before training, perform official `Head.SEGMENT` two-class label/loss compatibility QA, verify the exact OAM-TCD CC BY training records and transforms, and establish viable GPU and evaluation conditions. Old research decisions remain informative but are not controlling when explicitly superseded by the charter and ADR.
 
 ## License and evaluation caution
 
