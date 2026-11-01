@@ -14,8 +14,8 @@ SatlasPretrain publishes an aerial RGB single-image Swin-v2 Base checkpoint trai
 ## Decision
 
 Prioritize **one buildable Satlas-first route**:
-1. `Aerial_SwinB_SI` initialization from Ai2's published checkpoint, official backbone and optionally FPN.
-2. Newly initialized binary canopy segmentation head/decoder; **Tree and Canopy become the positive class** after verified label decoding.
+1. `Aerial_SwinB_SI` initialization from Ai2's published checkpoint, official backbone and pretrained FPN as the first implementation choice.
+2. Newly initialized official `Head.SEGMENT` with two output classes (background and canopy), subject to verified target shapes and void handling; **Tree and Canopy become the positive class** after verified label decoding.
 3. Fine-tune on documented OAM-TCD **CC BY 4.0 only**, using reproducible resolution-matched RGB/mask transforms and grouped splits.
 4. Check real Japan/GSI imagery for suitability and connect to OUEM via a model-agnostic inference contract.
 5. **No full Swin scratch-versus-pretrain comparison** and no research-style architecture search unless a practical blocker requires fallback.
@@ -39,7 +39,7 @@ Prioritize **one buildable Satlas-first route**:
 | Label source/shift | OAM-TCD nominal ~0.1m, different geography/sensors; provider CC BY-only dataset provenance known at documentation level | Pin actual rows, image/mask QA, honest downsample assumptions |
 | License clarity | Ai2 checkpoint ODC-BY is a reasonable working basis; prior Satlas code path uses ImageNet initialization | Preserve original statements, hash model, attribution and dependencies, treat downstream ImageNet interpretation as unresolved until proportionate production review |
 | Practical thresholds | No evidence-based thresholds yet | Define what OUEM can tolerate before final independent acceptance |
-| Architecture head | Official loader supports segmentation but behavior not executed by OUEM | Verify FPN/head semantics before implementation decisions |
+| Architecture head | Official loader supports segmentation but behavior not executed by OUEM | Verify official FPN/upsample and `Head.SEGMENT` class-index cross-entropy semantics before implementation decisions |
 | GT54 | Land-cover benchmark not necessarily reliable canopy ground truth | Preserve independent final role; validate labels before quantitative use |
 
 ## Superseded versus retained decisions
@@ -55,7 +55,7 @@ Prioritize **one buildable Satlas-first route**:
 - `oam_id` grouped splits, clean labels, no alterations to all-zero/all-one masks, provenance hashes and reproducible tests.
 - 5x resampling as an investigated *initial* candidate, not an asserted exact GSI simulation.
 - Tree IoU/F1, area error, boundary and difficult-class diagnostics; no accuracy claims based only on tree fraction or visual maps.
-- GT54 held out, independent Japan evaluation, OUEM owns geospatial/CHM/3D.
+- GT54 held out; independent Japanese quantitative evaluation is optional later for numerical GSI accuracy claims, not a gate for M1 fine-tuning or M2 visual inspection. OUEM owns geospatial/CHM/3D.
 - Small reviewable PRs and no unapproved merge or training.
 
 ## Treatment of pending or legacy P1-1 implementation
