@@ -33,6 +33,8 @@ The initial path is deliberately **one engineering candidate**, not a three-arm 
 - **Fallback only if blocked:** evaluate a smaller independently permissible model, changed decoder/learning setup, or additional licensed Japanese samples according to measured blocker. A Swin-v2 Base scratch comparator is **not required**.
 - Previous released Restor OAM-TCD pretrained checkpoints remain **excluded from a commercial-candidate weight chain** under currently documented noncommercial/restricted terms. The **OAM-TCD labels/data remain central**.
 
+**M1 architecture decision (confirmed):** Prefer the official SatlasPretrain `Aerial_SwinB_SI` pretrained backbone and FPN with the official U-Net-style semantic segmentation head, freshly initialized for two output classes (background and Tree/Canopy). Start with the official cross-entropy setup. Verify exact input normalization, tensor shapes, pretrained FPN loading, target/ignore-label semantics, and a forward/backward smoke test before committing to a full training run. Fine-tuning freeze policy and batch/patch sizes depend on measured GPU capacity; custom decoders are deferred unless the official path fails.
+
 ## 4. What is established versus what is open
 
 | Topic | Established/documented | NOT YET verified / decision still needed |
