@@ -1,3 +1,5 @@
+> **2026-11-01 IMPORTANT PROVENANCE UPDATE:** The published Satlas aerial training config has `Pretrained:true`, and Ai2 implementation loads torchvision `Swin_V2_B_Weights.IMAGENET1K_V1` before Satlas training. Therefore Satlas weights are **not established as ImageNet-free**. Official Ai2 ODC-BY weight release remains positive licensing evidence, but the upstream checkpoint chain-of-title needs clarification. See [P0_SATLAS_AERIAL_INITIALIZATION_LINEAGE_v0.1.md](P0_SATLAS_AERIAL_INITIALIZATION_LINEAGE_v0.1.md). This takes precedence over any unconditional commercial-clean inference below.
+
 # P0 — Commercially usable pretrained initial weights: first-party evidence review (v0.1)
 
 Date: 2026-11-01. **Research only; no approval to download or use any checkpoint for production.** Follows merged PRs #4 (architecture), #5 (OAM-TCD paper), #6 (scratch vs ImageNet checkpoint rights).
