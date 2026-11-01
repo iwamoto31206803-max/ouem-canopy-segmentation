@@ -8,7 +8,7 @@ Produce a **practical, maintainable, and commercially plausible** RGB canopy sem
 
 **This is engineering for a usable OUEM component, not a research project aimed at demonstrating the best architecture or quantifying pretraining benefit.** Aim for **good-enough accuracy, good-enough licensing clarity, reproducibility, affordability, and an operational handoff**. The project does not require perfect segmentation, single-tree detection, a paper, a state-of-the-art benchmark, or exhaustive model comparisons.
 
-"Good enough" is **not** equivalent to accepting attractive unvalidated maps. Acceptance must be evidenced by real Japanese GSI imagery and task-relevant errors (omissions, false positives, area bias, difficult settings) plus the feasibility of OUEM integration. **Numeric thresholds have not yet been agreed**; select them from downstream impact and limited independent annotations before final acceptance, not after viewing final test results.
+**Milestone discipline (confirmed 2026-11-01):** The immediate milestone is to **complete a working SatlasPretrain + OAM-TCD CC BY 4.0 fine-tuning workflow** and generate canopy masks. Do not impose GSI reference-label creation, independent Japanese quantitative accuracy thresholds, exhaustive benchmarking or downstream environmental validation on this first milestone. Next, inspect predictions **visually across several existing GSI environments**; decide further action only from observed problems. A successful training workflow is not evidence of nationwide or production-grade accuracy. Quantitative Japan/GSI evaluation may be added later if a concrete need emerges.
 
 ## 2. Fixed scope / boundaries
 
@@ -60,14 +60,15 @@ Research evidence lives in `docs/research/` including the merged P0/PR #7 proven
 - Verify actual RGB/mask pairing and grid alignment, deterministic `oam_id`-group split, source/output hashes, and no holdout/GT54 leakage.
 - Choose and document one **initial** target-resolution transform; keep 5x (~0.5m) from the previous plan as a defensible starting point, not a physically exact 0.6m equivalence.
 
-### D3 — Small-to-useful fine-tune
-- CPU/synthetic smoke, GPU micro-step, limited real-data overfit and held-out validation, then a bounded main training run **only if earlier gates pass**.
-- Log initialization, full configuration, loss behavior, throughput, VRAM, deterministic checkpoint behavior and metrics. No mandatory Swin scratch trial.
+### D3 — M1: complete the Satlas + OAM-TCD fine-tune
+- CPU/synthetic smoke, GPU micro-step, limited real-data overfit and held-out OAM-TCD validation, then a bounded main training run **only if earlier gates pass**.
+- **M1 completion:** verified CC BY-only dataset/preprocessing, reproducible Satlas-initialized training, saved locally usable checkpoint and successful canopy-mask inference, with basic source-domain validation and run provenance. No mandatory scratch control, new Japanese GT, or quantitative GSI accuracy gate.
+- Log initialization, full configuration, loss behavior, throughput, VRAM, deterministic checkpoint behavior and basic validation metrics. These are diagnostics, not proof of operational generalization.
 
-### D4 — GSI suitability assessment
-- Evaluate predefined representative GSI sites and failure strata, record area bias/false positives/omissions and geographic domain shift.
-- For a quantitative **accuracy** acceptance claim, gather a bounded independent Japanese canopy reference (or explicitly restrict conclusions to qualitative plausibility). Do not use GT54 as arbitrary tuning data.
-- If unusable, **diagnose the blocker** before increasing experiment scope (more appropriate training data, domain adaptation, smaller backbone, or fallback).
+### D4 — GSI visual suitability review (after M1, initially lightweight)
+- Run inference on several readily available GSI scenes/environments and inspect canopy omission, shadow/building false positives, fragmentation and scale plausibility. Record example images and observations, **without requiring new GSI ground truth**.
+- This is a **qualitative check**, not a numeric GSI accuracy certification or a nationwide generalization claim. Do not invent metrics without reference labels. Preserve GT54 independence.
+- Only if observed shortcomings or downstream requirements justify the cost, propose additional GSI annotations, targeted training, wider systematic evaluation or a fallback. Do not precommit to such work.
 
 ### D5 — OUEM handoff/operational readiness
 - Version and checksum a local model package, ship with preprocessing/threshold/GSD/output semantics, golden inference fixture, and spatial contract; validate downstream seams and polygon/CHM integration.
