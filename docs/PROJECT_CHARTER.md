@@ -65,6 +65,8 @@ Research evidence lives in `docs/research/` including the merged P0/PR #7 proven
 - Verify actual RGB/mask pairing and grid alignment, deterministic `oam_id`-group split, source/output hashes, and no holdout/GT54 leakage.
 - Choose and document one **initial** target-resolution transform; keep 5x (~0.5m) from the previous plan as a defensible starting point, not a physically exact 0.6m equivalence.
 
+**Training-data scale decision (confirmed):** Start with a small licensed, correctly paired OAM-TCD subset for pipeline and overfit/smoke checks. After those checks pass, use the eligible **verified CC BY 4.0** OAM-TCD training data broadly rather than arbitrarily restricting to the initial sample. Keep `oam_id`-grouped validation separate, and preserve designated holdout data. Scale training only after compute feasibility is measured; broad usage does not override record-level license or label QA.
+
 ### D3 — M1: complete the Satlas + OAM-TCD fine-tune
 - CPU/synthetic smoke, GPU micro-step, limited real-data overfit and held-out OAM-TCD validation, then a bounded main training run **only if earlier gates pass**.
 - **M1 completion:** verified CC BY-only dataset/preprocessing, reproducible Satlas-initialized training, saved locally usable checkpoint and successful canopy-mask inference, with basic source-domain validation and run provenance. No mandatory scratch control, new Japanese GT, or quantitative GSI accuracy gate.
