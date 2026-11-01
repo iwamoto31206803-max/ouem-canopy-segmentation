@@ -16,14 +16,14 @@
 
 ## Preferred engineering route
 
-**Prioritize:** Ai2 `Aerial_SwinB_SI` SatlasPretrain checkpoint -> official compatible pretrained backbone and potentially FPN -> newly initialized binary segmentation head -> Fine-tuning with **verified CC BY 4.0 OAM-TCD** labels and approximately GSI-scaled inputs -> verify on real GSI images -> handoff to OUEM.
+**Prioritize:** Ai2 `Aerial_SwinB_SI` SatlasPretrain checkpoint -> official compatible pretrained backbone and pretrained FPN as the initial choice -> newly initialized binary segmentation head -> Fine-tuning with **verified CC BY 4.0 OAM-TCD** labels and approximately GSI-scaled inputs -> verify on real GSI images -> handoff to OUEM.
 
 - This **does not** require original Restor pretrained weights, nor a Swin-v2 Base scratch control.
 - Do not claim that matched spatial resolution guarantees Japan/GSI performance.
-- Exact head semantics, package compatibility, crop/GSD choices, freeze policy, threshold, license notices and compute budget are **open design details**, to be settled by the smallest informative checks.
+- `Head.SEGMENT` is the initial two-class head choice; exact label/ignore semantics, package compatibility, crop/GSD choices, freeze policy, threshold, license notices and compute budget are **open design details**, to be settled by the smallest informative checks.
 - If blocked by memory, licensing, dataset quality or GSI model quality, diagnose and propose a bounded fallback rather than launch an open-ended architecture contest.
 
-**Agreed initial model composition:** official `Aerial_SwinB_SI` pretrained Swin-v2 Base backbone + pretrained FPN + official U-Net-style semantic segmentation head newly initialized for two classes (background, Tree/Canopy), starting with official cross-entropy loss. Confirm loader API, normalization, shapes, ignore-index semantics and successful forward/backward smoke; measure GPU memory before choosing fine-tuning scope. Do not develop a custom decoder unless a specific blocker warrants it.
+**Agreed initial model composition:** official `Aerial_SwinB_SI` pretrained Swin-v2 Base backbone + pretrained FPN + official `Head.SEGMENT` two-class semantic head newly initialized for two classes (background, Tree/Canopy), starting with official cross-entropy loss. Confirm loader API, normalization, class-index target shapes, cross-entropy loss and void/ignore handling, and successful forward/backward smoke. The official path uses FPN/upsampling and a simple convolutional head, not an interchangeable generic U-Net decoder; measure GPU memory before choosing fine-tuning scope. Do not develop a custom decoder unless a specific blocker warrants it.
 
 ## Non-negotiable principles
 
