@@ -67,6 +67,8 @@ Research evidence lives in `docs/research/` including the merged P0/PR #7 proven
 
 **Training-data scale decision (confirmed):** Start with a small licensed, correctly paired OAM-TCD subset for pipeline and overfit/smoke checks. After those checks pass, use the eligible **verified CC BY 4.0** OAM-TCD training data broadly rather than arbitrarily restricting to the initial sample. Keep `oam_id`-grouped validation separate, and preserve designated holdout data. Scale training only after compute feasibility is measured; broad usage does not override record-level license or label QA.
 
+**Compute decision (confirmed):** Do not choose patch size, batch size, freeze policy or alternative backbone from speculative VRAM estimates. First check official model load, tensor/loss and a CPU smoke; then run a minimal GPU forward/backward step (initially small patch, batch size 1) and measure peak allocated/reserved memory and step time. Select full-run patch/batch, accumulation and fine-tuning scope from measured feasibility. If constrained, try bounded configuration changes before changing architecture. A successful synthetic smoke is not proof of a full real-data training run.
+
 ### D3 — M1: complete the Satlas + OAM-TCD fine-tune
 - CPU/synthetic smoke, GPU micro-step, limited real-data overfit and held-out OAM-TCD validation, then a bounded main training run **only if earlier gates pass**.
 - **M1 completion:** verified CC BY-only dataset/preprocessing, reproducible Satlas-initialized training, saved locally usable checkpoint and successful canopy-mask inference, with basic source-domain validation and run provenance. No mandatory scratch control, new Japanese GT, or quantitative GSI accuracy gate.
