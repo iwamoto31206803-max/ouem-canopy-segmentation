@@ -58,6 +58,10 @@ Prioritize **one buildable Satlas-first route**:
 - GT54 held out, independent Japan evaluation, OUEM owns geospatial/CHM/3D.
 - Small reviewable PRs and no unapproved merge or training.
 
+## Treatment of pending or legacy P1-1 implementation
+
+The prior README noted that a separate P1-1 implementation was in development under the former experimental framework. **Do not merge or treat any such work as implementation approval merely because this design PR is merged.** Inventory that PR/branch before reuse. Reuse or adapt only compatible utilities (CC BY-only record selection, `oam_id` grouping, verified panoptic Tree/Canopy conversion, spatially aligned downsampling and deterministic manifest/tests) after review. Replace or discard any workflow that assumes the noncommercial published Restor checkpoint, original A/B/C contrast, or model-specific training semantics. The new active training specification must explicitly reference the Satlas-first architecture and approved data pipeline.
+
 ## Conditions to reopen
 
 Reconsider the foundation model if official Satlas loader proves unusable, training hardware cannot support a viable setup, rights review reveals a blocker for internal commercial inference, or actual Japan/GSI performance fails practical tolerances after one bounded tuning effort. Prefer the **smallest effective remediation** rather than immediately launching a full architecture comparison.
