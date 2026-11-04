@@ -8,9 +8,9 @@
 
 Demonstrate that the official Ai2 SatlasPretrain aerial single-image Swin-v2 Base architecture can be instantiated on **Windows / Python 3.11 / CPU**, and that an official two-class semantic segmentation forward, CE loss and backward step work with **synthetic RGB and 0/1 canopy masks**.
 
-Two different evidence levels must be kept separate:
+Two different evidence levels must be kept separate. **Implementation PR disposition:** if only the structural smoke can run because the official checkpoint is not yet available, report `STRUCTURAL_PASS / PRETRAINED_NOT_VERIFIED` and treat the M1-1 implementation as **partially verified**, not fully accepted for progression to real-data training:
 - **Structural smoke (random weights, no download):** proves compatible model/head/loss wiring only, **not Satlas checkpoint loading**.
-- **Pretrained smoke (locally supplied official checkpoint):** additionally proves that the intended `Aerial_SwinB_SI` backbone **and FPN** can be loaded and used with a newly initialized two-class segmentation head. Never label the first as proof of the second.
+- **Pretrained smoke (locally supplied official checkpoint):** additionally proves that the intended `Aerial_SwinB_SI` backbone **and FPN** can be loaded and used with a newly initialized two-class segmentation head. Never label the first as proof of the second. **Pretrained smoke must pass before moving to any training work that assumes Satlas initialization**, even if a structural-only implementation PR is reviewed and merged.
 
 **Not M1-1:** OAM-TCD data access/labels, any GSI inputs, ground resolution choice, GPU benchmark, real-data training, model-quality metrics, comparison models, checkpoint redistribution, commercial license signoff or OUEM geospatial integration.
 
@@ -32,9 +32,9 @@ Two different evidence levels must be kept separate:
    - `--init random`: **offline** official architecture with `weights=None`; never report pretrained PASS.
    - `--init checkpoint --checkpoint <local_path> --sha256 <expected_digest>`: load only the explicitly supplied official checkpoint; no automatic HTTP fetch, and reject absent/mismatching digest. Record download origin/immutable revision where known. Computing a digest locally alone records file identity, **not independent authenticity**.
 3. Prefer `torch.load(path, map_location="cpu", weights_only=True)` for locally supplied, publisher-origin tensors, with an explicit safe failure if this is incompatible with the pinned version. Do not use `weights_only=False` or unpickle arbitrary files just to make the test pass. Do not commit weights/data or dynamic download artifacts.
-4. Exercise deterministic synthetic RGB input and 0/1 masks; assert finite probabilities/loss, `[B,2,H,W]` output where supported, near-one class probability sums, and a finite backward gradient for the newly initialized segmentation head. Document any exact input-size constraints. Cover **all-background and all-canopy** masks without changing pixels.
+4. Exercise deterministic synthetic RGB input and 0/1 masks; assert finite probabilities/loss, `[B,2,H,W]` output where supported, near-one class probability sums, and finite backward gradients for the newly initialized segmentation head **and at least one trainable parameter in each of the backbone and FPN**. These checks prove gradient propagation, **not optimizer updates or full fine-tuning readiness**. If a component is frozen, explicitly unfreeze it for this isolated gradient check or clearly mark the check unverified. Document any exact input-size constraints. Cover **all-background and all-canopy** masks without changing pixels.
 5. Verify the intended **backbone AND FPN** really load in checkpoint mode (strict state-dict compatibility or explicit missing/unexpected-key checks; never silently accept random pretrained components). Fail clearly if the downloaded artifact's structure differs from expectations. A structural smoke is not evidence for weight loading.
-6. Add a short Windows `py -3.11` / venv / CPU instructions section, with tested install dependencies/version details. Keep the normal `pytest` checks **offline and lightweight**; put full Swin-v2 Base forward/backward in an explicit opt-in smoke, not every unit-test run. Missing dependencies, checkpoint or CPU resource exhaustion must be logged as **NOT VERIFIED**, not reported as PASS.
+6. Add a short Windows `py -3.11` / venv / CPU instructions section, with tested install dependencies/version details. Keep the normal `pytest` checks **offline and lightweight**; put full Swin-v2 Base forward/backward in an explicit opt-in smoke, not every unit-test run. **Use 128×128 as an initial synthetic input-size candidate, not an assured compatible size**; if the official model rejects it or CPU resources constrain execution, change to a minimal supported size, document why, and avoid silently weakening the tested contract. Missing dependencies, checkpoint or CPU resource exhaustion must be logged as **NOT VERIFIED**, not reported as PASS.
 7. Produce a concise machine-readable or Markdown result record including mode, package/source revisions, Python/torch/torchvision versions, input/output/target shapes, checkpoint source+SHA if applicable, model component loading, loss/backward status and any exceptions. Separate planned tests from actual observed runs.
 
 Minimal expected user commands (adjust to the implemented CLI, document exact commands):
@@ -53,16 +53,16 @@ These are interface examples, **not claims of tested commands**. Never copy chec
 - [ ] No changes to historical PoC outputs or existing inference defaults; no OAM-TCD/GT54 access or GSI processing.
 - [ ] Package/source versions and Windows/Python-3.11 compatibility documented from actual inspection; setup is reproducible with pinned, compatible dependencies.
 - [ ] Offline unit tests run with meaningful asserts and no implicit network calls.
-- [ ] Structural CPU synthetic smoke executed and independently labeled `STRUCTURAL_PASS` **only if actually observed**.
-- [ ] Official-checkpoint CPU smoke executed and labeled `PRETRAINED_PASS` **only if backbone+FPN weights load and forward/loss/backward succeed**; otherwise `NOT_VERIFIED` or `FAIL` with a specific reason.
-- [ ] Two-class `Head.SEGMENT` semantics and clean 0/1 masks, including uniform-mask cases, verified.
+- [ ] Structural CPU synthetic smoke executed and independently labeled `STRUCTURAL_PASS` **only if actually observed**. If the official checkpoint is absent, explicitly report `STRUCTURAL_PASS / PRETRAINED_NOT_VERIFIED` (partial implementation verification); do not label M1-1 fully verified.
+- [ ] Official-checkpoint CPU smoke executed and labeled `PRETRAINED_PASS` **only if backbone+FPN weights load and forward/loss/backward succeed**; otherwise `PRETRAINED_NOT_VERIFIED` or `FAIL` with a specific reason. Do not begin Satlas-initialized data training until `PRETRAINED_PASS` is observed.
+- [ ] Two-class `Head.SEGMENT` semantics and clean 0/1 masks, including uniform-mask cases, verified; backward gradients observed in the head, FPN, and backbone for the isolated unfrozen test.
 - [ ] No false claim of M1 fine-tuning, real canopy performance, GPU capacity, safe commercial deployment or license G0 completion.
 - [ ] Attribution/provenance notes identify code license, published ODC-BY designation and unresolved upstream ImageNet weight lineage; no final rights signoff implied.
 - [ ] Changes submitted for review as **separate implementation PR**; do not auto-merge.
 
 ## 5. Handoff after M1-1
 
-If M1-1 is accepted, begin M1-2 (CC BY-only OAM-TCD data/label QA and target GSD decision based on existing GSI GeoTIFF), then GPU micro-step and training configuration. CPU success is **not** evidence of GPU feasibility or segmentation accuracy.
+A structural-only implementation may be reviewed and merged with the explicit `PRETRAINED_NOT_VERIFIED` limitation, but this **does not complete the checkpoint-loading prerequisite**. Finish and record `PRETRAINED_PASS` before any Satlas-initialized training. M1-2 (CC BY-only OAM-TCD data/label QA and target GSD decision based on existing GSI GeoTIFF) can be prepared independently; then proceed to GPU micro-step and training configuration after the relevant prerequisites pass. CPU success is **not** evidence of GPU feasibility or segmentation accuracy.
 
 ## Official technical references
 
