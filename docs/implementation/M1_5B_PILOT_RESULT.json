@@ -393,5 +393,472 @@
     "plan.json": "11e07d24221720ade07d334d2de416c7296481f9e2257bb15ca5a48bdfc5501b",
     "raw_manifest.json": "767da57b0e1cff7357ee4a4d6fb8faa5054bbddd0bd310e25c2547c4676472d3",
     "pair_audit_manifest.json": "897b774e2b795a1b83d1e85a28745f56947751b765286913cb6305a4641dbc99"
+  },
+  "m1_5b3": {
+    "dataset": "restor/tcd",
+    "revision": "d97d4da0ebbb6e249ae95ac5e19656babd972eb2",
+    "official_code_revision": "05dab754a3fd15b83d6b7606de7310155f4e2df2",
+    "utc": "2026-11-05T12:11:47.962184+00:00",
+    "status": "REAL_PILOT_NOT_VERIFIED",
+    "stage": "prepare",
+    "samples": [
+      {
+        "image_id": 576,
+        "oam_id": "5ccfafe928c3b90006c145f4",
+        "split": "val",
+        "validation_fold": 0,
+        "status": "HOLD",
+        "training_eligible": false,
+        "rights": {
+          "stac_sha256": "8f9e16eaa8654fde0d9e07724ba7a3983a791761216c37dec8852be93b6100af",
+          "stac_url": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/5ccfafe928c3b90006c145f4",
+          "row_license": "CC-BY 4.0",
+          "image_license": "CC-BY-4.0",
+          "annotation_license": "CC BY 4.0",
+          "annotation_terms": "https://github.com/Restor-Foundation/tcd/blob/05dab754a3fd15b83d6b7606de7310155f4e2df2/docs/dataset.md",
+          "attribution": "named producer/licensor retained in external STAC; no contacts published",
+          "commercial_final_clearance": "NOT_ASSESSED"
+        },
+        "separation": {
+          "nearest_opposite_footprint_lower_bound_m": 19013.987875451563,
+          "proximity_hold_m": 1000,
+          "scope": "all cached opposite-role footprints, including holdout metadata; no holdout pixels"
+        },
+        "source_hashes": {
+          "rgb.bin": "47c9ef93a2c175bb72646817ccee1f861e70fa973b7b278262ee0dac9981b797",
+          "annotation.bin": "e0f60903e9c549807d4d6e8ea5506816f8a3fcd81e2a9d9f4f2f1a51bad1e04d",
+          "segments.json": "9e48198640b5303db03dde86415e4a02be69161772e61d9a6ad9b811b6933e08",
+          "coco_annotations.json": "a3f674c68c53b207320ee024695338c47705d849cf8f8558cb288b92dcd3618e",
+          "candidate-mask.png": "8690dd5815c00e5833020e62c4ae02ad86694a9e6a32d6b1b6d5fce2d1aa1288",
+          "stac.json": "8f9e16eaa8654fde0d9e07724ba7a3983a791761216c37dec8852be93b6100af",
+          "preview.jpg": "912bae665f2f7d95f656f6a264c72cac3484958c2d34b9ccafeb8ab847f32fe0"
+        },
+        "reason": "Crowd RLE mismatch/ambiguous"
+      },
+      {
+        "image_id": 3,
+        "oam_id": "5fb52130d89ab70006abca33",
+        "split": "train",
+        "validation_fold": 3,
+        "status": "PILOT_PAIR_PASS",
+        "training_eligible": true,
+        "rights": {
+          "stac_sha256": "2476a47f5ed65434b8340189e96c36e6ae19e9e722b0884dc55ca07e9244f5ec",
+          "stac_url": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/5fb52130d89ab70006abca33",
+          "row_license": "CC-BY 4.0",
+          "image_license": "CC-BY-4.0",
+          "annotation_license": "CC BY 4.0",
+          "annotation_terms": "https://github.com/Restor-Foundation/tcd/blob/05dab754a3fd15b83d6b7606de7310155f4e2df2/docs/dataset.md",
+          "attribution": "named producer/licensor retained in external STAC; no contacts published",
+          "commercial_final_clearance": "NOT_ASSESSED"
+        },
+        "separation": {
+          "nearest_opposite_footprint_lower_bound_m": 1568809.5872391006,
+          "proximity_hold_m": 1000,
+          "scope": "all cached opposite-role footprints, including holdout metadata; no holdout pixels"
+        },
+        "source_hashes": {
+          "rgb.bin": "ffd58b59c9eb163e962b530374505c9786426252b65a41bcaec3d22fe914bbfe",
+          "annotation.bin": "01f43d457c1315b53ecc3aa233c3c0486f11c0dbacd84f359de59e69fba4eed7",
+          "segments.json": "a306d116c5fb1c3fa264cc4210a32c01697bd34c70b73ea342226d7f477437f2",
+          "coco_annotations.json": "8bfd0528f0162bde986bb3770c9b39644f269d0be40fcb6559a6961d09461edc",
+          "candidate-mask.png": "a452756bd216b847ade9d7ae8bbd739e4f7fd438ee2c4a5a12d5a72b797f7242",
+          "stac.json": "2476a47f5ed65434b8340189e96c36e6ae19e9e722b0884dc55ca07e9244f5ec",
+          "preview.jpg": "91e7006f44fc3d8a4009cf4b04b7a6edeff56fd0053cfecee17814dcbd522e04"
+        },
+        "source_crs": "EPSG:3395",
+        "source_transform": [
+          0.1,
+          0.0,
+          3211017.441218063,
+          0.0,
+          -0.1,
+          -1787205.0359841876
+        ],
+        "source_bounds": [
+          3211017.441218063,
+          -1787409.8359841877,
+          3211222.2412180626,
+          -1787205.0359841876
+        ],
+        "source_wgs84_bounds": [
+          28.845060450205423,
+          -15.951841258755982,
+          28.846900199907303,
+          -15.950061323134523
+        ],
+        "input_shape": [
+          2048,
+          2048
+        ],
+        "source_ground_gsd": {
+          "latitude": -15.950951292945264,
+          "longitude": 28.845980325056367,
+          "east_m": 0.09617404561418824,
+          "north_m": 0.09617404610496577
+        },
+        "projected_pixel_m": [
+          0.1,
+          0.1
+        ],
+        "output_crs": "EPSG:3395",
+        "output_transform": [
+          0.5197969543142481,
+          0.0,
+          3211017.441218063,
+          0.0,
+          -0.519796954314839,
+          -1787205.0359841876
+        ],
+        "output_bounds": [
+          3211017.441218063,
+          -1787409.8359841877,
+          3211222.2412180626,
+          -1787205.0359841876
+        ],
+        "output_shape": [
+          394,
+          394
+        ],
+        "output_ground_gsd": {
+          "latitude": -15.950951292945264,
+          "longitude": 28.845980325056367,
+          "east_m": 0.4999097591309606,
+          "north_m": 0.4999097646643592
+        },
+        "target_ground_gsd_m": 0.5,
+        "gsd_error_m": {
+          "east_m": -9.02408690394152e-05,
+          "north_m": -9.0235335640787e-05
+        },
+        "nodata": null,
+        "validity": "all pixels reverified valid",
+        "pixel_definition": "outer bounds unchanged; centers col+0.5,row+0.5",
+        "label_qa": {
+          "categories": [
+            1,
+            2
+          ],
+          "zero_pixels": 3133687,
+          "crowd_ids": [
+            137
+          ],
+          "segments_without_pixels": [],
+          "positive_pixels": 1060617
+        },
+        "source_formats": [
+          "TIFF",
+          "PNG"
+        ],
+        "canopy_fraction_mean": 0.2528707981109619,
+        "binary_positive_pixels": 39260,
+        "binary_canopy_ratio": 0.2529052539359427,
+        "uniform_background": false,
+        "uniform_canopy": false,
+        "invalid_pixels": 0,
+        "threshold": 0.5,
+        "rgb_method": "exact pixel-overlap area float64; floor(value+0.5) uint8",
+        "fraction_method": "same area weights float64 then float32; binary >=0.5",
+        "crowd_policy": "known categories 1/2 positive; ID0 annotation background, not nodata",
+        "exact_black_pixels": 0,
+        "black_border_pixels": 0,
+        "gdal_all_valid": true,
+        "output_hashes": {
+          "rgb.tif": "0bc45fccd6ae7d9d85c8aef74846db8c643994898136932d91efbc1d61f744df",
+          "canopy_fraction.tif": "d444c4202d966ba9db7b4710951defb067e058849473b647c08a2fd7759c068f",
+          "canopy_mask.tif": "d22b29d2e8a7d6c53512ca25c83ced7ef632d16ccdb7a76d100b34b61cbcbbcc",
+          "valid_fraction.tif": "3ab3a8032f15be6acc92c084e9546220ad1be9f783a3aedfc91878cbd6d9d194"
+        },
+        "pixel_qa": "PASS",
+        "spatial_qa": "PASS",
+        "visual_qa": "PASS",
+        "attribution_reference": "raw/3/stac.json",
+        "visual_review": {
+          "preview_sha256": "91e7006f44fc3d8a4009cf4b04b7a6edeff56fd0053cfecee17814dcbd522e04",
+          "stac_sha256": "2476a47f5ed65434b8340189e96c36e6ae19e9e722b0884dc55ca07e9244f5ec",
+          "alignment": "PASS",
+          "quality": "PASS",
+          "attribution": "PASS",
+          "notes": "Source/overlay viewed: visible crowns broadly align, no black pixels/obvious coverage gap or spatial shift; known crowd RLE matches. Exact STAC licensor/producer and CC-BY-4.0 reviewed; complete attribution retained in external STAC. No accuracy/commercial clearance claim."
+        }
+      }
+    ],
+    "target_ground_gsd_m": 0.5,
+    "raw_manifest_sha256": "70ba4d1f82aca2133b84ce21d637fb52ef66bb54de13b3aafe72f56448f20b05",
+    "versions": {
+      "numpy": "1.26.4",
+      "Pillow": "13.0.0",
+      "rasterio": "1.4.3",
+      "pyproj": "3.7.1",
+      "pyarrow": "18.1.0"
+    },
+    "network_bytes": 154311469,
+    "total_stored_bytes_before_manifest": 3301028,
+    "stage_name": "M1-5B-3",
+    "overall_acceptance": "NOT_MET: one Train pair passed; Val held",
+    "target_ids": [
+      3,
+      576
+    ],
+    "training_eligible_ids": [
+      3
+    ],
+    "held_ids": [
+      576
+    ],
+    "new_geotiffs": 4,
+    "code_changes": false,
+    "tests": {
+      "passed": 106,
+      "warnings": 75,
+      "command": ".\\.venv\\Scripts\\python.exe -m pytest -q --disable-warnings"
+    },
+    "base_commit": "34bf7ef682426208fc86b7272287767d1b5d85a3",
+    "acquisition": {
+      "network_payload_bytes": 154311469,
+      "column_bytes": 154266320,
+      "metadata_footer_payload_bytes": 45149,
+      "transfer_limit_bytes": 268435456,
+      "storage_limit_bytes": 134217728,
+      "seconds": 63.18035819998477,
+      "all_saved_bytes_at_observation": 4215279,
+      "largest_compressed_group_bytes": 78838830,
+      "raw_planning_allowance_bytes": 52428800,
+      "peak_disk_usage": "NOT_MEASURED; existing pre-write storage guards applied",
+      "groups": [
+        {
+          "shard": "data/train-00001-of-00007.parquet",
+          "group": 2,
+          "group_rows": 100,
+          "targets": [
+            {
+              "image_id": 576,
+              "index": 91
+            }
+          ],
+          "compressed_bytes": 75427490
+        },
+        {
+          "shard": "data/train-00003-of-00007.parquet",
+          "group": 1,
+          "group_rows": 100,
+          "targets": [
+            {
+              "image_id": 3,
+              "index": 60
+            }
+          ],
+          "compressed_bytes": 78838830
+        }
+      ],
+      "unselected_encoded_rows_in_groups": 198,
+      "full_shard_sha256_recomputed": false
+    },
+    "val576_supplement": {
+      "image_id": 576,
+      "black_pixels": 412218,
+      "black_outer_pixels": 2529,
+      "black_label_positive_pixels": 0,
+      "black_component_stats": {
+        "connectivity": 4,
+        "components": 373,
+        "black_pixels": 412218,
+        "border_components": 6,
+        "border_connected_pixels": 408722,
+        "interior_components": 367,
+        "interior_pixels": 3496,
+        "border_positive_label_pixels": 0,
+        "interior_positive_label_pixels": 0,
+        "largest": [
+          {
+            "area": 326363,
+            "image_fraction": 0.07781100273132324,
+            "bbox_xyxy": [
+              0,
+              1184,
+              856,
+              2048
+            ],
+            "touches_border": true,
+            "positive_label_pixels": 0,
+            "bbox_occupancy": 0.44127915152301833
+          },
+          {
+            "area": 82306,
+            "image_fraction": 0.019623279571533203,
+            "bbox_xyxy": [
+              1552,
+              1718,
+              2048,
+              2048
+            ],
+            "touches_border": true,
+            "positive_label_pixels": 0,
+            "bbox_occupancy": 0.502847018572825
+          },
+          {
+            "area": 1667,
+            "image_fraction": 0.0003974437713623047,
+            "bbox_xyxy": [
+              110,
+              1040,
+              165,
+              1121
+            ],
+            "touches_border": false,
+            "positive_label_pixels": 0,
+            "bbox_occupancy": 0.3741863075196408
+          },
+          {
+            "area": 765,
+            "image_fraction": 0.0001823902130126953,
+            "bbox_xyxy": [
+              14,
+              1024,
+              64,
+              1061
+            ],
+            "touches_border": false,
+            "positive_label_pixels": 0,
+            "bbox_occupancy": 0.4135135135135135
+          },
+          {
+            "area": 68,
+            "image_fraction": 1.621246337890625e-05,
+            "bbox_xyxy": [
+              154,
+              1041,
+              170,
+              1050
+            ],
+            "touches_border": false,
+            "positive_label_pixels": 0,
+            "bbox_occupancy": 0.4722222222222222
+          }
+        ]
+      },
+      "crowd": {
+        "category_id": 1,
+        "panoptic_id": 35823,
+        "coco_id": 43919,
+        "rle_pixels": 79761,
+        "panoptic_pixels": 85819,
+        "mismatch_pixels": 6058,
+        "rle_only_pixels": 0,
+        "panoptic_only_pixels": 6058,
+        "mismatch_on_black_pixels": 0
+      },
+      "geometry": {
+        "source_crs": "EPSG:3395",
+        "source_shape": [
+          2048,
+          2048
+        ],
+        "source_transform": [
+          0.1,
+          0.0,
+          -13276651.152821733,
+          0.0,
+          -0.1,
+          6906927.987426638
+        ],
+        "source_bounds": [
+          -13276651.152821733,
+          6906723.187426638,
+          -13276446.352821732,
+          6906927.987426638
+        ],
+        "source_ground_gsd": {
+          "latitude": 52.771652494225,
+          "longitude": -119.26526665017732,
+          "east_m": 0.060628106019263654,
+          "north_m": 0.060628105632007635
+        },
+        "nodata": null,
+        "gdal_all_valid": true,
+        "proposed_output_shape": [
+          248,
+          248
+        ],
+        "proposed_ground_gsd": {
+          "latitude": 52.771652494225,
+          "longitude": -119.26526665017732,
+          "east_m": 0.5006708145248153,
+          "north_m": 0.5006707884668464
+        },
+        "proposed_only": true,
+        "metadata_bounds_rounding_check": "PASS",
+        "contained_in_stac_bbox": true
+      },
+      "visual": "Original/overlay and cropped cyan-discrepancy diagnostic viewed; pronounced bottom black wedges and local warping/softness. No correction applied.",
+      "hold_reasons": [
+        "Crowd RLE mismatch/ambiguous",
+        "HOLD_UNMARKED_BLACK_BORDER_VALIDITY"
+      ]
+    },
+    "train3_validation": {
+      "all_four_product_hashes_verified": true,
+      "source_derived_pixels_and_grid_readback": "PASS",
+      "repeat_generation_identical_hashes": true,
+      "source_and_processed_previews_viewed": true,
+      "known_crowd": {
+        "panoptic_id": 137,
+        "coco_id": 144,
+        "rle_pixels": 89664,
+        "panoptic_pixels": 89664,
+        "mismatch_pixels": 0
+      },
+      "interpretation": "Pass candidate under existing all-valid QA contract; no accuracy or commercial-final-clearance claim"
+    },
+    "whole_run_verify": {
+      "exit_code": 1,
+      "result": {
+        "dataset": "restor/tcd",
+        "revision": "d97d4da0ebbb6e249ae95ac5e19656babd972eb2",
+        "official_code_revision": "05dab754a3fd15b83d6b7606de7310155f4e2df2",
+        "utc": "2026-11-05T12:12:54.335990+00:00",
+        "status": "FAIL_STOPPED",
+        "stage": "verify",
+        "error": "ValueError: Crowd RLE mismatch/ambiguous",
+        "seconds": 0.4794810999883339
+      }
+    },
+    "whole_run_verify_limitation": "Existing verify aborts on the first crowd mismatch (576); Train 3 was independently verified with existing inspect_source/verify_sample, not inferred from whole-run success.",
+    "visual_review": {
+      "source_previews_viewed": [
+        3,
+        576
+      ],
+      "processed_preview_viewed": [
+        3
+      ],
+      "val_crowd_discrepancy_preview_viewed": true,
+      "train3": "Visible crowns broadly align with source and reduced masks, no obvious black fill or spatial shift; completeness/accuracy not established.",
+      "val576": "Bottom wedges/void-like patches and local soft/warped image content; cyan discrepancy is in nonblack imagery. No label repair or validity inference applied."
+    },
+    "diagnostic_hashes": {
+      "train3-processed-preview.png": "afa493b3e8be2b994cc08f82161310fce8b0c2e3a0d1549e174c8ac0a273fa91",
+      "576-crowd-discrepancy.png": "d435edc01300dfec417cfcc063876085d1a40a9b5ce5184832473f96c23c83e4"
+    },
+    "external_record_hashes": {
+      "plan.json": "74205611d7085c46f9b40d66e22ba12870e9b807dfc1cb2cc0f3ef08a1933c7d",
+      "raw_manifest.json": "70ba4d1f82aca2133b84ce21d637fb52ef66bb54de13b3aafe72f56448f20b05",
+      "manifest.json": "fb59b3b6831007843979448c61ee979b146a70c491e12968db19df19df755ee2",
+      "reviews.json": "5559c7fa08c7ec73f002677f6ea494e55eaeaca71787572f7837362aaa74966b",
+      "repeat_manifest.json": "563d4176120521aa35029457a4cdbfddfccbbb664d641dcbe8d460315aae3d77"
+    },
+    "preserved_prior_state": {
+      "2_and_9_hold_unchanged": true,
+      "2_and_9_original_hashes_reverified": true,
+      "661_and_1972_eight_output_hashes_reverified": true,
+      "no_training_or_gpu_code_changes": true
+    },
+    "limitations": [
+      "Val 576 has no generated training GeoTIFF and remains ineligible",
+      "Crowd mismatch root cause not resolved; neither representation was altered",
+      "Exact black color was not converted to NoData; no crop/ignore/validity policy change",
+      "Source attribution/contact information retained externally, not published",
+      "Current training loaders remain restricted to existing accepted IDs; no model or GPU smoke on ID3"
+    ]
   }
 }
