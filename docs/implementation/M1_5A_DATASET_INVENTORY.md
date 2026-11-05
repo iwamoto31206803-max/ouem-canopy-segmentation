@@ -419,3 +419,55 @@ $Out = '<fresh-external-held-output-directory>'
 ```
 
 Regression: **106 passed, 75 Affine-related warnings**. Existing scripts/tests are unchanged; this PR adds only audit text and the nested result record, preserving every earlier JSON value. Remaining obstacles are source validity, crowd discrepancy cause, and a safe shared-budget candidate-switch mechanism. A/B acceptance is explicitly unmet. No new candidate, NoData conversion, repair, model/GPU run or training connection was introduced to force completion.
+
+## M1-5B-5 acceptance and acquisition redesign — PROPOSAL (2026-11-06)
+
+**Review-only design; NOT IMPLEMENTED.** This section follows the historical M1-5A to M1-5B-4 evidence above. It does not change any prior PASS/HOLD, release any new sample for training, alter M1-6 or enlarge a download budget.
+
+### What the official Restor implementation actually does
+
+Evidence pinned to upstream `05dab754a3fd15b83d6b7606de7310155f4e2df2`:
+
+- [Dataset card](https://github.com/Restor-Foundation/tcd/blob/05dab754a3fd15b83d6b7606de7310155f4e2df2/docs/dataset.md): Panoptic-derived binary semantic labels are supported. Tiles were sampled with a *valid-pixel threshold*, not a guarantee of 100% valid image coverage.
+- [Exporter](https://github.com/Restor-Foundation/tcd/blob/05dab754a3fd15b83d6b7606de7310155f4e2df2/tools/generate_dataset.py): optional `binary_mask=True` uses `np.any(annotation != 0, axis=-1)`. COCO annotations are copied separately; **there is no Panoptic/COCO Crowd pixel-equality gate** in the semantic export. Note that the exporter **defaults to `binary_mask=False`**, so do not equate the binary option with all released checkpoint training runs.
+- [Semantic training dataset](https://github.com/Restor-Foundation/tcd/blob/05dab754a3fd15b83d6b7606de7310155f4e2df2/src/tcd_pipeline/data/cocodataset.py) and [datamodule](https://github.com/Restor-Foundation/tcd/blob/05dab754a3fd15b83d6b7606de7310155f4e2df2/src/tcd_pipeline/data/datamodule.py): load the PNG mask for binary training; they do not reconstruct semantic supervision from COCO RLE, nor explicitly load per-pixel source coverage into loss. The dataset loader changes one pixel of a wholly empty/full target as a model workaround: **OUEM should continue to preserve literal all-zero/all-one masks**.
+- [OAM current imagery usage](https://docs.imagery.hotosm.org/usage/using-imagery/): suggests `&nodata=0` when displaying some older images with black borders. This does **not** certify all zero-valued pixels in our distributed TIFFs as invalid or explain the original processing step.
+
+These inspected source paths do **not** prove the exact images, options and preprocessing used to produce every published Restor checkpoint.
+
+### Separate strict scientific requirements from diagnostic cross-format QA
+
+| Check | Proposed training acceptance |
+| --- | --- |
+| Dataset revision, row/source rights and attribution, split/holdout/source grouping and geographic overlap, source/output hashes | **Mandatory PASS**, unchanged |
+| GeoTIFF dimensions, original affine/CRS/bounds, label alignment, unknown nonzero Panoptic IDs/categories and malformed required data | **Mandatory PASS**, unchanged |
+| Canonical semantic target | Derive from **validated Panoptic PNG + segment categories 1/2**, including known Crowd; zero is annotation background, **not** evidence of image coverage. Preserve true empty/full targets. |
+| COCO Crowd RLE versus Panoptic disagreement | **Record `WARN_CROWD_CROSS_FORMAT`**, area and discrepancy location, instead of automatic HOLD **if** canonical Panoptic/source checks pass. Unknown/conflicting canonical label identity or corrupted required metadata remains HOLD. |
+| Edge black / coverage uncertainty | Detect edge-connected black regions and dark-fringe shapes as **review triggers**, not a permanent "one edge-black pixel = reject" law. Visibly large artificial fill or uncertain coverage remains **HOLD**; isolated dark pixels may be reviewed individually, never auto-certified. Do not infer `nodata=0` from RGB alone. |
+| Manual review and conversion | Require documented image/semantic-mask alignment, obvious artifacts, full source attribution and hash-bound review. Only approved all-valid images follow the existing ~0.50m shared-grid/fraction/binary/readback procedure. Never silently invent an ignore mask, crop or all-one `valid_fraction` for uncertain coverage. |
+
+Record **per-image** `qa_state` (PASS, PASS_WITH_WARNINGS, REVIEW_REQUIRED, HOLD, FAIL), individual reason codes, source evidence and `training_eligible`. A warning is not a pass if any mandatory check fails. Existing **2/9/576/1401 stay HOLD**, because their unresolved substantial black wedges are a *separate* blocker, regardless of Crowd severity. Train 3 remains accepted within its documented scope.
+
+This is a change to which findings are **blocking**, not a relaxation of original data provenance or image-validity standards. Do not invent pixel-percentage thresholds from the five selected audited samples; they are not representative of the 4,608-image corpus.
+
+**Required tests before changing code:** canonical Panoptic good + optional Crowd disagreement -> warning and otherwise eligible; unknown Panoptic ID/category -> HOLD; large external black wedge -> coverage HOLD; isolated edge-black pixel -> manual review (not auto acceptance); unchanged all-background/all-positive masks; split/holdout/source leak -> HOLD. Existing accepted hashes must remain unchanged.
+
+### Stop paying a whole Parquet row group for one image
+
+The real pilot repeatedly downloaded about **74–79 MiB of compressed Parquet columns per row group containing ~100 records**, while saving only one image. This creates severe avoidable overhead for large-scale acquisition.
+
+- Select **several independently eligible IDs within the same row group** when possible, after metadata-based role, leakage, license and geographic-diversity screening. Batch planning must not make geography unrepresentative purely to reduce bytes. New source STAC rights evidence still requires individual validation.
+- Preflight exact footer/column byte ranges and temporary memory/disk estimates **before** reading pixels; decode/store only approved candidate IDs, not all 100 images. Record encoded-row overhead.
+- Introduce the **smallest possible persistent acquisition-session ledger**, so subsequent candidate plans share **one cumulative HTTP payload budget (initially 256MiB)** and **one storage budget (initially 128MiB)**. Plan IDs and revision must be immutable; partial downloads count against the budget. Neither a new cache nor a new candidate silently resets the ceiling. Stop if the budget/caching contract cannot be upheld.
+- Make per-ID `prepare`/`verify` receipts independent: one HOLD must not prevent verification of another accepted image. Global invalid revision, cache integrity or provenance remains fail-fast; aggregate status must still report any HOLD/FAIL honestly.
+- Extend **existing `scripts/m1_5b_pilot.py` and its tests**, with no parallel acquisition framework, no new notebook and no additional standalone design document. Keep Windows/offline replay, hashes, external STAC, and read-only previously accepted files.
+
+### Proposed sequence and explicit acceptance
+
+**M1-5B-5A — implementation PR:** minimal CLI/test changes for nonblocking Crowd diagnostics, coverage-review states, batch/row-group preflight, shared session budget, and independent per-ID verify. Verify offline using synthetic samples, budget-exhaustion/failure injection and regression tests. No new real-data acquisition in this code PR; no model/loss/loader changes.
+
+**M1-5B-5B — separately reviewed real pilot:** preflight Val 4235 and nearby-in-row-group eligible candidates using an explicitly approved session allowance. Only fetch when rights, transfer and storage gates pass. Success requires **at least one newly approved Val image**, combined with already approved new Train 3, exact source/processed hashes, verified pixel/geometry outputs, and manual review receipts. If not achieved within the limit, stop and report the evidence instead of looping through single images. New budget rounds require explicit authorization, not an implicit reset.
+
+**Later:** plan a separate multi-image training loader and useful-size fine-tuning after pilot acceptance. The existing M1-6 Tesla T4 **two-image GPU smoke remains independent** and does not need refactoring now.
+
+**Boundaries:** no Holdout pixel downloads or tuning, no GT54 promotion to canopy truth, no automatic black-to-NoData, no permission to train on uncertain coverage, no changes to commercial legal clearance, no reclassification of past HOLD, and no trained-weight redistribution.
