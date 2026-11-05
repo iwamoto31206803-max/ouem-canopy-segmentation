@@ -348,3 +348,74 @@ print('Train 3 source-derived pixels/grid and saved-file hashes verified')
 ```
 
 Regression: **106 passed, 75 Affine-related warnings**. No code/test additions were needed. Real acquisition, successful Train conversion/readback/repeat and held Val QA are separate from unit results. This two-doc change records execution only. Next action is review of 3's addition and 576's two HOLD findings; a new candidate or validity/label policy needs a separate explicit decision. Nothing was silently changed to satisfy the missing Val acceptance condition.
+
+## M1-5B-4 additional Val attempt (2026-11-05)
+
+**A: new Val acceptance NOT MET. B: new Train+Val pilot completion NOT MET.** Val1401 was acquired and inspected but is HOLD; Val4235 was not attempted because the present CLI does not safely support shared cumulative budgets across a candidate switch. Train3 remains independently verified. This section and the additive `m1_5b4` object in [the existing result JSON](M1_5B_PILOT_RESULT.json) record the unsuccessful attempt without changing previous receipts or production code.
+
+### Ordered acquisition and cumulative budget decision
+
+Only 1401 was planned/acquired. Fixed restor/tcd revision is d97d4da0ebbb6e249ae95ac5e19656babd972eb2; M1-5A rows/STAC were reused and hash-verified. Image1401 is official train/fold0 -> Val, oam_id 5bf6a8f50d1a8c00054a41cc. Row CC-BY 4.0 agrees with exact STAC CC-BY-4.0, the named producer/licensor fields and original metadata object key. Full attribution stays in the external STAC; final manual training eligibility/commercial clearance is not granted to this held image. Existing source/group/object/footprint/Holdout separation checks passed; nearest opposite-role footprint lower bound is ~136.842km. No Holdout pixels were requested.
+
+| Quantity | Measured / planned value |
+| --- | ---: |
+| Target shard / group / within-group row | train-00001-of-00007 / 3 / 21 (shard row321) |
+| Required compressed columns, before image acquisition | 78,576,451 bytes |
+| Raw planning allowance | 26,214,400 bytes, plus metadata/control reserve |
+| Cumulative data acquisition HTTP payload | **78,600,370 bytes (~74.96MiB)** |
+| Included publisher/footer payload | 23,919 bytes |
+| Remaining under 256MiB | **189,835,086 bytes** |
+| Acquisition time | 33.86s |
+| New cache + held-output manifest + diagnostics | **2,375,386 bytes (~2.27MiB)** |
+| Limits | 268,435,456 payload bytes / 134,217,728 saved bytes |
+
+The same `network.json` counted plan/footer/acquire responses cumulatively; no retries/reset occurred. Header/TLS overhead is excluded, as in earlier CLI accounting. A single 100-row compressed group was required; 99 unselected encoded records were transfer overhead, not individually decoded/saved image originals. Per-write storage guards applied and the group's new compressed cache was evicted. Peak disk use was not separately measured. Full-shard SHA was not recomputed.
+
+**The transfer budget is not exhausted.** Stopping is a control limitation, not a claim that 4235 cannot fit. `plan` requires a fresh cache, `acquire` requires its exact planned IDs/limits, and a new raw subdirectory. There is no shared cross-cache transfer/storage ledger or immutable candidate-switch workflow. A second fresh cache with 256MiB would reset the allowance; overwriting plan/raw or copying/editing counters ad hoc is not an acceptable workaround. Following the user's stop instruction, no network plan or acquisition for 4235 was started. Its bytes, raw QA, conversion and eligibility remain unverified. The consumed count and remaining balance are preserved for a separately reviewed budget-control improvement; do not silently start a new full allowance.
+
+### Image1401 QA and HOLD
+
+Raw TIFF/PNG are 2048 square. Primary panoptic decoding has only known Canopy1/Tree2 IDs, with 3,111,092 positive source-label pixels. Source and mask dimensions/orientation and TIFF/PIL pixels agree. Embedded CRS is EPSG:3395, affine `[0.1,0,-8896331.301420463,0,-0.1,-363685.2894560287]`; local ground GSD is ~0.09983647m E/N. Embedded bounds agree with float32 row metadata rounding uncertainty. Literal STAC bbox containment is false at the north edge by 2.953e-7 degrees, within half a six-decimal-degree rounding unit; this is not proof of a bad affine. No geometry/tolerance was changed. The existing strict check would need to be addressed separately if reached.
+
+TIFF has three RGB bands, no alpha or nodata; GDAL reports only all_valid/255. **658,503 exact-black pixels**, of which **3,449 lie on the unique outer border**, include clear upper/corner wedges. Four-neighbor analysis has 652,680 border-connected pixels in three components; internal exact-black fragments include 4,817 positive-labelled pixels. Source/GT overlay and a colored black-component diagnostic were actually viewed. This is not a reason to turn all black pixels into NoData. Coverage remains unresolved and `HOLD_UNMARKED_BLACK_BORDER_VALIDITY` applies. No crop, validity mask or label repair was introduced.
+
+Crowd category1 has two panoptic segments (20526/20527) and two COCO objects (110212/110213). The current category-only unique correspondence gate raises `Crowd RLE mismatch/ambiguous`; it is not relaxed. For diagnosis only, all four pairwise decoded-RLE comparisons were checked:
+
+| COCO | Panoptic | RLE pixels | Panoptic pixels | XOR pixels |
+| --- | --- | ---: | ---: | ---: |
+| 110212 | 20526 | 779,527 | 790,790 | 11,263 |
+| 110212 | 20527 | 779,527 | 2,232,487 | 3,012,014 |
+| 110213 | 20526 | 2,224,027 | 790,790 | 3,014,817 |
+| 110213 | 20527 | 2,224,027 | 2,232,487 | 8,460 |
+
+There is no exact pair, even after considering ambiguity. In the smallest-XOR pairs the differences are panoptic-only. These are not accepted assignments; no source representation was preferred. The cause remains unresolved. `prepare` first records the Crowd gate, while the supplemental read-only audit records both Crowd and black-coverage reasons.
+
+No 0.50m products or output-product hashes were generated, so saved-file/repeat/converted-preview checks for a new Val were NOT_PERFORMED. The output directory contains a HOLD manifest only. Whole-run `prepare` returns exit3 / REAL_PILOT_NOT_VERIFIED. No whole-run verification PASS is claimed.
+
+### Minimal official-code reference, without policy change
+
+The fixed official [dataset_to_coco exporter](https://github.com/Restor-Foundation/tcd/blob/05dab754a3fd15b83d6b7606de7310155f4e2df2/tools/generate_dataset.py#L92) copies `coco_annotations` into annotations JSON. Its [binary-mask export](https://github.com/Restor-Foundation/tcd/blob/05dab754a3fd15b83d6b7606de7310155f4e2df2/tools/generate_dataset.py#L119) derives semantic masks from nonzero panoptic annotation pixels. In that routine there is no equality check reconciling crowd RLE with panoptic masks. This establishes two export paths, not the generating cause of Val576's 6,058px or 1401's discrepancies. The full creation/training history was not investigated. Our category validation and strict Crowd agreement/rejection rules remain unchanged; this reference does not authorize a different training label definition.
+
+### Existing Train3 and future verify improvement
+
+The approved Train3 raw/processed manifests and review receipts were hash-verified against PR27. Source-derived arrays were recomputed in memory and compared with all four existing saved products, including their SHA/grid/readback; **no Train3 file was rewritten or regenerated**. Its prior 394-square/~0.49991m results and deterministic-repeat evidence remain valid. Train3/1401 prospective metadata roles, distinct source groups and footprints were checked together, but no new Val is accepted, so this does not complete the pilot. Existing661/1972 eight hashes and held2/9/576 originals/records were also reverified unchanged; checkpoint and M1-6 were untouched.
+
+A future small improvement could add per-ID filtering or keep-going verification with separate PASS/HOLD/FAIL receipts, nonzero aggregate status for any HOLD/FAIL, and fail-fast global provenance errors. This would allow healthy samples to be verified without hiding rejected ones. It was not implemented here. A separate shared, persistent cumulative acquisition/storage ledger plus immutable per-candidate plans would be required before safely resuming at 4235 under the remaining allowance.
+
+### Commands, tests and remaining work
+
+Actual new external names are `m1-5b4-val1401-01` and `m1-5b4-val1401-pairs-01`. Original hashes, complete STAC, source/label preview, black diagnostic, cumulative counter and detailed HOLD records stay there. Existing Windows PowerShell CLI, no new script/document/dependency:
+
+```powershell
+$Meta = '<completed-M1-5A-cache>'
+$Cache = '<fresh-external-M1-5B4-cache>'
+$Out = '<fresh-external-held-output-directory>'
+.\.venv\Scripts\python.exe scripts/m1_5b_pilot.py plan --inventory-cache $Meta --cache $Cache --ids 1401 --transfer-mib 256 --storage-mib 128
+# Inspect plan and remaining budget, then acquire the first candidate only.
+.\.venv\Scripts\python.exe scripts/m1_5b_pilot.py acquire --inventory-cache $Meta --cache $Cache --ids 1401 --transfer-mib 256 --storage-mib 128
+.\.venv\Scripts\python.exe scripts/m1_5b_pilot.py prepare --inventory-cache $Meta --cache $Cache --output $Out --ids 1401
+# Expected exit3 here. STOP; do not switch to a fresh 256MiB cache for 4235.
+.\.venv\Scripts\python.exe -m pytest -q --disable-warnings
+```
+
+Regression: **106 passed, 75 Affine-related warnings**. Existing scripts/tests are unchanged; this PR adds only audit text and the nested result record, preserving every earlier JSON value. Remaining obstacles are source validity, crowd discrepancy cause, and a safe shared-budget candidate-switch mechanism. A/B acceptance is explicitly unmet. No new candidate, NoData conversion, repair, model/GPU run or training connection was introduced to force completion.

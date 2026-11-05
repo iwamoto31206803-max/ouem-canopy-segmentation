@@ -860,5 +860,395 @@
       "Source attribution/contact information retained externally, not published",
       "Current training loaders remain restricted to existing accepted IDs; no model or GPU smoke on ID3"
     ]
+  },
+  "m1_5b4": {
+    "stage": "M1-5B-4",
+    "dataset": "restor/tcd",
+    "revision": "d97d4da0ebbb6e249ae95ac5e19656babd972eb2",
+    "official_code_revision": "05dab754a3fd15b83d6b7606de7310155f4e2df2",
+    "base_commit": "abf8a04d3f706c8778d7ebaf5880cd381d66d529",
+    "A_new_val_acceptance": "NOT_MET",
+    "B_small_pilot_completion": "NOT_MET",
+    "candidates": {
+      "1401": {
+        "acquisition": "COMPLETE",
+        "qa": "HOLD",
+        "reasons": [
+          "Crowd RLE mismatch/ambiguous",
+          "HOLD_UNMARKED_BLACK_BORDER_VALIDITY"
+        ]
+      },
+      "4235": {
+        "acquisition": "NOT_ATTEMPTED",
+        "qa": "NOT_VERIFIED",
+        "reason": "Current CLI lacks shared cross-cache budget/candidate-switch workflow; stopped under explicit instruction, not because bytes are exhausted"
+      }
+    },
+    "acquisition": {
+      "payload_bytes": 78600370,
+      "compressed_columns": 78576451,
+      "metadata_footer_payload_bytes": 23919,
+      "seconds": 33.855497999931686,
+      "transfer_limit_bytes": 268435456,
+      "remaining_bytes": 189835086,
+      "storage_limit_bytes": 134217728,
+      "saved_artifact_bytes_at_observation": 2375386,
+      "planning_raw_allowance_bytes": 26214400,
+      "peak_disk_usage": "NOT_MEASURED; pre-write storage guard enforced",
+      "groups": [
+        {
+          "shard": "data/train-00001-of-00007.parquet",
+          "group": 3,
+          "group_rows": 100,
+          "targets": [
+            {
+              "image_id": 1401,
+              "index": 21
+            }
+          ],
+          "compressed_bytes": 78576451
+        }
+      ],
+      "unselected_encoded_rows": 99,
+      "full_shard_sha256_recomputed": false,
+      "one_data_acquisition_ledger": true,
+      "budget_reset_or_automatic_retry": false
+    },
+    "budget_workflow_review": {
+      "cache_ledger": "network.json; cumulative plan/footer/acquire payload in this cache",
+      "fresh_plan_requires_new_cache": true,
+      "acquire_requires_matching_plan_ids_and_limits": true,
+      "raw_directory_must_be_new": true,
+      "shared_cross_cache_ledger_supported": false,
+      "4235_new_network_plan_started": false,
+      "decision": "STOP_AFTER_1401_HOLD; no copy/reset/edit of ledger, no bypass"
+    },
+    "prepare_execution": {
+      "exit_code": 3,
+      "result": {
+        "dataset": "restor/tcd",
+        "revision": "d97d4da0ebbb6e249ae95ac5e19656babd972eb2",
+        "official_code_revision": "05dab754a3fd15b83d6b7606de7310155f4e2df2",
+        "utc": "2026-11-05T14:49:09.916031+00:00",
+        "status": "REAL_PILOT_NOT_VERIFIED",
+        "stage": "prepare",
+        "samples": [
+          {
+            "image_id": 1401,
+            "oam_id": "5bf6a8f50d1a8c00054a41cc",
+            "split": "val",
+            "validation_fold": 0,
+            "status": "HOLD",
+            "training_eligible": false,
+            "rights": {
+              "stac_sha256": "741579c4c56117941a8222c1aa59f30a89766af632bbcebd9affa8e8f9bf75bd",
+              "stac_url": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/5bf6a8f50d1a8c00054a41cc",
+              "row_license": "CC-BY 4.0",
+              "image_license": "CC-BY-4.0",
+              "annotation_license": "CC BY 4.0",
+              "annotation_terms": "https://github.com/Restor-Foundation/tcd/blob/05dab754a3fd15b83d6b7606de7310155f4e2df2/docs/dataset.md",
+              "attribution": "named producer/licensor retained in external STAC; no contacts published",
+              "commercial_final_clearance": "NOT_ASSESSED"
+            },
+            "separation": {
+              "nearest_opposite_footprint_lower_bound_m": 136841.95917265344,
+              "proximity_hold_m": 1000,
+              "scope": "all cached opposite-role footprints, including holdout metadata; no holdout pixels"
+            },
+            "source_hashes": {
+              "rgb.bin": "897d439f0d702884bc35b453571e4e68ed623c741a29c5661e8c5359d5a49a81",
+              "annotation.bin": "77b949643c33dca0bc4bf761fcdd042735ebe00b67caa711f55f2604b1a0954e",
+              "segments.json": "85024a3295f9aa57efc63babe783c2e0576a8887472738d63a8c1150b78091c8",
+              "coco_annotations.json": "1669e4a939dc6236f9587927dc060d9911e7615c7ddd54734d5d915292109c91",
+              "candidate-mask.png": "46fba38dd9844b3e047c4b46db229f9f225cdb8147aff3289d2b80df2ee1314c",
+              "stac.json": "741579c4c56117941a8222c1aa59f30a89766af632bbcebd9affa8e8f9bf75bd",
+              "preview.jpg": "e1b88dba8889467176048671e57e5254b5a4113a2d0056f658dcd15ac0e725b2"
+            },
+            "reason": "Crowd RLE mismatch/ambiguous"
+          }
+        ],
+        "target_ground_gsd_m": 0.5,
+        "raw_manifest_sha256": "c3fd0709900277048ef76236ffa18b924318a460e0f8cd5c12d9156f220faa9a",
+        "versions": {
+          "numpy": "1.26.4",
+          "Pillow": "13.0.0",
+          "rasterio": "1.4.3",
+          "pyproj": "3.7.1",
+          "pyarrow": "18.1.0"
+        },
+        "network_bytes": 78600370,
+        "total_stored_bytes_before_manifest": 1407325,
+        "seconds": 0.4993589000077918
+      }
+    },
+    "val1401_supplement": {
+      "image_id": 1401,
+      "geometry": {
+        "crs": "EPSG:3395",
+        "shape": [
+          2048,
+          2048
+        ],
+        "affine": [
+          0.1,
+          0.0,
+          -8896331.301420463,
+          0.0,
+          -0.1,
+          -363685.2894560287
+        ],
+        "bounds": [
+          -8896331.301420463,
+          -363890.0894560287,
+          -8896126.501420463,
+          -363685.2894560287
+        ],
+        "local_ground_gsd": {
+          "latitude": -3.2881542345043324,
+          "longitude": -79.91618393171821,
+          "east_m": 0.09983646996386315,
+          "north_m": 0.09983646904692181
+        },
+        "nodata": null,
+        "color_interpretation": [
+          "red",
+          "green",
+          "blue"
+        ],
+        "alpha_present": false,
+        "mask_flags": [
+          [
+            "all_valid"
+          ],
+          [
+            "all_valid"
+          ],
+          [
+            "all_valid"
+          ]
+        ],
+        "dataset_mask_values": [
+          255
+        ],
+        "metadata_bounds_rounding_check": "PASS",
+        "rasterio_pil_pixel_equality": true,
+        "contained_in_stac_bbox": false
+      },
+      "black_pixels": 658503,
+      "outer_black_pixels": 3449,
+      "black_components": {
+        "connectivity": 4,
+        "components": 460,
+        "black_pixels": 658503,
+        "border_components": 3,
+        "border_connected_pixels": 652680,
+        "interior_components": 457,
+        "interior_pixels": 5823,
+        "border_positive_label_pixels": 0,
+        "interior_positive_label_pixels": 4817,
+        "largest": [
+          {
+            "area": 357952,
+            "image_fraction": 0.0853424072265625,
+            "bbox_xyxy": [
+              944,
+              0,
+              2048,
+              674
+            ],
+            "touches_border": true,
+            "positive_label_pixels": 0,
+            "bbox_occupancy": 0.48105620780114394
+          },
+          {
+            "area": 294717,
+            "image_fraction": 0.0702660083770752,
+            "bbox_xyxy": [
+              0,
+              0,
+              880,
+              817
+            ],
+            "touches_border": true,
+            "positive_label_pixels": 0,
+            "bbox_occupancy": 0.4099212751752531
+          },
+          {
+            "area": 2315,
+            "image_fraction": 0.0005519390106201172,
+            "bbox_xyxy": [
+              863,
+              76,
+              922,
+              165
+            ],
+            "touches_border": false,
+            "positive_label_pixels": 2315,
+            "bbox_occupancy": 0.44086840601790134
+          },
+          {
+            "area": 1608,
+            "image_fraction": 0.0003833770751953125,
+            "bbox_xyxy": [
+              832,
+              160,
+              864,
+              240
+            ],
+            "touches_border": false,
+            "positive_label_pixels": 1608,
+            "bbox_occupancy": 0.628125
+          },
+          {
+            "area": 588,
+            "image_fraction": 0.00014019012451171875,
+            "bbox_xyxy": [
+              920,
+              64,
+              960,
+              85
+            ],
+            "touches_border": false,
+            "positive_label_pixels": 588,
+            "bbox_occupancy": 0.7
+          }
+        ]
+      },
+      "primary_panoptic_qa": {
+        "categories": [
+          1,
+          2
+        ],
+        "zero_pixels": 1083212,
+        "crowd_ids": [
+          20526,
+          20527
+        ],
+        "segments_without_pixels": [],
+        "positive_pixels": 3111092
+      },
+      "crowd_comparisons": [
+        {
+          "coco_id": 110212,
+          "panoptic_id": 20526,
+          "category_id": 1,
+          "rle_pixels": 779527,
+          "panoptic_pixels": 790790,
+          "mismatch_pixels": 11263,
+          "rle_only_pixels": 0,
+          "panoptic_only_pixels": 11263
+        },
+        {
+          "coco_id": 110212,
+          "panoptic_id": 20527,
+          "category_id": 1,
+          "rle_pixels": 779527,
+          "panoptic_pixels": 2232487,
+          "mismatch_pixels": 3012014,
+          "rle_only_pixels": 779527,
+          "panoptic_only_pixels": 2232487
+        },
+        {
+          "coco_id": 110213,
+          "panoptic_id": 20526,
+          "category_id": 1,
+          "rle_pixels": 2224027,
+          "panoptic_pixels": 790790,
+          "mismatch_pixels": 3014817,
+          "rle_only_pixels": 2224027,
+          "panoptic_only_pixels": 790790
+        },
+        {
+          "coco_id": 110213,
+          "panoptic_id": 20527,
+          "category_id": 1,
+          "rle_pixels": 2224027,
+          "panoptic_pixels": 2232487,
+          "mismatch_pixels": 8460,
+          "rle_only_pixels": 0,
+          "panoptic_only_pixels": 8460
+        }
+      ],
+      "exact_rle_panoptic_pairs": [],
+      "crowd_gate_reason": "Two same-category crowd segments; existing category-only pairing is ambiguous; gate unchanged",
+      "hold_reasons": [
+        "Crowd RLE mismatch/ambiguous",
+        "HOLD_UNMARKED_BLACK_BORDER_VALIDITY"
+      ],
+      "source_preview_viewed": true,
+      "no_training_geotiffs": true,
+      "consumed_payload_bytes": 78600370,
+      "remaining_payload_bytes": 189835086,
+      "fallback_4235": "NOT_ATTEMPTED: current CLI has no shared cross-cache ledger / safe candidate-switch workflow; stop per request, no budget reset"
+    },
+    "saved_training_geotiffs": 0,
+    "output_hashes": {},
+    "processed_preview": "NOT_GENERATED_SOURCE_QA_HOLD",
+    "bbox_precision_note": {
+      "tile_north_lat": -3.287229704687159,
+      "catalog_north_lat": -3.28723,
+      "strict_containment": false,
+      "north_overrun_degrees": 2.9531284129191704e-07,
+      "interpretation": "Within half a six-decimal degree rounding unit; not proof of a bad affine. No tolerance or geometry changed."
+    },
+    "diagnostics": {
+      "source_overlay_viewed": true,
+      "black_component_preview_viewed": true,
+      "black_component_preview_sha256": "812dedfb8e15f05307e36c15bae5a085e17006ffa8b73696172a817d21e03436",
+      "interpretation": "Sharp upper/corner fill-like regions and internal holes observed; no zero-color validity rule applied"
+    },
+    "train3_reverification": {
+      "status": "PASS_INDEPENDENT_EXISTING_PAIR",
+      "original_and_prepared_manifest_receipts_reverified": true,
+      "source_and_all_four_product_hashes_reverified": true,
+      "source_derived_pixel_grid_readback_reverified": true,
+      "regenerated_or_overwritten": false,
+      "output_hashes": {
+        "rgb.tif": "0bc45fccd6ae7d9d85c8aef74846db8c643994898136932d91efbc1d61f744df",
+        "canopy_fraction.tif": "d444c4202d966ba9db7b4710951defb067e058849473b647c08a2fd7759c068f",
+        "canopy_mask.tif": "d22b29d2e8a7d6c53512ca25c83ced7ef632d16ccdb7a76d100b34b61cbcbbcc",
+        "valid_fraction.tif": "3ab3a8032f15be6acc92c084e9546220ad1be9f783a3aedfc91878cbd6d9d194"
+      },
+      "prior_record": "m1_5b3; formal source, rights, review, geometry and deterministic repeat evidence retained"
+    },
+    "separation": {
+      "metadata_3_1401_rechecked": true,
+      "source_group_object_and_opposite_role_footprints": "PASS_METADATA",
+      "val1401_nearest_opposite_footprint_lower_bound_m": 136841.95917265344,
+      "new_val_pair_accepted": false
+    },
+    "preserved": {
+      "661_1972_all_eight_output_hashes_match": true,
+      "2_9_originals_and_raw_manifest_hashes_match": true,
+      "576_original_hashes_match": true,
+      "all_prior_HOLD_records_unchanged": true,
+      "checkpoint_and_M1_6_code_untouched": true
+    },
+    "official_reference": {
+      "url": "https://github.com/Restor-Foundation/tcd/blob/05dab754a3fd15b83d6b7606de7310155f4e2df2/tools/generate_dataset.py",
+      "scope": "dataset_to_coco export routine only, not full training/creation history",
+      "observed": "COCO annotations are copied into annotations JSON; semantic binary export is formed from nonzero panoptic annotation. No equality check in that export routine.",
+      "cause_of_576_or_1401_discrepancy": "UNRESOLVED",
+      "current_acceptance_rules_relaxed": false
+    },
+    "tests": {
+      "command": ".\\.venv\\Scripts\\python.exe -m pytest -q --disable-warnings",
+      "passed": 106,
+      "warnings": 75
+    },
+    "whole_verify_proposal": "Future optional per-ID/keep-going verification with PASS/HOLD/FAIL receipts and nonzero aggregate when any HOLD/FAIL; global provenance errors remain fail-fast. Not implemented.",
+    "unresolved": [
+      "Reliable 1401 coverage/validity",
+      "Crowd representation mismatch cause",
+      "Safe shared cumulative budget and immutable candidate-switch plan before attempting 4235",
+      "No accepted new Val, so Train3 plus new Val pilot completion unmet"
+    ],
+    "external_receipts": {
+      "plan.json": "6418156339fac8dcd55515533312c3e7900eea7da654781ff06737fa6785c457",
+      "raw_manifest.json": "c3fd0709900277048ef76236ffa18b924318a460e0f8cd5c12d9156f220faa9a",
+      "network.json": "0b68eed8e7686fe3a08778dc1d2c9df82b08febd19de2a8bad7ea0a8c31cf7e2",
+      "manifest.json": "df1f4caa57aff2b164086024f819028a3b004bc9781decb67f285082df7caf14",
+      "1401-supplement.json": "b2c07fb9e9e8ea05b183d1005a8b1a4ef11fbedd1ee508752650dad8d9fe2562"
+    }
   }
 }
