@@ -1,0 +1,251 @@
+{
+  "dataset": "restor/tcd",
+  "revision": "d97d4da0ebbb6e249ae95ac5e19656babd972eb2",
+  "target_ground_gsd_m": 0.5,
+  "status": "PASS_CANDIDATE",
+  "versions": {
+    "numpy": "1.26.4",
+    "Pillow": "13.0.0",
+    "rasterio": "1.4.3",
+    "pyproj": "3.7.1"
+  },
+  "samples": [
+    {
+      "image_id": 661,
+      "oam_id": "60f0a29989ec130007b828a8",
+      "split": "train",
+      "source_hashes": {
+        "rgb.bin": "ea69df9a2d636655c04e4c9002ee5ba3f5774ebf54b076c083958a4b0b28cf10",
+        "annotation.bin": "6975c1455eee9a68ebffe54b6e53971f63a7a81ae861e7733e13ff6c968ab105",
+        "segments.json": "38e75db943428e7086f76db4df286887d9649edf4a398260ca193bd275ba46f5",
+        "coco_annotations.json": "96eaa3219f34dd0bd693e944749ad14e9ca37a095b8e9595dd230027166ab5df",
+        "candidate-mask.png": "9e2366c5cf66ecb548194836dff0554e951bc954331e9fb3f64680732860b31f"
+      },
+      "stac_sha256": "84c387e6457b887633a69fcd6728a1a3653c5c104b3ac795332143ea3828bb4c",
+      "source_crs": "EPSG:3395",
+      "source_bounds": [
+        3497317.652389994,
+        6419001.373651781,
+        3497522.4523899937,
+        6419206.173651781
+      ],
+      "source_transform": [
+        0.09999999999990905,
+        0.0,
+        3497317.652389994,
+        0.0,
+        -0.09999999999990905,
+        6419206.173651781
+      ],
+      "input_shape": [
+        2048,
+        2048
+      ],
+      "projected_pixel_m": [
+        0.09999999999990905,
+        0.09999999999990905
+      ],
+      "local_ground_pixel": {
+        "latitude": 50.03229413421251,
+        "longitude": 31.417859329637928,
+        "east_m": 0.06436223886509389,
+        "north_m": 0.0643622374263178
+      },
+      "source_wgs84_bounds": [
+        31.416939005629345,
+        50.03170188980349,
+        31.418778755331225,
+        50.03288694991251
+      ],
+      "contained_in_stac_bbox": true,
+      "nodata": null,
+      "gdal_all_valid": true,
+      "rights_evidence": "M1_2B verified; user conditionally accepted assigned split",
+      "attribution_reference": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/60f0a29989ec130007b828a8",
+      "status": "PASS_CANDIDATE",
+      "training_pair_generated": true,
+      "output_shape": [
+        264,
+        264
+      ],
+      "output_crs": "EPSG:3395",
+      "output_transform": [
+        0.7757575757568702,
+        0.0,
+        3497317.652389994,
+        0.0,
+        -0.7757575757568702,
+        6419206.173651781
+      ],
+      "output_bounds": [
+        3497317.652389994,
+        6419001.373651781,
+        3497522.4523899937,
+        6419206.173651781
+      ],
+      "crop": [
+        0,
+        0,
+        2048,
+        2048
+      ],
+      "output_ground_gsd": {
+        "latitude": 50.03229442353382,
+        "longitude": 31.41785888048029,
+        "east_m": 0.49929494025999394,
+        "north_m": 0.49929491685044175
+      },
+      "error_from_target_m": {
+        "east_m": -0.0007050597400060643,
+        "north_m": -0.0007050831495582499
+      },
+      "output_hashes": {
+        "rgb.tif": "613bd41499495ba275347d6882e188d45a5a130c9c50ece72d3fad0418c22557",
+        "canopy_fraction.tif": "bc067ba75ee57eb6907d1e1e8b0ebb71a78928a671795c1d116c98a0d8e0234e",
+        "canopy_mask.tif": "b68c48d0dda494fe2d1255e4004b5a204cb0ce209859de11b3f62babbf14bd50",
+        "valid_fraction.tif": "e4623edadeeb4c06e950a578c3de578555b67c30a49e279fc63cfeeed68e96b4"
+      },
+      "label_qa": {
+        "categories": [
+          1,
+          2
+        ],
+        "zero_pixels": 1994184,
+        "crowd_ids": [],
+        "segments_without_pixels": [],
+        "positive_pixels": 2200120
+      },
+      "threshold": 0.5,
+      "validity": "all-valid assumption reverified",
+      "rgb_method": "separable exact pixel-overlap box area, float64 sum; floor(value+0.5) uint8",
+      "fraction_method": "same overlap weights, float64 sum then float32 save",
+      "eligibility": "user accepted assigned split; two samples only",
+      "boundary_definition": "source outer edges preserved; centers at col+0.5,row+0.5",
+      "row_license": "CC-BY 4.0",
+      "source_license": "CC-BY-4.0",
+      "annotation_license": "CC BY 4.0",
+      "audit_reference": "M1_2B_RIGHTS_SEMANTICS.md",
+      "deterministic_rerun_hashes_equal": true
+    },
+    {
+      "image_id": 1972,
+      "oam_id": "5bba1c4f9ed15b0006d24f3b",
+      "split": "val",
+      "source_hashes": {
+        "rgb.bin": "eba6c1dee12d6cd9b75c6928acd0ab2b08428ab02d0eb63c5f0c165652d21726",
+        "annotation.bin": "d932e8b89682823951ddd69f9f4755d0188d75d99b9489a8bfb7d4555ef5f576",
+        "segments.json": "4f4ae5fd9abad93f4fabb57d85f8b35c19a1d99655aa96f19937281a8df077cf",
+        "coco_annotations.json": "97b7ab83a8b4f0b18dfe01f970cf9e17031ac57d9db09d9f4b0d53f43a680bdd",
+        "candidate-mask.png": "e9dc3036c8645a657b6779fc9387f9763543a5bf3ac618748182ee50b3aa4d8f"
+      },
+      "stac_sha256": "c4b9caacd229b7908ce711b9c1c4195be71b6ab53d4c902c4c531da5f0b349af",
+      "source_crs": "EPSG:3395",
+      "source_bounds": [
+        4341875.762843216,
+        7486561.904808961,
+        4342080.562843216,
+        7486766.704808961
+      ],
+      "source_transform": [
+        0.1,
+        0.0,
+        4341875.762843216,
+        0.0,
+        -0.1,
+        7486766.704808961
+      ],
+      "input_shape": [
+        2048,
+        2048
+      ],
+      "projected_pixel_m": [
+        0.1,
+        0.1
+      ],
+      "local_ground_pixel": {
+        "latitude": 55.81684030120562,
+        "longitude": 39.004653919110254,
+        "east_m": 0.05631316460514507,
+        "north_m": 0.056313165166399066
+      },
+      "source_wgs84_bounds": [
+        39.00373359510167,
+        55.816322628415946,
+        39.00557334480355,
+        55.81735847285613
+      ],
+      "contained_in_stac_bbox": true,
+      "nodata": null,
+      "gdal_all_valid": true,
+      "rights_evidence": "M1_2B verified; user conditionally accepted assigned split",
+      "attribution_reference": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/5bba1c4f9ed15b0006d24f3b",
+      "status": "PASS_CANDIDATE",
+      "training_pair_generated": true,
+      "output_shape": [
+        231,
+        231
+      ],
+      "output_crs": "EPSG:3395",
+      "output_transform": [
+        0.8865800865792802,
+        0.0,
+        4341875.762843216,
+        0.0,
+        -0.8865800865792802,
+        7486766.704808961
+      ],
+      "output_bounds": [
+        4341875.762843216,
+        7486561.904808961,
+        4342080.562843216,
+        7486766.704808961
+      ],
+      "crop": [
+        0,
+        0,
+        2048,
+        2048
+      ],
+      "output_ground_gsd": {
+        "latitude": 55.81684055409733,
+        "longitude": 39.004653469952615,
+        "east_m": 0.4992613034330109,
+        "north_m": 0.4992612746117913
+      },
+      "error_from_target_m": {
+        "east_m": -0.0007386965669891055,
+        "north_m": -0.000738725388208683
+      },
+      "output_hashes": {
+        "rgb.tif": "1fae6803ad979b740973bf14ba0374f058a5e9d466337da31dddebc911dea4bf",
+        "canopy_fraction.tif": "74f451310aa9ac988681d235c36fa9e9f530470ffad535105c773ffa2facbd59",
+        "canopy_mask.tif": "c5a8872779da640c8a290187c9bb5325c9edede563e9a6a54933cf7e28ddb70d",
+        "valid_fraction.tif": "34627479a78415c879158a63615bb60ea3d2552e2759039cd86f840e5ebd7255"
+      },
+      "label_qa": {
+        "categories": [
+          1,
+          2
+        ],
+        "zero_pixels": 1650554,
+        "crowd_ids": [
+          106343
+        ],
+        "segments_without_pixels": [],
+        "positive_pixels": 2543750
+      },
+      "threshold": 0.5,
+      "validity": "all-valid assumption reverified",
+      "rgb_method": "separable exact pixel-overlap box area, float64 sum; floor(value+0.5) uint8",
+      "fraction_method": "same overlap weights, float64 sum then float32 save",
+      "eligibility": "user accepted assigned split; two samples only",
+      "boundary_definition": "source outer edges preserved; centers at col+0.5,row+0.5",
+      "row_license": "CC-BY 4.0",
+      "source_license": "CC-BY-4.0",
+      "annotation_license": "CC BY 4.0",
+      "audit_reference": "M1_2B_RIGHTS_SEMANTICS.md",
+      "deterministic_rerun_hashes_equal": true
+    }
+  ],
+  "deterministic_rerun": "All 8 GeoTIFF file SHA-256 values match across independent runs"
+}
