@@ -1,0 +1,873 @@
+{
+  "revision": "d97d4da0ebbb6e249ae95ac5e19656babd972eb2",
+  "official_code_revision": "05dab754a3fd15b83d6b7606de7310155f4e2df2",
+  "acquisition": {
+    "utc": "2026-11-05T07:13:25.865552+00:00",
+    "revision": "d97d4da0ebbb6e249ae95ac5e19656babd972eb2",
+    "metadata_columns": [
+      "image_id",
+      "oam_id",
+      "license",
+      "validation_fold",
+      "height",
+      "width",
+      "crs",
+      "bounds",
+      "biome",
+      "meta"
+    ],
+    "transfer_payload_bytes": 924991,
+    "shards": [
+      {
+        "path": "data/test-00000-of-00001.parquet",
+        "publisher_sha256": "5c10ac4cb8afaf18dae5aad5b22cc86bb80977116a8bcd8c16d41ae48b9b13cf",
+        "rows": 439
+      },
+      {
+        "path": "data/train-00000-of-00007.parquet",
+        "publisher_sha256": "ec8fe0c79ed8286264625351c307331646c04717df186a25628fe96815bf2acb",
+        "rows": 596
+      },
+      {
+        "path": "data/train-00001-of-00007.parquet",
+        "publisher_sha256": "dd2ed7425aa6abc26db5c226a7d42c3d9e63cfb90cce73530736dfd26e6bf4d1",
+        "rows": 596
+      },
+      {
+        "path": "data/train-00002-of-00007.parquet",
+        "publisher_sha256": "71ee733c150b088ae109818c2f507be0d13bf7b65dc1ff645d742f359dca4ce7",
+        "rows": 596
+      },
+      {
+        "path": "data/train-00003-of-00007.parquet",
+        "publisher_sha256": "c1228e8c458d4f1ef94f50107e769a573d210236de89a6a9ec78008ad828da2a",
+        "rows": 596
+      },
+      {
+        "path": "data/train-00004-of-00007.parquet",
+        "publisher_sha256": "d656d76c4943bc30a6abf42acba3733e46c23f87380c4ea9edd9f23c84b46b09",
+        "rows": 595
+      },
+      {
+        "path": "data/train-00005-of-00007.parquet",
+        "publisher_sha256": "a441a767fd91286aa2db3a425b36131cd26e0e3a629350756f71b8a2dd7efbb9",
+        "rows": 595
+      },
+      {
+        "path": "data/train-00006-of-00007.parquet",
+        "publisher_sha256": "9a7721d81b076d28afe7ab29ec10cb0f51e37670e73cf9c3f7b939e3c2342857",
+        "rows": 595
+      }
+    ]
+  },
+  "existing_sample_identity_verified": true,
+  "geography": {
+    "geometry_unverified_rows": 0,
+    "longitude_range": [
+      -175.3038471604217,
+      177.5352443598689
+    ],
+    "latitude_range": [
+      -42.559050296815364,
+      65.75840054391756
+    ],
+    "coarse_cell_counts": {
+      "[3, -1]": 695,
+      "[2, 6]": 11,
+      "[13, 3]": 103,
+      "[-4, -2]": 45,
+      "[1, 4]": 70,
+      "[3, 4]": 116,
+      "[10, -1]": 70,
+      "[-9, 2]": 17,
+      "[-6, -2]": 77,
+      "[3, 5]": 145,
+      "[-13, 4]": 52,
+      "[-1, 6]": 10,
+      "[-8, 3]": 41,
+      "[2, 5]": 76,
+      "[17, -5]": 24,
+      "[-9, -1]": 12,
+      "[1, 5]": 73,
+      "[9, 2]": 49,
+      "[-18, -3]": 70,
+      "[-1, 0]": 60,
+      "[10, 0]": 4,
+      "[13, -4]": 1,
+      "[-12, 3]": 46,
+      "[12, 1]": 244,
+      "[0, 4]": 76,
+      "[-13, 3]": 87,
+      "[-7, 1]": 1,
+      "[-8, 0]": 23,
+      "[-8, 4]": 150,
+      "[-5, -3]": 40,
+      "[4, 5]": 34,
+      "[0, 5]": 101,
+      "[-7, -4]": 3,
+      "[-8, 1]": 96,
+      "[-8, -1]": 66,
+      "[15, -4]": 6,
+      "[-2, 1]": 1,
+      "[3, -2]": 92,
+      "[17, -2]": 9,
+      "[-13, 5]": 14,
+      "[12, 3]": 63,
+      "[-1, 5]": 80,
+      "[8, 2]": 56,
+      "[-9, 3]": 107,
+      "[-7, -2]": 61,
+      "[12, 2]": 23,
+      "[6, 5]": 16,
+      "[-7, -1]": 33,
+      "[-10, 2]": 11,
+      "[8, 0]": 4,
+      "[9, 1]": 32,
+      "[3, 3]": 19,
+      "[2, 4]": 175,
+      "[11, -1]": 78,
+      "[4, 4]": 58,
+      "[0, 0]": 54,
+      "[-9, 4]": 106,
+      "[1, 0]": 16,
+      "[5, 5]": 12,
+      "[16, -2]": 30,
+      "[11, 3]": 19,
+      "[12, -1]": 100,
+      "[12, 0]": 19,
+      "[-10, 1]": 25,
+      "[3, -3]": 42,
+      "[-8, -5]": 11,
+      "[4, 3]": 10,
+      "[9, 0]": 6,
+      "[-10, 4]": 17,
+      "[-1, 4]": 21,
+      "[-4, -1]": 1,
+      "[-11, 1]": 10,
+      "[-2, 0]": 30,
+      "[14, 3]": 9,
+      "[1, 6]": 13,
+      "[-8, 2]": 6,
+      "[-8, -3]": 12,
+      "[17, -4]": 2,
+      "[14, -4]": 12,
+      "[-12, 5]": 28,
+      "[-7, -3]": 18,
+      "[0, 1]": 12,
+      "[14, 4]": 16,
+      "[9, 5]": 8,
+      "[-16, 2]": 5,
+      "[3, 0]": 16,
+      "[-5, -2]": 32,
+      "[10, 1]": 18,
+      "[-1, 1]": 2,
+      "[-9, 1]": 19,
+      "[11, 1]": 9,
+      "[-6, -1]": 22,
+      "[14, -3]": 2,
+      "[5, -1]": 25,
+      "[-6, -3]": 2,
+      "[-1, 3]": 6,
+      "[-6, -4]": 4,
+      "[7, 1]": 1,
+      "[-12, 4]": 18,
+      "[2, -2]": 10,
+      "[14, -5]": 5,
+      "[-8, -4]": 5,
+      "[-7, 4]": 1,
+      "[-10, 3]": 8,
+      "[15, -3]": 4,
+      "[-11, 4]": 2,
+      "[5, 2]": 1
+    },
+    "estimated_ground_pixel_m_range": [
+      0.04101602577406042,
+      0.10009765554875534
+    ],
+    "estimated_ground_pixel_m_quantiles": [
+      0.04101602577406042,
+      0.07319632468798992,
+      0.09265640340860513,
+      0.09906660775300716,
+      0.10009765554875534
+    ]
+  },
+  "counts": {
+    "total": 4608,
+    "official_split": {
+      "test": 439,
+      "train": 4169
+    },
+    "roles": {
+      "holdout": 439,
+      "train": 3341,
+      "val": 828
+    },
+    "licenses": {
+      "CC-BY 4.0": 4608
+    },
+    "folds": {
+      "-1": 439,
+      "2": 792,
+      "4": 677,
+      "0": 828,
+      "1": 945,
+      "3": 927
+    },
+    "crs": {
+      "EPSG:3395": 4608
+    },
+    "shapes": {
+      "[2048, 2048]": 4608
+    }
+  },
+  "split_audit": {
+    "unique_oam_ids": 541,
+    "duplicate_oam_groups": 446,
+    "cross_role_conflicts": {},
+    "cross_fold_conflicts": [],
+    "existing_roles_preserved": true
+  },
+  "role_oam_counts": {
+    "train": 384,
+    "val": 102,
+    "holdout": 55
+  },
+  "candidates": [
+    {
+      "image_id": 1,
+      "oam_id": "59e62b8f3d6412ef72209f84",
+      "license": "CC-BY 4.0",
+      "validation_fold": 4,
+      "height": 2048,
+      "width": 2048,
+      "crs": "EPSG:3395",
+      "bounds": [
+        -11039045.0,
+        2182004.0,
+        -11038840.0,
+        2182208.75
+      ],
+      "biome": 13,
+      "meta": "http://oin-hotosm.s3.amazonaws.com/58d7f628ca8ed70011209f7b/0/1787e2f8-8eb4-42c9-a3b2-9d3adfdff627_meta.json",
+      "official_split": "train",
+      "shard": "data/train-00003-of-00007.parquet",
+      "shard_row": 90,
+      "center": [
+        -99.1645076826656,
+        19.35060368746629
+      ],
+      "wgs84_bounds": [
+        -99.16542845583182,
+        19.349730781290948,
+        -99.16358690949937,
+        19.35147658891559
+      ],
+      "projected_pixel": [
+        0.10009765625,
+        0.0999755859375
+      ],
+      "estimated_ground_pixel_m": [
+        0.0944777327978197,
+        0.09436251579903235
+      ],
+      "assigned_role": "train",
+      "selection_reason": "New oam; nonoverlapping opposite-role bbox; prefer unused 10deg cell, then biome, then lowest image_id",
+      "nearest_opposite_role_center_m": 62558.23566294069,
+      "m1_5b_disposition": "HOLD",
+      "source_evidence": {
+        "url": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/59e62b8f3d6412ef72209f84",
+        "status": "HOLD_SOURCE_LICENSE_MISSING",
+        "source_license": null,
+        "attribution_provider_present": true,
+        "snapshot_sha256": "fe930dbc31140922e3a3c91b47e955956ef23269a82e58bf5d8ea83dd8ac3600"
+      },
+      "training_eligible": false,
+      "category_pixel_qa": "NOT_VERIFIED"
+    },
+    {
+      "image_id": 2,
+      "oam_id": "5cb0ece9fa020e0006eb43d4",
+      "license": "CC-BY 4.0",
+      "validation_fold": 2,
+      "height": 2048,
+      "width": 2048,
+      "crs": "EPSG:3395",
+      "bounds": [
+        -7828417.0,
+        -3148293.5,
+        -7828212.5,
+        -3148088.75
+      ],
+      "biome": 12,
+      "meta": "https://oin-hotosm.s3.amazonaws.com/5cb0ec1cfa020e0006eb43d2/0/5cb0ec1cfa020e0006eb43d3_meta.json",
+      "official_split": "train",
+      "shard": "data/train-00000-of-00007.parquet",
+      "shard_row": 231,
+      "center": [
+        -70.3229478882329,
+        -27.354400885693934
+      ],
+      "wgs84_bounds": [
+        -70.32386641561091,
+        -27.355222041496287,
+        -70.3220293608549,
+        -27.35357972373869
+      ],
+      "projected_pixel": [
+        0.099853515625,
+        0.0999755859375
+      ],
+      "estimated_ground_pixel_m": [
+        0.08875077403256466,
+        0.08885927181484671
+      ],
+      "assigned_role": "train",
+      "selection_reason": "New oam; nonoverlapping opposite-role bbox; prefer unused 10deg cell, then biome, then lowest image_id",
+      "nearest_opposite_role_center_m": 676438.1038566662,
+      "m1_5b_disposition": "PROVISIONAL_ACQUIRE_FOR_QA",
+      "source_evidence": {
+        "url": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/5cb0ece9fa020e0006eb43d4",
+        "status": "SOURCE_LICENSE_VERIFIED_PIXEL_QA_PENDING",
+        "source_license": "CC-BY-4.0",
+        "attribution_provider_present": true,
+        "snapshot_sha256": "bb1f1f6c54c9254574d8c0dbec55c7d611ca4c06f54515eb94d018a96d20c6ea"
+      },
+      "training_eligible": false,
+      "category_pixel_qa": "NOT_VERIFIED"
+    },
+    {
+      "image_id": 3,
+      "oam_id": "5fb52130d89ab70006abca33",
+      "license": "CC-BY 4.0",
+      "validation_fold": 3,
+      "height": 2048,
+      "width": 2048,
+      "crs": "EPSG:3395",
+      "bounds": [
+        3211017.5,
+        -1787409.875,
+        3211222.25,
+        -1787205.0
+      ],
+      "biome": 7,
+      "meta": "https://oin-hotosm.s3.amazonaws.com/5fb51d70d89ab70006abca2f/1/5fb51d70d89ab70006abca31_meta.json",
+      "official_split": "train",
+      "shard": "data/train-00003-of-00007.parquet",
+      "shard_row": 160,
+      "center": [
+        28.84598062852467,
+        -15.950951306119327
+      ],
+      "wgs84_bounds": [
+        28.845060978252555,
+        -15.95184159784447,
+        28.846900278796788,
+        -15.950061010391238
+      ],
+      "projected_pixel": [
+        0.0999755859375,
+        0.10003662109375
+      ],
+      "estimated_ground_pixel_m": [
+        0.0961505651432739,
+        0.0962092654991526
+      ],
+      "assigned_role": "train",
+      "selection_reason": "New oam; nonoverlapping opposite-role bbox; prefer unused 10deg cell, then biome, then lowest image_id",
+      "nearest_opposite_role_center_m": 1569092.9271075604,
+      "m1_5b_disposition": "PROVISIONAL_ACQUIRE_FOR_QA",
+      "source_evidence": {
+        "url": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/5fb52130d89ab70006abca33",
+        "status": "SOURCE_LICENSE_VERIFIED_PIXEL_QA_PENDING",
+        "source_license": "CC-BY-4.0",
+        "attribution_provider_present": true,
+        "snapshot_sha256": "2476a47f5ed65434b8340189e96c36e6ae19e9e722b0884dc55ca07e9244f5ec"
+      },
+      "training_eligible": false,
+      "category_pixel_qa": "NOT_VERIFIED"
+    },
+    {
+      "image_id": 4,
+      "oam_id": "6051fa7273881800080aa06d",
+      "license": "CC-BY 4.0",
+      "validation_fold": 4,
+      "height": 2048,
+      "width": 2048,
+      "crs": "EPSG:3395",
+      "bounds": [
+        -11114592.0,
+        3826684.5,
+        -11114387.0,
+        3826889.25
+      ],
+      "biome": 8,
+      "meta": "https://oin-hotosm.s3.amazonaws.com/6051fa2273881800080aa06b/0/6051fa2273881800080aa06c_meta.json",
+      "official_split": "train",
+      "shard": "data/train-00004-of-00007.parquet",
+      "shard_row": 495,
+      "center": [
+        -99.84315793035937,
+        32.656828610625396
+      ],
+      "wgs84_bounds": [
+        -99.8440787035256,
+        32.656050638669875,
+        -99.84223715719315,
+        32.65760657574623
+      ],
+      "projected_pixel": [
+        0.10009765625,
+        0.0999755859375
+      ],
+      "estimated_ground_pixel_m": [
+        0.08435623390862691,
+        0.08425335911153611
+      ],
+      "assigned_role": "train",
+      "selection_reason": "New oam; nonoverlapping opposite-role bbox; prefer unused 10deg cell, then biome, then lowest image_id",
+      "nearest_opposite_role_center_m": 1260753.780408747,
+      "m1_5b_disposition": "PROVISIONAL_ACQUIRE_FOR_QA",
+      "source_evidence": {
+        "url": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/6051fa7273881800080aa06d",
+        "status": "SOURCE_LICENSE_VERIFIED_PIXEL_QA_PENDING",
+        "source_license": "CC-BY-4.0",
+        "attribution_provider_present": true,
+        "snapshot_sha256": "4be59f8a1ae9ea75dd0fe0885445fab5adaa82bfaa24d61683eebdda7361190d"
+      },
+      "training_eligible": false,
+      "category_pixel_qa": "NOT_VERIFIED"
+    },
+    {
+      "image_id": 5,
+      "oam_id": "5e4fae9a24710000056a5156",
+      "license": "CC-BY 4.0",
+      "validation_fold": 2,
+      "height": 2048,
+      "width": 2048,
+      "crs": "EPSG:3395",
+      "bounds": [
+        -6539481.0,
+        -1068817.25,
+        -6539276.5,
+        -1068612.375
+      ],
+      "biome": 1,
+      "meta": "https://oin-hotosm.s3.amazonaws.com/5e4fae1324710000056a5154/0/5e4fae1324710000056a5155_meta.json",
+      "official_split": "train",
+      "shard": "data/train-00004-of-00007.parquet",
+      "shard_row": 382,
+      "center": [
+        -58.744238797714104,
+        -9.619017640544959
+      ],
+      "wgs84_bounds": [
+        -58.74515732509212,
+        -9.619930857262048,
+        -58.7433202703361,
+        -9.618104421328912
+      ],
+      "projected_pixel": [
+        0.099853515625,
+        0.10003662109375
+      ],
+      "estimated_ground_pixel_m": [
+        0.09845884043155065,
+        0.09863938821291693
+      ],
+      "assigned_role": "train",
+      "selection_reason": "New oam; nonoverlapping opposite-role bbox; prefer unused 10deg cell, then biome, then lowest image_id",
+      "nearest_opposite_role_center_m": 494280.9008691894,
+      "m1_5b_disposition": "PROVISIONAL_ACQUIRE_FOR_QA",
+      "source_evidence": {
+        "url": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/5e4fae9a24710000056a5156",
+        "status": "SOURCE_LICENSE_VERIFIED_PIXEL_QA_PENDING",
+        "source_license": "CC-BY-4.0",
+        "attribution_provider_present": true,
+        "snapshot_sha256": "f83be9f35049369bff96c593c1b034c98bb2878f64df23f19410fdbcf4ca08c3"
+      },
+      "training_eligible": false,
+      "category_pixel_qa": "NOT_VERIFIED"
+    },
+    {
+      "image_id": 6,
+      "oam_id": "5c8d82f0b8e7090005010554",
+      "license": "CC-BY 4.0",
+      "validation_fold": 1,
+      "height": 2048,
+      "width": 2048,
+      "crs": "EPSG:3395",
+      "bounds": [
+        13380898.0,
+        1336471.0,
+        13381103.0,
+        1336675.875
+      ],
+      "biome": -1,
+      "meta": "https://oin-hotosm.s3.amazonaws.com/5c8d82c4b8e7090005010552/0/5c8d82c4b8e7090005010553_meta.json",
+      "official_split": "train",
+      "shard": "data/train-00001-of-00007.parquet",
+      "shard_row": 188,
+      "center": [
+        120.20357265960956,
+        11.997729250375341
+      ],
+      "wgs84_bounds": [
+        120.20265188644336,
+        11.996823334206695,
+        120.20449343277579,
+        11.998635163461007
+      ],
+      "projected_pixel": [
+        0.10009765625,
+        0.10003662109375
+      ],
+      "estimated_ground_pixel_m": [
+        0.09792527283879875,
+        0.09786556097805883
+      ],
+      "assigned_role": "train",
+      "selection_reason": "New oam; nonoverlapping opposite-role bbox; prefer unused 10deg cell, then biome, then lowest image_id",
+      "nearest_opposite_role_center_m": 211601.1239767445,
+      "m1_5b_disposition": "PROVISIONAL_ACQUIRE_FOR_QA",
+      "source_evidence": {
+        "url": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/5c8d82f0b8e7090005010554",
+        "status": "SOURCE_LICENSE_VERIFIED_PIXEL_QA_PENDING",
+        "source_license": "CC-BY-4.0",
+        "attribution_provider_present": true,
+        "snapshot_sha256": "c895461104b656e65031da58bd1cea3597628ab817030460a38cae3383677911"
+      },
+      "training_eligible": false,
+      "category_pixel_qa": "NOT_VERIFIED"
+    },
+    {
+      "image_id": 11,
+      "oam_id": "5cb64e020a3a5c0005ff12ff",
+      "license": "CC-BY 4.0",
+      "validation_fold": 2,
+      "height": 2048,
+      "width": 2048,
+      "crs": "EPSG:3395",
+      "bounds": [
+        -7304801.0,
+        -1980591.25,
+        -7304596.5,
+        -1980386.5
+      ],
+      "biome": 10,
+      "meta": "https://oin-hotosm.s3.amazonaws.com/5cb64d5a0a3a5c0005ff12fd/0/5cb64d5a0a3a5c0005ff12fe_meta.json",
+      "official_split": "train",
+      "shard": "data/train-00005-of-00007.parquet",
+      "shard_row": 330,
+      "center": [
+        -65.61922533013762,
+        -17.622571047540493
+      ],
+      "wgs84_bounds": [
+        -65.62014385751564,
+        -17.623452903505562,
+        -65.61830680275962,
+        -17.621689187211476
+      ],
+      "projected_pixel": [
+        0.099853515625,
+        0.0999755859375
+      ],
+      "estimated_ground_pixel_m": [
+        0.09519674608758211,
+        0.09531312540308012
+      ],
+      "assigned_role": "train",
+      "selection_reason": "New oam; nonoverlapping opposite-role bbox; prefer unused 10deg cell, then biome, then lowest image_id",
+      "nearest_opposite_role_center_m": 360979.36243462324,
+      "m1_5b_disposition": "PROVISIONAL_ACQUIRE_FOR_QA",
+      "source_evidence": {
+        "url": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/5cb64e020a3a5c0005ff12ff",
+        "status": "SOURCE_LICENSE_VERIFIED_PIXEL_QA_PENDING",
+        "source_license": "CC-BY-4.0",
+        "attribution_provider_present": true,
+        "snapshot_sha256": "a95aa7d7b6e75fa0604fa7e46e08b7f2f2316a640c04fae7eb9226358926b205"
+      },
+      "training_eligible": false,
+      "category_pixel_qa": "NOT_VERIFIED"
+    },
+    {
+      "image_id": 17,
+      "oam_id": "5a5c13545a9ef7cb5df674f1",
+      "license": "CC-BY 4.0",
+      "validation_fold": 4,
+      "height": 2048,
+      "width": 2048,
+      "crs": "EPSG:3395",
+      "bounds": [
+        19471996.0,
+        -5013416.0,
+        19472202.0,
+        -5013211.5
+      ],
+      "biome": 4,
+      "meta": "http://oin-hotosm.s3.amazonaws.com/5a5c131c2553e6000ce5aba8/0/acb64eb1-1063-473c-9ce6-26fa98fcc568_meta.json",
+      "official_split": "train",
+      "shard": "data/train-00001-of-00007.parquet",
+      "shard_row": 422,
+      "center": [
+        174.92084145588447,
+        -41.197143568376994
+      ],
+      "wgs84_bounds": [
+        174.91991619114185,
+        -41.19783734576144,
+        174.92176672062712,
+        -41.19644978358302
+      ],
+      "projected_pixel": [
+        0.1005859375,
+        0.099853515625
+      ],
+      "estimated_ground_pixel_m": [
+        0.07579580527944128,
+        0.07524389212220153
+      ],
+      "assigned_role": "train",
+      "selection_reason": "New oam; nonoverlapping opposite-role bbox; prefer unused 10deg cell, then biome, then lowest image_id",
+      "nearest_opposite_role_center_m": 113949.5005852924,
+      "m1_5b_disposition": "PROVISIONAL_ACQUIRE_FOR_QA",
+      "source_evidence": {
+        "url": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/5a5c13545a9ef7cb5df674f1",
+        "status": "SOURCE_LICENSE_VERIFIED_PIXEL_QA_PENDING",
+        "source_license": "CC-BY-4.0",
+        "attribution_provider_present": true,
+        "snapshot_sha256": "a9557f50e90f15986a400d64b397d9c50ba0a1bf7c86d1505dde18058d832a8d"
+      },
+      "training_eligible": false,
+      "category_pixel_qa": "NOT_VERIFIED"
+    },
+    {
+      "image_id": 9,
+      "oam_id": "5de875b7b332ff0007897508",
+      "license": "CC-BY 4.0",
+      "validation_fold": 0,
+      "height": 2048,
+      "width": 2048,
+      "crs": "EPSG:3395",
+      "bounds": [
+        -9080258.0,
+        5070481.0,
+        -9080053.0,
+        5070686.0
+      ],
+      "biome": 98,
+      "meta": "https://oin-hotosm.s3.amazonaws.com/5de87569b332ff0007897503/0/5de87569b332ff0007897504_meta.json",
+      "official_split": "train",
+      "shard": "data/train-00000-of-00007.parquet",
+      "shard_row": 503,
+      "center": [
+        -81.56842467831935,
+        41.58456430885856
+      ],
+      "wgs84_bounds": [
+        -81.56934545148557,
+        41.583872991208935,
+        -81.56750390515313,
+        41.58525561905094
+      ],
+      "projected_pixel": [
+        0.10009765625,
+        0.10009765625
+      ],
+      "estimated_ground_pixel_m": [
+        0.07498138179567315,
+        0.07498138286404947
+      ],
+      "assigned_role": "val",
+      "selection_reason": "New oam; nonoverlapping opposite-role bbox; prefer unused 10deg cell, then biome, then lowest image_id",
+      "nearest_opposite_role_center_m": 177611.53894495484,
+      "m1_5b_disposition": "PROVISIONAL_ACQUIRE_FOR_QA",
+      "source_evidence": {
+        "url": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/5de875b7b332ff0007897508",
+        "status": "SOURCE_LICENSE_VERIFIED_PIXEL_QA_PENDING",
+        "source_license": "CC-BY-4.0",
+        "attribution_provider_present": true,
+        "snapshot_sha256": "01f2418ad2d7af50db29b2107021597117513f29aadf4105096ea6c276c5d63d"
+      },
+      "training_eligible": false,
+      "category_pixel_qa": "NOT_VERIFIED"
+    },
+    {
+      "image_id": 576,
+      "oam_id": "5ccfafe928c3b90006c145f4",
+      "license": "CC-BY 4.0",
+      "validation_fold": 0,
+      "height": 2048,
+      "width": 2048,
+      "crs": "EPSG:3395",
+      "bounds": [
+        -13276651.0,
+        6906723.0,
+        -13276446.0,
+        6906928.0
+      ],
+      "biome": 5,
+      "meta": "https://oin-hotosm.s3.amazonaws.com/5ccfaf9728c3b90006c145f2/0/5ccfaf9728c3b90006c145f3_meta.json",
+      "official_split": "train",
+      "shard": "data/train-00001-of-00007.parquet",
+      "shard_row": 291,
+      "center": [
+        -119.26526437904107,
+        52.77165201791139
+      ],
+      "wgs84_bounds": [
+        -119.26618515220729,
+        52.77109357872478,
+        -119.26434360587484,
+        52.77221044989947
+      ],
+      "projected_pixel": [
+        0.10009765625,
+        0.10009765625
+      ],
+      "estimated_ground_pixel_m": [
+        0.060687315009656365,
+        0.0606873135989054
+      ],
+      "assigned_role": "val",
+      "selection_reason": "New oam; nonoverlapping opposite-role bbox; prefer unused 10deg cell, then biome, then lowest image_id",
+      "nearest_opposite_role_center_m": 19189.621329422625,
+      "m1_5b_disposition": "PROVISIONAL_ACQUIRE_FOR_QA",
+      "source_evidence": {
+        "url": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/5ccfafe928c3b90006c145f4",
+        "status": "SOURCE_LICENSE_VERIFIED_PIXEL_QA_PENDING",
+        "source_license": "CC-BY-4.0",
+        "attribution_provider_present": true,
+        "snapshot_sha256": "8f9e16eaa8654fde0d9e07724ba7a3983a791761216c37dec8852be93b6100af"
+      },
+      "training_eligible": false,
+      "category_pixel_qa": "NOT_VERIFIED"
+    },
+    {
+      "image_id": 1401,
+      "oam_id": "5bf6a8f50d1a8c00054a41cc",
+      "license": "CC-BY 4.0",
+      "validation_fold": 0,
+      "height": 2048,
+      "width": 2048,
+      "crs": "EPSG:3395",
+      "bounds": [
+        -8896331.0,
+        -363890.09375,
+        -8896127.0,
+        -363685.28125
+      ],
+      "biome": 2,
+      "meta": "https://oin-hotosm.s3.amazonaws.com/5bf6a8940d1a8c00054a41ca/0/5bf6a8940d1a8c00054a41cb_meta.json",
+      "official_split": "train",
+      "shard": "data/train-00001-of-00007.parquet",
+      "shard_row": 321,
+      "center": [
+        -79.91618481727326,
+        -3.2881542168441174
+      ],
+      "wgs84_bounds": [
+        -79.91710109886306,
+        -3.289078802221524,
+        -79.91526853568345,
+        -3.2872296305980795
+      ],
+      "projected_pixel": [
+        0.099609375,
+        0.100006103515625
+      ],
+      "estimated_ground_pixel_m": [
+        0.09944648221864355,
+        0.09984256270504714
+      ],
+      "assigned_role": "val",
+      "selection_reason": "New oam; nonoverlapping opposite-role bbox; prefer unused 10deg cell, then biome, then lowest image_id",
+      "nearest_opposite_role_center_m": 137130.77790575224,
+      "m1_5b_disposition": "PROVISIONAL_ACQUIRE_FOR_QA",
+      "source_evidence": {
+        "url": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/5bf6a8f50d1a8c00054a41cc",
+        "status": "SOURCE_LICENSE_VERIFIED_PIXEL_QA_PENDING",
+        "source_license": "CC-BY-4.0",
+        "attribution_provider_present": true,
+        "snapshot_sha256": "741579c4c56117941a8222c1aa59f30a89766af632bbcebd9affa8e8f9bf75bd"
+      },
+      "training_eligible": false,
+      "category_pixel_qa": "NOT_VERIFIED"
+    },
+    {
+      "image_id": 4235,
+      "oam_id": "5ddb95a2aff195000554e7e4",
+      "license": "CC-BY 4.0",
+      "validation_fold": 0,
+      "height": 2048,
+      "width": 2048,
+      "crs": "EPSG:3395",
+      "bounds": [
+        9340705.0,
+        3245465.25,
+        9340910.0,
+        3245670.0
+      ],
+      "biome": 3,
+      "meta": "https://oin-hotosm.s3.amazonaws.com/5ddb954faff195000554e7e2/0/5ddb954faff195000554e7e3_meta.json",
+      "official_split": "train",
+      "shard": "data/train-00004-of-00007.parquet",
+      "shard_row": 167,
+      "center": [
+        83.90990143268257,
+        28.132665577440775
+      ],
+      "wgs84_bounds": [
+        83.90898065951635,
+        28.131850322621553,
+        83.91082220584879,
+        28.133480825992955
+      ],
+      "projected_pixel": [
+        0.10009765625,
+        0.0999755859375
+      ],
+      "estimated_ground_pixel_m": [
+        0.08833769872375623,
+        0.08822997043435289
+      ],
+      "assigned_role": "val",
+      "selection_reason": "New oam; nonoverlapping opposite-role bbox; prefer unused 10deg cell, then biome, then lowest image_id",
+      "nearest_opposite_role_center_m": 144406.00654255252,
+      "m1_5b_disposition": "PROVISIONAL_ACQUIRE_FOR_QA",
+      "source_evidence": {
+        "url": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/5ddb95a2aff195000554e7e4",
+        "status": "SOURCE_LICENSE_VERIFIED_PIXEL_QA_PENDING",
+        "source_license": "CC-BY-4.0",
+        "attribution_provider_present": true,
+        "snapshot_sha256": "5709312b85fe73aa935765cf76a0c91a4e9e10924c523628f832c7051f644479"
+      },
+      "training_eligible": false,
+      "category_pixel_qa": "NOT_VERIFIED"
+    }
+  ],
+  "candidate_reason_counts": {
+    "HOLD_SPLIT": 439,
+    "EXCLUDED_EXISTING_OR_SELECTED_OAM": 81,
+    "NOT_SELECTED_WITHIN_BUDGET": 4021,
+    "HOLD_CROSS_ROLE_FOOTPRINT_OVERLAP": 55,
+    "SELECTED_PROVISIONAL": 12
+  },
+  "metadata_cache_sha256": "f83ad4c27154d62e485d59b4abc5148c74fc5760c090530663ee927ca1566c27",
+  "status": "METADATA_AUDIT_COMPLETE_CANDIDATES_PROVISIONAL",
+  "total_network_payload_bytes": 963094,
+  "offline_replay": true,
+  "limitations": [
+    "No image or annotation column read",
+    "Metadata bounds are float32, embedded grids unverified",
+    "Canopy coverage/quality and raw pixel IDs unverified for new candidates"
+  ],
+  "dispositions_sha256": "f606214d8157ace56f8641204dd4ef543fd0478854e2eaca6768481977e737d8",
+  "aborted_attempts": {
+    "count": 2,
+    "transfer_payload_bytes": "NOT_RECORDED",
+    "per_attempt_limit_bytes": 134217728,
+    "reason": "Slow per-request redirects and repeated CRS setup; no completed cache/result persisted"
+  }
+}
