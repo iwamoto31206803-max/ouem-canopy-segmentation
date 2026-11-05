@@ -1,0 +1,154 @@
+{
+  "utc": "2026-11-05T04:05:19.426365+00:00",
+  "dataset": "restor/tcd",
+  "revision": "d97d4da0ebbb6e249ae95ac5e19656babd972eb2",
+  "status": "HOLD_GSD_MISMATCH",
+  "samples": [
+    {
+      "image_id": 661,
+      "oam_id": "60f0a29989ec130007b828a8",
+      "split": "train",
+      "source_hashes": {
+        "rgb.bin": "ea69df9a2d636655c04e4c9002ee5ba3f5774ebf54b076c083958a4b0b28cf10",
+        "annotation.bin": "6975c1455eee9a68ebffe54b6e53971f63a7a81ae861e7733e13ff6c968ab105",
+        "segments.json": "38e75db943428e7086f76db4df286887d9649edf4a398260ca193bd275ba46f5",
+        "coco_annotations.json": "96eaa3219f34dd0bd693e944749ad14e9ca37a095b8e9595dd230027166ab5df",
+        "candidate-mask.png": "9e2366c5cf66ecb548194836dff0554e951bc954331e9fb3f64680732860b31f"
+      },
+      "stac_sha256": "84c387e6457b887633a69fcd6728a1a3653c5c104b3ac795332143ea3828bb4c",
+      "source_crs": "EPSG:3395",
+      "source_bounds": [
+        3497317.652389994,
+        6419001.373651781,
+        3497522.4523899937,
+        6419206.173651781
+      ],
+      "source_transform": [
+        0.09999999999990905,
+        0.0,
+        3497317.652389994,
+        0.0,
+        -0.09999999999990905,
+        6419206.173651781
+      ],
+      "input_shape": [
+        2048,
+        2048
+      ],
+      "projected_pixel_m": [
+        0.09999999999990905,
+        0.09999999999990905
+      ],
+      "local_ground_pixel": {
+        "latitude": 50.03229413421251,
+        "longitude": 31.417859329637928,
+        "east_m": 0.06436223886509389,
+        "north_m": 0.0643622374263178
+      },
+      "source_wgs84_bounds": [
+        31.416939005629345,
+        50.03170188980349,
+        31.418778755331225,
+        50.03288694991251
+      ],
+      "contained_in_stac_bbox": true,
+      "nodata": null,
+      "gdal_all_valid": true,
+      "proposed_crop": [
+        0,
+        0,
+        2040,
+        2040
+      ],
+      "proposed_output_shape": [
+        408,
+        408
+      ],
+      "nominal_gsd_m": 0.5,
+      "fivefold_ground_pixel_m": [
+        0.32181119432546945,
+        0.321811187131589
+      ],
+      "rights_evidence": "M1_2B verified; user conditionally accepted assigned split",
+      "attribution_reference": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/60f0a29989ec130007b828a8",
+      "status": "HOLD_GSD_MISMATCH",
+      "training_pair_generated": false
+    },
+    {
+      "image_id": 1972,
+      "oam_id": "5bba1c4f9ed15b0006d24f3b",
+      "split": "val",
+      "source_hashes": {
+        "rgb.bin": "eba6c1dee12d6cd9b75c6928acd0ab2b08428ab02d0eb63c5f0c165652d21726",
+        "annotation.bin": "d932e8b89682823951ddd69f9f4755d0188d75d99b9489a8bfb7d4555ef5f576",
+        "segments.json": "4f4ae5fd9abad93f4fabb57d85f8b35c19a1d99655aa96f19937281a8df077cf",
+        "coco_annotations.json": "97b7ab83a8b4f0b18dfe01f970cf9e17031ac57d9db09d9f4b0d53f43a680bdd",
+        "candidate-mask.png": "e9dc3036c8645a657b6779fc9387f9763543a5bf3ac618748182ee50b3aa4d8f"
+      },
+      "stac_sha256": "c4b9caacd229b7908ce711b9c1c4195be71b6ab53d4c902c4c531da5f0b349af",
+      "source_crs": "EPSG:3395",
+      "source_bounds": [
+        4341875.762843216,
+        7486561.904808961,
+        4342080.562843216,
+        7486766.704808961
+      ],
+      "source_transform": [
+        0.1,
+        0.0,
+        4341875.762843216,
+        0.0,
+        -0.1,
+        7486766.704808961
+      ],
+      "input_shape": [
+        2048,
+        2048
+      ],
+      "projected_pixel_m": [
+        0.1,
+        0.1
+      ],
+      "local_ground_pixel": {
+        "latitude": 55.81684030120562,
+        "longitude": 39.004653919110254,
+        "east_m": 0.05631316460514507,
+        "north_m": 0.056313165166399066
+      },
+      "source_wgs84_bounds": [
+        39.00373359510167,
+        55.816322628415946,
+        39.00557334480355,
+        55.81735847285613
+      ],
+      "contained_in_stac_bbox": true,
+      "nodata": null,
+      "gdal_all_valid": true,
+      "proposed_crop": [
+        0,
+        0,
+        2040,
+        2040
+      ],
+      "proposed_output_shape": [
+        408,
+        408
+      ],
+      "nominal_gsd_m": 0.5,
+      "fivefold_ground_pixel_m": [
+        0.28156582302572536,
+        0.28156582583199535
+      ],
+      "rights_evidence": "M1_2B verified; user conditionally accepted assigned split",
+      "attribution_reference": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/5bba1c4f9ed15b0006d24f3b",
+      "status": "HOLD_GSD_MISMATCH",
+      "training_pair_generated": false
+    }
+  ],
+  "target_reference_m": [
+    0.484,
+    0.486
+  ],
+  "output_hashes": {},
+  "reason": "Fivefold projected-grid reduction differs materially from target ground spacing"
+}
