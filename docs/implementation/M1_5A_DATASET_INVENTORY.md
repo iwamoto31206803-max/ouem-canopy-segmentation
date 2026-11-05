@@ -258,3 +258,93 @@ The diagnostic CLI is completely offline and checks raw_manifest plus every orig
 Regression result: **106 passed**, including four new diagnostic tests, with 75 existing/reused Affine warnings. Tests independently compare run-union components with flood-fill on synthetic arrays (4/8 connectivity), distinguish exterior/interior and annotated dark pixels, check square capacity/threshold sensitivity, and validate empty/bad inputs. No real model training or GPU experiment was performed.
 
 Unresolved: true source valid-data mask/footprint, exact processing stage of fill/coverage loss, source-side alpha/nodata/sidecars, per-component ecological interpretation, certified crop suitability, B/C semantics and corpus-wide incidence. Evidence that would establish category 1 or justify B/C would include an authoritative original coverage mask or documented processing trace spatially matched to the tile; a bbox or an RGB-zero threshold alone is insufficient. These unknowns do not block the reviewed A-first replacement plan, but they do block using 2/9 as all-valid training pairs.
+
+## M1-5B-3 execution: Train 3 / Val 576 (2026-11-05)
+
+**Partial completion: Train 3 pair PASS candidate; Val 576 HOLD. The minimum of one new Train and one new Val is NOT MET.** No runtime/test script, training/GPU code, dependency or formal design changed. The existing [pilot result JSON](M1_5B_PILOT_RESULT.json) has an additive `m1_5b3` record. Every previous JSON field, including 2/9's HOLD, was preserved and compared with the base version.
+
+### Source, budget and protection
+
+The fixed restor/tcd revision remains d97d4da0ebbb6e249ae95ac5e19656babd972eb2. Completed M1-5A rows/acquisition/STAC cache was reused and hash-checked. Train 3 is fold3 / oam_id 5fb52130d89ab70006abca33; Val 576 is fold0 / oam_id 5ccfafe928c3b90006c145f4. Both row licenses are CC-BY 4.0, matching their exact STAC CC-BY-4.0 declarations. Annotation terms remain the fixed official TCD documentation. Named source/producer/licensor and full attribution stay external; no contacts are copied to Git. Train3's full STAC attribution was manually reviewed; commercial final clearance is separate.
+
+Source-group, original metadata object, opposite-role/holdout metadata footprint and proximity checks passed. Nearest opposite-role footprint lower bounds are ~1,568.81km for 3 and ~19.014km for 576. Existing Train661 / Val1972 roles and all eight output hashes were reverified. Old 2/9 originals and raw-manifest hashes were reverified; their HOLD was not lifted. No Holdout pixels or automatic replacement candidates were acquired.
+
+| Target | Shard / zero-based group / row in group | Compressed column bytes | Acquisition |
+| --- | --- | ---: | --- |
+| Train 3 | train-00003 / 1 / 60 (shard row160) | 78,838,830 | Complete |
+| Val 576 | train-00001 / 2 / 91 (shard row291) | 75,427,490 | Complete |
+
+Required compressed columns were **154,266,320 bytes**. Largest live group was 78,838,830 bytes; two-pair raw planning allowance was 52,428,800 bytes plus metadata/control reserve, within 128MiB. Actual HTTP payload was **154,311,469 bytes (147.16MiB)** including 45,149 bytes of publisher/footer work, below 256MiB. Acquisition took 63.18s. One group at a time was staged and its new compressed cache evicted. Two 100-row groups necessarily included 198 other encoded records; only the target two pairs were decoded/saved as individual images. Full-shard hashes were not recomputed.
+
+Total new cache + canonical products/preview + repeat artifacts at the recorded observation was **4,215,279 bytes (~4.02MiB)**, below 128MiB. Existing metadata/accepted caches are excluded. Peak disk use was not separately measured; existing pre-write storage guards were used. No automatic retry or budget increase occurred.
+
+### QA and generated data
+
+Both originals are 2048-square RGB TIFF plus matching RGB PNG annotation, with categories Canopy1/Tree2 and known crowd. Primary IDs/categories, dimensions/orientation and binary decoding passed. Embedded EPSG:3395 bounds agree with float32 metadata rounding uncertainty and lie inside their source STAC bbox; containment alone does not prove coverage.
+
+| Item | Train 3 | Val 576 |
+| --- | --- | --- |
+| Source local ground GSD E/N | ~0.096174m / ~0.096174m | ~0.060628m / ~0.060628m |
+| Exact-black / unique outer-edge pixels | 0 / 0 | 412,218 / 2,529 |
+| TIFF nodata / GDAL mask | None / all_valid | None / all_valid, insufficient for black fill |
+| Crowd | ID137 / COCO144: 89,664 pixels each, exact match | ID35823 / COCO43919: mismatch |
+| Output | **394x394**, four GeoTIFFs saved | **No training GeoTIFFs saved** |
+| Output ground GSD E/N | 0.499909759m / 0.499909765m | 248x248/~0.500671m is proposed diagnostic grid only |
+| Binary positive / fraction mean | 39,260 pixels / 25.287080% | Not approved/generated at 0.50m |
+| Binary canopy ratio | 25.290525% | Not approved/generated |
+| Eligibility | PASS candidate under current all-valid QA contract | HOLD |
+
+Train3 retains the entire source extent. Source/output CRS is EPSG:3395; output affine is approximately `[0.519796954314,0,3211017.441218,0,-0.519796954315,-1787205.035984]`. Exact affine/bounds and four output SHA-256 values are in JSON/manifest. RGB area averaging/rounding, fraction aggregation, >=0.5 threshold and all-one valid_fraction reuse M1-2D unchanged. Source/overlay and converted RGB/mask previews were actually viewed: crowns broadly align without obvious spatial shift or missing coverage. Some vegetation is unlabelled; no accuracy/ecological-completeness claim is made.
+
+All four saved files passed hash/grid/dtype/label/validity checks and readback against a fresh invocation of the source transform. A second fresh output run produced the **same four SHA-256 values**. No model/optimizer/GPU work occurred. Existing training loaders remain restricted to their accepted IDs; this PR does not connect 3 to training automatically.
+
+### Val576 HOLD details
+
+Source/overlay and an enlarged cyan discrepancy diagnostic were actually viewed. Large sharp bottom wedges and local soft/warped image content remain. Four-neighbor analysis finds 408,722 border-connected black pixels (six components), the largest two areas 326,363 and 82,306 pixels. Black pixels carry background labels, which does not establish valid coverage. No color-based NoData, crop or label correction was applied.
+
+Separately, category1 crowd COCO RLE decodes to **79,761 pixels**, while its corresponding panoptic ID35823 covers **85,819**. There are **6,058 panoptic-only pixels**, zero RLE-only. None of the mismatch lies on exact-black RGB. The cyan diagnostic is in nonblack imagery: deleting black fill does not explain it. The same decoder exactly matches Train3, and source hashes match. The generating cause/which representation is intended is unresolved; neither representation was edited or preferred automatically.
+
+Existing `prepare` records `Crowd RLE mismatch/ambiguous` before reaching its black-border gate. A separate read-only inspection records **both** this mismatch and `HOLD_UNMARKED_BLACK_BORDER_VALIDITY`. Both prevent using 576 under current policy. No Val fraction/mask/validity product or alternate candidate was generated/acquired.
+
+Whole-run `prepare` exits **3 / REAL_PILOT_NOT_VERIFIED** despite the successful Train pair. Existing whole-run `verify` exits **1 / FAIL_STOPPED** on the first crowd mismatch, so it does not summarize the later Train entry. This limitation is recorded rather than calling that command PASS. Train3 was independently verified with existing `inspect_source` and `verify_sample`; no gate/script was changed merely to make whole-run verification succeed.
+
+### Existing-CLI reproduction
+
+Actual fresh external names are `m1-5b3-pilot-01`, `m1-5b3-pairs-01`, `m1-5b3-pairs-repeat-01`. They contain source/processed previews, STAC, review and discrepancy records. Transfer cache and outputs together. `raw/<id>/stac.json` attribution references are relative to the pilot cache root.
+
+```powershell
+$Meta = '<completed-M1-5A-cache>'
+$Cache = '<fresh-external-M1-5B3-cache>'
+$Out = '<fresh-external-M1-5B3-pairs>'
+$Review = '<external-review-json>'
+.\.venv\Scripts\python.exe scripts/m1_5b_pilot.py plan --inventory-cache $Meta --cache $Cache --ids 3 576 --transfer-mib 256 --storage-mib 128
+# Inspect plan.json; stop if budget/evidence checks fail.
+.\.venv\Scripts\python.exe scripts/m1_5b_pilot.py acquire --inventory-cache $Meta --cache $Cache --ids 3 576 --transfer-mib 256 --storage-mib 128
+# View preview and full STAC; create the hash-bound review JSON documented above.
+# Actual run explicitly passed 3's alignment/quality/attribution only, not 576.
+.\.venv\Scripts\python.exe scripts/m1_5b_pilot.py prepare --inventory-cache $Meta --cache $Cache --output $Out --ids 3 576 --reviews $Review
+# Expected here: exit3, Val HOLD. Whole-run verify stops on Val with exit1:
+.\.venv\Scripts\python.exe scripts/m1_5b_pilot.py verify --inventory-cache $Meta --cache $Cache --output $Out --ids 3 576
+```
+
+For independent offline validation of the successful Train entry, the following uses only existing functions (repository-root PowerShell):
+
+```powershell
+@'
+import json, sys
+from pathlib import Path
+sys.path.insert(0, 'scripts')
+from m1_5b_pilot import inspect_source, verify_sample
+cache, output = map(Path, sys.argv[1:])
+raw = json.loads((cache/'raw_manifest.json').read_text())
+pairs = json.loads((output/'manifest.json').read_text())
+original = next(s for s in raw['samples'] if s['metadata']['image_id']==3)
+prepared = next(s for s in pairs['samples'] if s['image_id']==3)
+arrays, info = inspect_source(cache/'raw'/'3', original)
+verify_sample(output, prepared, arrays)
+print('Train 3 source-derived pixels/grid and saved-file hashes verified')
+'@ | .\.venv\Scripts\python.exe - $Cache $Out
+.\.venv\Scripts\python.exe -m pytest -q --disable-warnings
+```
+
+Regression: **106 passed, 75 Affine-related warnings**. No code/test additions were needed. Real acquisition, successful Train conversion/readback/repeat and held Val QA are separate from unit results. This two-doc change records execution only. Next action is review of 3's addition and 576's two HOLD findings; a new candidate or validity/label policy needs a separate explicit decision. Nothing was silently changed to satisfy the missing Val acceptance condition.
