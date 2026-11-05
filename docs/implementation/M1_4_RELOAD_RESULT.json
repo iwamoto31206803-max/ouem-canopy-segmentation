@@ -1,0 +1,22 @@
+{
+  "status": "CHECKPOINT_RESUME_PASS",
+  "experiment": "M1-4-CPU-20steps-seed0",
+  "utc": "2026-11-05T05:38:18.060066+00:00",
+  "gpu_vram": "NOT_MEASURED",
+  "checks": {
+    "model": true,
+    "optimizer": true,
+    "rng": true
+  },
+  "completed_steps": 20,
+  "checkpoint_sha256": "0f07c0d43a02a4c33073f86899d46ed6c60bfb31f3cbaa8861079f5b77dd8047",
+  "reload_seconds": 6.188305399962701,
+  "memory_after_reload": {
+    "working_set_bytes": 1796075520,
+    "peak_working_set_bytes": 2862542848,
+    "committed_private_bytes": 3179528192,
+    "peak_committed_private_bytes": 4248096768
+  },
+  "continuation_determinism": "NOT_VERIFIED_LOAD_AND_STATE_COMPARISON_ONLY",
+  "total_seconds": 7.275057199993171
+}

@@ -1,0 +1,1611 @@
+{
+  "status": "TRAINING_COMPLETE_RELOAD_PENDING",
+  "experiment": "M1-4-CPU-20steps-seed0",
+  "utc": "2026-11-05T05:36:19.807686+00:00",
+  "gpu_vram": "NOT_MEASURED",
+  "config": {
+    "seed": 0,
+    "threads": 4,
+    "batch_size": 1,
+    "patch_size": 256,
+    "lr": 0.0001,
+    "weight_decay": 0.01,
+    "betas": [
+      0.9,
+      0.999
+    ],
+    "eps": 1e-08,
+    "steps": 20,
+    "dtype": "float32",
+    "device": "cpu"
+  },
+  "initial_checkpoint": {
+    "filename": "aerial_swinb_si.pth",
+    "sha256": "f8abf21cadaab2a71859e9d172bec4e5d6b7cc9710882a2f6a4d8aae826db036",
+    "source": "https://huggingface.co/allenai/satlas-pretrain/resolve/b1f8de04dacf9f9ed9640fe32484947710b47ede/aerial_swinb_si.pth",
+    "revision": "b1f8de04dacf9f9ed9640fe32484947710b47ede",
+    "publisher_sha256": "f8abf21cadaab2a71859e9d172bec4e5d6b7cc9710882a2f6a4d8aae826db036",
+    "publisher_size_bytes": 504439674,
+    "local_size_bytes": 504439674
+  },
+  "dataset_revision": "d97d4da0ebbb6e249ae95ac5e19656babd972eb2",
+  "inputs": [
+    {
+      "image_id": 661,
+      "oam_id": "60f0a29989ec130007b828a8",
+      "split": "train",
+      "hashes": {
+        "rgb.tif": "613bd41499495ba275347d6882e188d45a5a130c9c50ece72d3fad0418c22557",
+        "canopy_fraction.tif": "bc067ba75ee57eb6907d1e1e8b0ebb71a78928a671795c1d116c98a0d8e0234e",
+        "canopy_mask.tif": "b68c48d0dda494fe2d1255e4004b5a204cb0ce209859de11b3f62babbf14bd50",
+        "valid_fraction.tif": "e4623edadeeb4c06e950a578c3de578555b67c30a49e279fc63cfeeed68e96b4"
+      },
+      "license": "CC-BY-4.0",
+      "attribution": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/60f0a29989ec130007b828a8"
+    },
+    {
+      "image_id": 1972,
+      "oam_id": "5bba1c4f9ed15b0006d24f3b",
+      "split": "val",
+      "hashes": {
+        "rgb.tif": "1fae6803ad979b740973bf14ba0374f058a5e9d466337da31dddebc911dea4bf",
+        "canopy_fraction.tif": "74f451310aa9ac988681d235c36fa9e9f530470ffad535105c773ffa2facbd59",
+        "canopy_mask.tif": "c5a8872779da640c8a290187c9bb5325c9edede563e9a6a54933cf7e28ddb70d",
+        "valid_fraction.tif": "34627479a78415c879158a63615bb60ea3d2552e2759039cd86f840e5ebd7255"
+      },
+      "license": "CC-BY-4.0",
+      "attribution": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/5bba1c4f9ed15b0006d24f3b"
+    }
+  ],
+  "versions": {
+    "torch": "2.7.1+cpu",
+    "torchvision": "0.22.1+cpu",
+    "satlaspretrain-models": "0.3.1"
+  },
+  "python": "3.11.9",
+  "model_construction_seconds": 2.1531056999228895,
+  "model_constructed_memory": {
+    "working_set_bytes": 1195282432,
+    "peak_working_set_bytes": 1195282432,
+    "committed_private_bytes": 2176622592,
+    "peak_committed_private_bytes": 2176622592
+  },
+  "optimizer_construction_seconds": 0.002112400019541383,
+  "optimizer_constructed_memory": {
+    "working_set_bytes": 1195286528,
+    "peak_working_set_bytes": 1195286528,
+    "committed_private_bytes": 2176622592,
+    "peak_committed_private_bytes": 2176622592
+  },
+  "construction_seconds": 2.4286507999058813,
+  "model_optimizer_ready_memory": {
+    "working_set_bytes": 1191948288,
+    "peak_working_set_bytes": 1195286528,
+    "committed_private_bytes": 2172420096,
+    "peak_committed_private_bytes": 2176622592
+  },
+  "initial_eval": {
+    "train": {
+      "ce": 0.6926009058952332,
+      "tp": 34601,
+      "fp": 30713,
+      "fn": 25,
+      "iou": 0.5295612115275716,
+      "f1": 0.692435461276766,
+      "precision": 0.529763909728389,
+      "recall": 0.9992779991913591
+    },
+    "val": {
+      "ce": 0.6912980079650879,
+      "tp": 30224,
+      "fp": 19869,
+      "fn": 63,
+      "iou": 0.6025998883483531,
+      "f1": 0.7520278676287634,
+      "precision": 0.6033577545764878,
+      "recall": 0.9979198996269026
+    }
+  },
+  "steps": [
+    {
+      "step": 1,
+      "memory_before": {
+        "working_set_bytes": 1274150912,
+        "peak_working_set_bytes": 1274150912,
+        "committed_private_bytes": 2210594816,
+        "peak_committed_private_bytes": 2210594816
+      },
+      "forward_ce_seconds": 0.7883469000225887,
+      "loss": 0.6926024556159973,
+      "memory_after_forward": {
+        "working_set_bytes": 1438535680,
+        "peak_working_set_bytes": 1438535680,
+        "committed_private_bytes": 2256547840,
+        "peak_committed_private_bytes": 2256547840
+      },
+      "backward_seconds": 1.8846212000353262,
+      "gradients": {
+        "backbone": {
+          "finite_nonzero_parameters": 289,
+          "example": "backbone.features.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "upsample": {
+          "finite_nonzero_parameters": 8,
+          "example": "layers.0.0.weight"
+        },
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        }
+      },
+      "gradient_norm": 0.0465754296622576,
+      "memory_before_optimizer": {
+        "working_set_bytes": 1547276288,
+        "peak_working_set_bytes": 1547313152,
+        "committed_private_bytes": 2425655296,
+        "peak_committed_private_bytes": 2426441728
+      },
+      "optimizer_seconds": 0.3350055000046268,
+      "memory_after_optimizer": {
+        "working_set_bytes": 2069438464,
+        "peak_working_set_bytes": 2069438464,
+        "committed_private_bytes": 3234377728,
+        "peak_committed_private_bytes": 3242233856
+      },
+      "updated": {
+        "backbone": {
+          "parameter": "backbone.features.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010019540786743164
+        },
+        "fpn": {
+          "parameter": "fpn.inner_blocks.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.0001001507043838501
+        },
+        "upsample": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010002218186855316
+        },
+        "head": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010002590715885162
+        }
+      },
+      "optimizer_state_entries": 419
+    },
+    {
+      "step": 2,
+      "memory_before": {
+        "working_set_bytes": 2069495808,
+        "peak_working_set_bytes": 2069753856,
+        "committed_private_bytes": 3233787904,
+        "peak_committed_private_bytes": 3242233856
+      },
+      "forward_ce_seconds": 0.8092974999453872,
+      "loss": 0.6909927129745483,
+      "memory_after_forward": {
+        "working_set_bytes": 2259521536,
+        "peak_working_set_bytes": 2259521536,
+        "committed_private_bytes": 3391205376,
+        "peak_committed_private_bytes": 3391205376
+      },
+      "backward_seconds": 2.108333299984224,
+      "gradients": {
+        "backbone": {
+          "finite_nonzero_parameters": 273,
+          "example": "backbone.features.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "upsample": {
+          "finite_nonzero_parameters": 8,
+          "example": "layers.0.0.weight"
+        },
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        }
+      },
+      "gradient_norm": 0.05462094351823182,
+      "memory_before_optimizer": {
+        "working_set_bytes": 2391048192,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3533373440,
+        "peak_committed_private_bytes": 3562266624
+      },
+      "optimizer_seconds": 0.22571309993509203,
+      "memory_after_optimizer": {
+        "working_set_bytes": 2357768192,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3491348480,
+        "peak_committed_private_bytes": 3562266624
+      },
+      "updated": {
+        "backbone": {
+          "parameter": "backbone.features.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010025501251220703
+        },
+        "fpn": {
+          "parameter": "fpn.inner_blocks.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.0001001507043838501
+        },
+        "upsample": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010015442967414856
+        },
+        "head": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010015815496444702
+        }
+      },
+      "optimizer_state_entries": 419
+    },
+    {
+      "step": 3,
+      "memory_before": {
+        "working_set_bytes": 2357964800,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3491348480,
+        "peak_committed_private_bytes": 3562266624
+      },
+      "forward_ce_seconds": 0.6174215000355616,
+      "loss": 0.6885052919387817,
+      "memory_after_forward": {
+        "working_set_bytes": 2412658688,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3563581440,
+        "peak_committed_private_bytes": 3571310592
+      },
+      "backward_seconds": 1.9897580000106245,
+      "gradients": {
+        "backbone": {
+          "finite_nonzero_parameters": 313,
+          "example": "backbone.features.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "upsample": {
+          "finite_nonzero_parameters": 8,
+          "example": "layers.0.0.weight"
+        },
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        }
+      },
+      "gradient_norm": 0.08425295044063202,
+      "memory_before_optimizer": {
+        "working_set_bytes": 2358202368,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3533508608,
+        "peak_committed_private_bytes": 3571310592
+      },
+      "optimizer_seconds": 0.22133639990352094,
+      "memory_after_optimizer": {
+        "working_set_bytes": 2324586496,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3490959360,
+        "peak_committed_private_bytes": 3571310592
+      },
+      "updated": {
+        "backbone": {
+          "parameter": "backbone.features.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010037422180175781
+        },
+        "fpn": {
+          "parameter": "fpn.inner_blocks.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010022521018981934
+        },
+        "upsample": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010035280138254166
+        },
+        "head": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010037235915660858
+        }
+      },
+      "optimizer_state_entries": 419
+    },
+    {
+      "step": 4,
+      "memory_before": {
+        "working_set_bytes": 2324520960,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3490435072,
+        "peak_committed_private_bytes": 3571310592
+      },
+      "forward_ce_seconds": 0.6278816999401897,
+      "loss": 0.6828262805938721,
+      "memory_after_forward": {
+        "working_set_bytes": 2387582976,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3563581440,
+        "peak_committed_private_bytes": 3571445760
+      },
+      "backward_seconds": 2.1181124999420717,
+      "gradients": {
+        "backbone": {
+          "finite_nonzero_parameters": 291,
+          "example": "backbone.features.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "upsample": {
+          "finite_nonzero_parameters": 8,
+          "example": "layers.0.0.weight"
+        },
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        }
+      },
+      "gradient_norm": 0.1575738705737543,
+      "memory_before_optimizer": {
+        "working_set_bytes": 2358206464,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3533508608,
+        "peak_committed_private_bytes": 3571445760
+      },
+      "optimizer_seconds": 0.2160308000165969,
+      "memory_after_optimizer": {
+        "working_set_bytes": 2324664320,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3491483648,
+        "peak_committed_private_bytes": 3571445760
+      },
+      "updated": {
+        "backbone": {
+          "parameter": "backbone.features.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010035187005996704
+        },
+        "fpn": {
+          "parameter": "fpn.inner_blocks.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010023266077041626
+        },
+        "upsample": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010067224502563477
+        },
+        "head": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010066293179988861
+        }
+      },
+      "optimizer_state_entries": 419
+    },
+    {
+      "step": 5,
+      "memory_before": {
+        "working_set_bytes": 2324668416,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3491483648,
+        "peak_committed_private_bytes": 3571445760
+      },
+      "forward_ce_seconds": 0.6703321000095457,
+      "loss": 0.6751675605773926,
+      "memory_after_forward": {
+        "working_set_bytes": 2291245056,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3391549440,
+        "peak_committed_private_bytes": 3571445760
+      },
+      "backward_seconds": 1.9781910000601783,
+      "gradients": {
+        "backbone": {
+          "finite_nonzero_parameters": 271,
+          "example": "backbone.features.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "upsample": {
+          "finite_nonzero_parameters": 8,
+          "example": "layers.0.0.weight"
+        },
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        }
+      },
+      "gradient_norm": 0.24291788079550894,
+      "memory_before_optimizer": {
+        "working_set_bytes": 2354282496,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3533778944,
+        "peak_committed_private_bytes": 3571445760
+      },
+      "optimizer_seconds": 0.22197530011180788,
+      "memory_after_optimizer": {
+        "working_set_bytes": 2320601088,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3491229696,
+        "peak_committed_private_bytes": 3571445760
+      },
+      "updated": {
+        "backbone": {
+          "parameter": "backbone.features.0.0.weight",
+          "changed": true,
+          "max_abs_change": 9.82256606221199e-05
+        },
+        "fpn": {
+          "parameter": "fpn.inner_blocks.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010013207793235779
+        },
+        "upsample": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010071997530758381
+        },
+        "head": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010101776570081711
+        }
+      },
+      "optimizer_state_entries": 419
+    },
+    {
+      "step": 6,
+      "memory_before": {
+        "working_set_bytes": 2320535552,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3490705408,
+        "peak_committed_private_bytes": 3571445760
+      },
+      "forward_ce_seconds": 0.6795594000723213,
+      "loss": 0.6547252535820007,
+      "memory_after_forward": {
+        "working_set_bytes": 2291240960,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3391549440,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "backward_seconds": 2.1347116000251845,
+      "gradients": {
+        "backbone": {
+          "finite_nonzero_parameters": 327,
+          "example": "backbone.features.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "upsample": {
+          "finite_nonzero_parameters": 8,
+          "example": "layers.0.0.weight"
+        },
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        }
+      },
+      "gradient_norm": 0.4631063960028056,
+      "memory_before_optimizer": {
+        "working_set_bytes": 2354487296,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3533778944,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "optimizer_seconds": 0.2202516000252217,
+      "memory_after_optimizer": {
+        "working_set_bytes": 2320945152,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3491753984,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "updated": {
+        "backbone": {
+          "parameter": "backbone.features.0.0.weight",
+          "changed": true,
+          "max_abs_change": 9.923428297042847e-05
+        },
+        "fpn": {
+          "parameter": "fpn.inner_blocks.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010010600090026855
+        },
+        "upsample": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010122312232851982
+        },
+        "head": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010144896805286407
+        }
+      },
+      "optimizer_state_entries": 419
+    },
+    {
+      "step": 7,
+      "memory_before": {
+        "working_set_bytes": 2320945152,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3491753984,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "forward_ce_seconds": 0.7490502999862656,
+      "loss": 0.6263112425804138,
+      "memory_after_forward": {
+        "working_set_bytes": 2291507200,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3391549440,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "backward_seconds": 2.0842673999723047,
+      "gradients": {
+        "backbone": {
+          "finite_nonzero_parameters": 315,
+          "example": "backbone.features.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "upsample": {
+          "finite_nonzero_parameters": 8,
+          "example": "layers.0.0.weight"
+        },
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        }
+      },
+      "gradient_norm": 0.6891735029611922,
+      "memory_before_optimizer": {
+        "working_set_bytes": 2354544640,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3533778944,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "optimizer_seconds": 0.2168206999776885,
+      "memory_after_optimizer": {
+        "working_set_bytes": 2320863232,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3491229696,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "updated": {
+        "backbone": {
+          "parameter": "backbone.features.0.0.weight",
+          "changed": true,
+          "max_abs_change": 9.822845458984375e-05
+        },
+        "fpn": {
+          "parameter": "fpn.inner_blocks.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010079145431518555
+        },
+        "upsample": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010086223483085632
+        },
+        "head": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010198727250099182
+        }
+      },
+      "optimizer_state_entries": 419
+    },
+    {
+      "step": 8,
+      "memory_before": {
+        "working_set_bytes": 2320797696,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3490705408,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "forward_ce_seconds": 0.8015487999655306,
+      "loss": 0.5967005491256714,
+      "memory_after_forward": {
+        "working_set_bytes": 2272063488,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3391549440,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "backward_seconds": 2.018026700010523,
+      "gradients": {
+        "backbone": {
+          "finite_nonzero_parameters": 287,
+          "example": "backbone.features.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "upsample": {
+          "finite_nonzero_parameters": 8,
+          "example": "layers.0.0.weight"
+        },
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        }
+      },
+      "gradient_norm": 0.7951168006080906,
+      "memory_before_optimizer": {
+        "working_set_bytes": 2354491392,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3533778944,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "optimizer_seconds": 0.20268820005003363,
+      "memory_after_optimizer": {
+        "working_set_bytes": 2321002496,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3491753984,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "updated": {
+        "backbone": {
+          "parameter": "backbone.features.0.0.weight",
+          "changed": true,
+          "max_abs_change": 9.95248556137085e-05
+        },
+        "fpn": {
+          "parameter": "fpn.inner_blocks.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010134000331163406
+        },
+        "upsample": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010136328637599945
+        },
+        "head": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010247994214296341
+        }
+      },
+      "optimizer_state_entries": 419
+    },
+    {
+      "step": 9,
+      "memory_before": {
+        "working_set_bytes": 2321002496,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3491753984,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "forward_ce_seconds": 0.618660100037232,
+      "loss": 0.555192232131958,
+      "memory_after_forward": {
+        "working_set_bytes": 2388062208,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3563851776,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "backward_seconds": 1.9153110999614,
+      "gradients": {
+        "backbone": {
+          "finite_nonzero_parameters": 307,
+          "example": "backbone.features.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "upsample": {
+          "finite_nonzero_parameters": 8,
+          "example": "layers.0.0.weight"
+        },
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        }
+      },
+      "gradient_norm": 0.5984613364927185,
+      "memory_before_optimizer": {
+        "working_set_bytes": 2354552832,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3533778944,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "optimizer_seconds": 0.21581069997046143,
+      "memory_after_optimizer": {
+        "working_set_bytes": 2320871424,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3491229696,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "updated": {
+        "backbone": {
+          "parameter": "backbone.features.0.0.weight",
+          "changed": true,
+          "max_abs_change": 9.743869304656982e-05
+        },
+        "fpn": {
+          "parameter": "fpn.inner_blocks.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010223407298326492
+        },
+        "upsample": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010156817734241486
+        },
+        "head": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010325852781534195
+        }
+      },
+      "optimizer_state_entries": 419
+    },
+    {
+      "step": 10,
+      "memory_before": {
+        "working_set_bytes": 2320805888,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3490705408,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "forward_ce_seconds": 0.6703622000059113,
+      "loss": 0.5475771427154541,
+      "memory_after_forward": {
+        "working_set_bytes": 2291511296,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3391549440,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "backward_seconds": 1.8367021000012755,
+      "gradients": {
+        "backbone": {
+          "finite_nonzero_parameters": 321,
+          "example": "backbone.features.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "upsample": {
+          "finite_nonzero_parameters": 8,
+          "example": "layers.0.0.weight"
+        },
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        }
+      },
+      "gradient_norm": 1.1682707814408277,
+      "memory_before_optimizer": {
+        "working_set_bytes": 2358689792,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3533778944,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "optimizer_seconds": 0.2117930999957025,
+      "memory_after_optimizer": {
+        "working_set_bytes": 2325147648,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3491753984,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "updated": {
+        "backbone": {
+          "parameter": "backbone.features.0.0.weight",
+          "changed": true,
+          "max_abs_change": 9.848922491073608e-05
+        },
+        "fpn": {
+          "parameter": "fpn.inner_blocks.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010211765766143799
+        },
+        "upsample": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010268855839967728
+        },
+        "head": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010395608842372894
+        }
+      },
+      "optimizer_state_entries": 419
+    },
+    {
+      "step": 11,
+      "memory_before": {
+        "working_set_bytes": 2325147648,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3491753984,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "forward_ce_seconds": 0.7226043000118807,
+      "loss": 0.5183326005935669,
+      "memory_after_forward": {
+        "working_set_bytes": 2291519488,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3391549440,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "backward_seconds": 1.7289535999298096,
+      "gradients": {
+        "backbone": {
+          "finite_nonzero_parameters": 305,
+          "example": "backbone.features.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "upsample": {
+          "finite_nonzero_parameters": 8,
+          "example": "layers.0.0.weight"
+        },
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        }
+      },
+      "gradient_norm": 0.7450585357815874,
+      "memory_before_optimizer": {
+        "working_set_bytes": 2354487296,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3533656064,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "optimizer_seconds": 0.1780259000370279,
+      "memory_after_optimizer": {
+        "working_set_bytes": 2320805888,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3491106816,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "updated": {
+        "backbone": {
+          "parameter": "backbone.features.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010018795728683472
+        },
+        "fpn": {
+          "parameter": "fpn.inner_blocks.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.0001031532883644104
+        },
+        "upsample": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010234490036964417
+        },
+        "head": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.0001048259437084198
+        }
+      },
+      "optimizer_state_entries": 419
+    },
+    {
+      "step": 12,
+      "memory_before": {
+        "working_set_bytes": 2320744448,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3490582528,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "forward_ce_seconds": 0.7917328999610618,
+      "loss": 0.5066977143287659,
+      "memory_after_forward": {
+        "working_set_bytes": 2272006144,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3391426560,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "backward_seconds": 1.822136600036174,
+      "gradients": {
+        "backbone": {
+          "finite_nonzero_parameters": 261,
+          "example": "backbone.features.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "upsample": {
+          "finite_nonzero_parameters": 8,
+          "example": "layers.0.0.weight"
+        },
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        }
+      },
+      "gradient_norm": 0.5695541974910523,
+      "memory_before_optimizer": {
+        "working_set_bytes": 2354446336,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3533656064,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "optimizer_seconds": 0.20211660000495613,
+      "memory_after_optimizer": {
+        "working_set_bytes": 2320904192,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3491631104,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "updated": {
+        "backbone": {
+          "parameter": "backbone.features.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010135769844055176
+        },
+        "fpn": {
+          "parameter": "fpn.inner_blocks.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010439008474349976
+        },
+        "upsample": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010361149907112122
+        },
+        "head": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010566785931587219
+        }
+      },
+      "optimizer_state_entries": 419
+    },
+    {
+      "step": 13,
+      "memory_before": {
+        "working_set_bytes": 2320904192,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3491631104,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "forward_ce_seconds": 0.7856138000497594,
+      "loss": 0.4946011006832123,
+      "memory_after_forward": {
+        "working_set_bytes": 2272022528,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3391426560,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "backward_seconds": 1.84621160000097,
+      "gradients": {
+        "backbone": {
+          "finite_nonzero_parameters": 281,
+          "example": "backbone.features.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "upsample": {
+          "finite_nonzero_parameters": 8,
+          "example": "layers.0.0.weight"
+        },
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        }
+      },
+      "gradient_norm": 0.5900966822675915,
+      "memory_before_optimizer": {
+        "working_set_bytes": 2354507776,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3533656064,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "optimizer_seconds": 0.2015978000126779,
+      "memory_after_optimizer": {
+        "working_set_bytes": 2320834560,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3491106816,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "updated": {
+        "backbone": {
+          "parameter": "backbone.features.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010113418102264404
+        },
+        "fpn": {
+          "parameter": "fpn.inner_blocks.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010541826486587524
+        },
+        "upsample": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010486878454685211
+        },
+        "head": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010613910853862762
+        }
+      },
+      "optimizer_state_entries": 419
+    },
+    {
+      "step": 14,
+      "memory_before": {
+        "working_set_bytes": 2320769024,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3490582528,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "forward_ce_seconds": 0.7336530000902712,
+      "loss": 0.47925540804862976,
+      "memory_after_forward": {
+        "working_set_bytes": 2291486720,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3391426560,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "backward_seconds": 2.039168499992229,
+      "gradients": {
+        "backbone": {
+          "finite_nonzero_parameters": 325,
+          "example": "backbone.features.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "upsample": {
+          "finite_nonzero_parameters": 8,
+          "example": "layers.0.0.weight"
+        },
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        }
+      },
+      "gradient_norm": 0.4748058063194656,
+      "memory_before_optimizer": {
+        "working_set_bytes": 2354475008,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3533656064,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "optimizer_seconds": 0.20140279992483556,
+      "memory_after_optimizer": {
+        "working_set_bytes": 2320932864,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3491631104,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "updated": {
+        "backbone": {
+          "parameter": "backbone.features.0.0.weight",
+          "changed": true,
+          "max_abs_change": 9.990110993385315e-05
+        },
+        "fpn": {
+          "parameter": "fpn.inner_blocks.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010631978511810303
+        },
+        "upsample": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010483153164386749
+        },
+        "head": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010716821998357773
+        }
+      },
+      "optimizer_state_entries": 419
+    },
+    {
+      "step": 15,
+      "memory_before": {
+        "working_set_bytes": 2320932864,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3491631104,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "forward_ce_seconds": 0.5918646000791341,
+      "loss": 0.47153937816619873,
+      "memory_after_forward": {
+        "working_set_bytes": 2384384000,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3563728896,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "backward_seconds": 2.004116200027056,
+      "gradients": {
+        "backbone": {
+          "finite_nonzero_parameters": 285,
+          "example": "backbone.features.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "upsample": {
+          "finite_nonzero_parameters": 8,
+          "example": "layers.0.0.weight"
+        },
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        }
+      },
+      "gradient_norm": 0.4876965816000703,
+      "memory_before_optimizer": {
+        "working_set_bytes": 2354556928,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3533656064,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "optimizer_seconds": 0.1886856999481097,
+      "memory_after_optimizer": {
+        "working_set_bytes": 2320875520,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3491106816,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "updated": {
+        "backbone": {
+          "parameter": "backbone.features.0.0.weight",
+          "changed": true,
+          "max_abs_change": 9.995698928833008e-05
+        },
+        "fpn": {
+          "parameter": "fpn.inner_blocks.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.000107593834400177
+        },
+        "upsample": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010610651224851608
+        },
+        "head": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.0001083696261048317
+        }
+      },
+      "optimizer_state_entries": 419
+    },
+    {
+      "step": 16,
+      "memory_before": {
+        "working_set_bytes": 2320818176,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3490582528,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "forward_ce_seconds": 0.7491916000144556,
+      "loss": 0.45460349321365356,
+      "memory_after_forward": {
+        "working_set_bytes": 2275291136,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3391426560,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "backward_seconds": 1.7821189999813214,
+      "gradients": {
+        "backbone": {
+          "finite_nonzero_parameters": 311,
+          "example": "backbone.features.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "upsample": {
+          "finite_nonzero_parameters": 8,
+          "example": "layers.0.0.weight"
+        },
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        }
+      },
+      "gradient_norm": 0.5513661244859955,
+      "memory_before_optimizer": {
+        "working_set_bytes": 2354520064,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3533656064,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "optimizer_seconds": 0.20640130003448576,
+      "memory_after_optimizer": {
+        "working_set_bytes": 2320986112,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3491631104,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "updated": {
+        "backbone": {
+          "parameter": "backbone.features.0.0.weight",
+          "changed": true,
+          "max_abs_change": 9.953975677490234e-05
+        },
+        "fpn": {
+          "parameter": "fpn.inner_blocks.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010894238948822021
+        },
+        "upsample": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010681618005037308
+        },
+        "head": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.000109437620267272
+        }
+      },
+      "optimizer_state_entries": 419
+    },
+    {
+      "step": 17,
+      "memory_before": {
+        "working_set_bytes": 2320990208,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3491631104,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "forward_ce_seconds": 0.8491873999591917,
+      "loss": 0.4449959993362427,
+      "memory_after_forward": {
+        "working_set_bytes": 2272108544,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3391426560,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "backward_seconds": 1.9615632999921218,
+      "gradients": {
+        "backbone": {
+          "finite_nonzero_parameters": 283,
+          "example": "backbone.features.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "upsample": {
+          "finite_nonzero_parameters": 8,
+          "example": "layers.0.0.weight"
+        },
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        }
+      },
+      "gradient_norm": 0.7704006458670294,
+      "memory_before_optimizer": {
+        "working_set_bytes": 2354610176,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3533656064,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "optimizer_seconds": 0.19307190005201846,
+      "memory_after_optimizer": {
+        "working_set_bytes": 2320928768,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3491106816,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "updated": {
+        "backbone": {
+          "parameter": "backbone.features.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010282546281814575
+        },
+        "fpn": {
+          "parameter": "fpn.inner_blocks.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00011038035154342651
+        },
+        "upsample": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010869652032852173
+        },
+        "head": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00011085090227425098
+        }
+      },
+      "optimizer_state_entries": 419
+    },
+    {
+      "step": 18,
+      "memory_before": {
+        "working_set_bytes": 2320867328,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3490582528,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "forward_ce_seconds": 0.5992287000408396,
+      "loss": 0.4275483787059784,
+      "memory_after_forward": {
+        "working_set_bytes": 2388123648,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3563728896,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "backward_seconds": 2.030134299886413,
+      "gradients": {
+        "backbone": {
+          "finite_nonzero_parameters": 301,
+          "example": "backbone.features.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "upsample": {
+          "finite_nonzero_parameters": 8,
+          "example": "layers.0.0.weight"
+        },
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        }
+      },
+      "gradient_norm": 0.7209460800718822,
+      "memory_before_optimizer": {
+        "working_set_bytes": 2354565120,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3533656064,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "optimizer_seconds": 0.20134010002948344,
+      "memory_after_optimizer": {
+        "working_set_bytes": 2321022976,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3491631104,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "updated": {
+        "backbone": {
+          "parameter": "backbone.features.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010170042514801025
+        },
+        "fpn": {
+          "parameter": "fpn.inner_blocks.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00011048838496208191
+        },
+        "upsample": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010934658348560333
+        },
+        "head": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00011219829320907593
+        }
+      },
+      "optimizer_state_entries": 419
+    },
+    {
+      "step": 19,
+      "memory_before": {
+        "working_set_bytes": 2321027072,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3491631104,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "forward_ce_seconds": 0.6345997999887913,
+      "loss": 0.39937764406204224,
+      "memory_after_forward": {
+        "working_set_bytes": 2388131840,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3563728896,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "backward_seconds": 2.0675216000527143,
+      "gradients": {
+        "backbone": {
+          "finite_nonzero_parameters": 311,
+          "example": "backbone.features.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "upsample": {
+          "finite_nonzero_parameters": 8,
+          "example": "layers.0.0.weight"
+        },
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        }
+      },
+      "gradient_norm": 0.9700192997265451,
+      "memory_before_optimizer": {
+        "working_set_bytes": 2354638848,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3533656064,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "optimizer_seconds": 0.1968189999461174,
+      "memory_after_optimizer": {
+        "working_set_bytes": 2320961536,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3491106816,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "updated": {
+        "backbone": {
+          "parameter": "backbone.features.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010405853390693665
+        },
+        "fpn": {
+          "parameter": "fpn.inner_blocks.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00011216104030609131
+        },
+        "upsample": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00011098012328147888
+        },
+        "head": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00011353311128914356
+        }
+      },
+      "optimizer_state_entries": 419
+    },
+    {
+      "step": 20,
+      "memory_before": {
+        "working_set_bytes": 2320900096,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3490582528,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "forward_ce_seconds": 0.6275366001063958,
+      "loss": 0.3766815960407257,
+      "memory_after_forward": {
+        "working_set_bytes": 2388152320,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3563728896,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "backward_seconds": 1.8701072999974713,
+      "gradients": {
+        "backbone": {
+          "finite_nonzero_parameters": 297,
+          "example": "backbone.features.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "upsample": {
+          "finite_nonzero_parameters": 8,
+          "example": "layers.0.0.weight"
+        },
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        }
+      },
+      "gradient_norm": 1.1364233244183475,
+      "memory_before_optimizer": {
+        "working_set_bytes": 2354593792,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3533656064,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "optimizer_seconds": 0.20123379991855472,
+      "memory_after_optimizer": {
+        "working_set_bytes": 2321051648,
+        "peak_working_set_bytes": 2417152000,
+        "committed_private_bytes": 3491631104,
+        "peak_committed_private_bytes": 3571716096
+      },
+      "updated": {
+        "backbone": {
+          "parameter": "backbone.features.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00010688230395317078
+        },
+        "fpn": {
+          "parameter": "fpn.inner_blocks.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00011364370584487915
+        },
+        "upsample": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.0001129303127527237
+        },
+        "head": {
+          "parameter": "layers.0.0.weight",
+          "changed": true,
+          "max_abs_change": 0.00011479109525680542
+        }
+      },
+      "optimizer_state_entries": 419
+    }
+  ],
+  "optimizer_step_status": "OPTIMIZER_STEP_PASS",
+  "final_eval": {
+    "train": {
+      "ce": 0.323572039604187,
+      "tp": 32850,
+      "fp": 4215,
+      "fn": 1776,
+      "iou": 0.8457557735382714,
+      "f1": 0.9164330250659078,
+      "precision": 0.8862808579522461,
+      "recall": 0.9487090625541501
+    },
+    "val": {
+      "ce": 0.5468147993087769,
+      "tp": 25111,
+      "fp": 3395,
+      "fn": 5176,
+      "iou": 0.7455317380203076,
+      "f1": 0.8542173387988365,
+      "precision": 0.8809022661895741,
+      "recall": 0.8291015947436193
+    }
+  },
+  "overfit_diagnostic": "IMPROVED",
+  "save_seconds": 1.1296457999851555,
+  "memory_after_save": {
+    "working_set_bytes": 2323996672,
+    "peak_working_set_bytes": 2417152000,
+    "committed_private_bytes": 3493277696,
+    "peak_committed_private_bytes": 3571716096
+  },
+  "saved_checkpoint": {
+    "filename": "m1_4_trained_step20.pth",
+    "sha256": "0f07c0d43a02a4c33073f86899d46ed6c60bfb31f3cbaa8861079f5b77dd8047",
+    "bytes": 1066468012,
+    "model_fingerprint": "b2181dd99b78ad8c215295b5254ec8c302beb2668c8e49a7398c1f3e1e0c5bbe",
+    "optimizer_fingerprint": "8de786825ce4cf20dea7d7c205874216e7611b2c92c8938289bdc96aa87c1f1c",
+    "rng_fingerprint": "10122e6adb3f5d57a99e1f26d3164bc6026d3d4248ba1c172e86b4967f66fdde"
+  },
+  "total_seconds": 97.73789479990955
+}
