@@ -1,0 +1,96 @@
+{
+  "dataset": "restor/tcd",
+  "revision": "d97d4da0ebbb6e249ae95ac5e19656babd972eb2",
+  "official_code_revision": "05dab754a3fd15b83d6b7606de7310155f4e2df2",
+  "utc": "2026-11-05T02:40:30.856247+00:00",
+  "samples": [
+    {
+      "image_id": 661,
+      "oam_id": "60f0a29989ec130007b828a8",
+      "validation_fold": 2,
+      "license": "CC-BY 4.0",
+      "split": "train",
+      "height": 2048,
+      "width": 2048,
+      "hashes": {
+        "rgb.bin": "ea69df9a2d636655c04e4c9002ee5ba3f5774ebf54b076c083958a4b0b28cf10",
+        "annotation.bin": "6975c1455eee9a68ebffe54b6e53971f63a7a81ae861e7733e13ff6c968ab105",
+        "segments.json": "38e75db943428e7086f76db4df286887d9649edf4a398260ca193bd275ba46f5",
+        "coco_annotations.json": "96eaa3219f34dd0bd693e944749ad14e9ca37a095b8e9595dd230027166ab5df",
+        "candidate-mask.png": "9e2366c5cf66ecb548194836dff0554e951bc954331e9fb3f64680732860b31f"
+      },
+      "qa": {
+        "categories": [
+          1,
+          2
+        ],
+        "zero_pixels": 1994184,
+        "crowd_ids": [],
+        "segments_without_pixels": [],
+        "positive_pixels": 2200120
+      },
+      "source_metadata_url": "https://oin-hotosm.s3.amazonaws.com/60f0a1cb89ec130007b828a6/0/60f0a1cb89ec130007b828a7_meta.json",
+      "source_metadata_sha256": null,
+      "metadata_error": "HTTPError (source metadata unavailable)",
+      "training_eligible": false,
+      "rights_status": "PENDING_MANUAL_REVIEW",
+      "background_status": "UNANNOTATED_ZERO_PENDING",
+      "annotation_terms": "CC BY 4.0 per official docs/dataset.md at recorded code revision",
+      "shard": "data/train-00000-of-00007.parquet",
+      "row_index": 0,
+      "source_provider": "UNVERIFIED",
+      "source_license": "UNVERIFIED",
+      "crowd_status": "ABSENT"
+    },
+    {
+      "image_id": 1972,
+      "oam_id": "5bba1c4f9ed15b0006d24f3b",
+      "validation_fold": 0,
+      "license": "CC-BY 4.0",
+      "split": "val",
+      "height": 2048,
+      "width": 2048,
+      "hashes": {
+        "rgb.bin": "eba6c1dee12d6cd9b75c6928acd0ab2b08428ab02d0eb63c5f0c165652d21726",
+        "annotation.bin": "d932e8b89682823951ddd69f9f4755d0188d75d99b9489a8bfb7d4555ef5f576",
+        "segments.json": "4f4ae5fd9abad93f4fabb57d85f8b35c19a1d99655aa96f19937281a8df077cf",
+        "coco_annotations.json": "97b7ab83a8b4f0b18dfe01f970cf9e17031ac57d9db09d9f4b0d53f43a680bdd",
+        "candidate-mask.png": "e9dc3036c8645a657b6779fc9387f9763543a5bf3ac618748182ee50b3aa4d8f"
+      },
+      "qa": {
+        "categories": [
+          1,
+          2
+        ],
+        "zero_pixels": 1650554,
+        "crowd_ids": [
+          106343
+        ],
+        "segments_without_pixels": [],
+        "positive_pixels": 2543750
+      },
+      "source_metadata_url": "https://oin-hotosm.s3.amazonaws.com/5bba1a619ed15b0006d24f39/0/5bba1a619ed15b0006d24f3a_meta.json",
+      "source_metadata_sha256": null,
+      "metadata_error": "HTTPError (source metadata unavailable)",
+      "training_eligible": false,
+      "rights_status": "PENDING_MANUAL_REVIEW",
+      "background_status": "UNANNOTATED_ZERO_PENDING",
+      "annotation_terms": "CC BY 4.0 per official docs/dataset.md at recorded code revision",
+      "shard": "data/train-00000-of-00007.parquet",
+      "row_index": 2,
+      "source_provider": "UNVERIFIED",
+      "source_license": "UNVERIFIED",
+      "crowd_status": "PENDING_SEMANTICS"
+    }
+  ],
+  "status": "PIXEL_QA_COMPLETE_RIGHTS_PENDING",
+  "limits": {
+    "output": "external cache",
+    "scan_limit": 32,
+    "transfer_mib": 128,
+    "storage_mib": 32
+  },
+  "scanned": 32,
+  "transfer_payload_bytes": 81380037,
+  "stored_bytes": 1801688
+}
