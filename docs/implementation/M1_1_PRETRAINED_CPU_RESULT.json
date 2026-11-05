@@ -6,9 +6,9 @@
   "threads": 4,
   "python": "3.11.9",
   "platform": "Windows-10-10.0.26300-SP0",
-  "utc": "2026-11-05T01:40:53.077676+00:00",
-  "status": "NOT_VERIFIED",
-  "pretrained_status": "PRETRAINED_NOT_VERIFIED",
+  "utc": "2026-11-05T01:51:53.128979+00:00",
+  "status": "PRETRAINED_PASS",
+  "pretrained_status": "PRETRAINED_PASS",
   "versions": {
     "torch": "2.7.1+cpu",
     "torchvision": "0.22.1+cpu",
@@ -23,6 +23,105 @@
     "utils": "68fb5344a63fbf5abb424b6b9ff7abaddfa1f881db96dc9d723e3db3014e553d"
   },
   "torch_cuda_build": null,
-  "exception": "FileNotFoundError: [Errno 2] No such file or directory: 'absent-official-checkpoint.pth'",
-  "total_seconds": 7.820124199963175
+  "checkpoint": {
+    "filename": "aerial_swinb_si.pth",
+    "sha256": "f8abf21cadaab2a71859e9d172bec4e5d6b7cc9710882a2f6a4d8aae826db036",
+    "source": "https://huggingface.co/allenai/satlas-pretrain/resolve/b1f8de04dacf9f9ed9640fe32484947710b47ede/aerial_swinb_si.pth",
+    "revision": "b1f8de04dacf9f9ed9640fe32484947710b47ede",
+    "publisher_sha256": "f8abf21cadaab2a71859e9d172bec4e5d6b7cc9710882a2f6a4d8aae826db036",
+    "publisher_size_bytes": 504439674,
+    "local_size_bytes": 504439674
+  },
+  "components": {
+    "backbone": "strict_loaded",
+    "fpn": "strict_loaded",
+    "upsample": "random",
+    "head": "random"
+  },
+  "input_shape": [
+    1,
+    3,
+    128,
+    128
+  ],
+  "target_shape": [
+    1,
+    128,
+    128
+  ],
+  "cases": {
+    "mixed": {
+      "output_shape": [
+        1,
+        2,
+        128,
+        128
+      ],
+      "loss": 0.6932653188705444,
+      "gradients": {
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "backbone": {
+          "finite_nonzero_parameters": 289,
+          "example": "backbone.features.0.0.weight"
+        }
+      },
+      "seconds": 1.419001100002788
+    },
+    "background": {
+      "output_shape": [
+        1,
+        2,
+        128,
+        128
+      ],
+      "loss": 0.7013576030731201,
+      "gradients": {
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "backbone": {
+          "finite_nonzero_parameters": 273,
+          "example": "backbone.features.0.0.weight"
+        }
+      },
+      "seconds": 1.3172063999809325
+    },
+    "canopy": {
+      "output_shape": [
+        1,
+        2,
+        128,
+        128
+      ],
+      "loss": 0.6847562789916992,
+      "gradients": {
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "backbone": {
+          "finite_nonzero_parameters": 313,
+          "example": "backbone.features.0.0.weight"
+        }
+      },
+      "seconds": 1.3249199000420049
+    }
+  },
+  "total_seconds": 12.83339329995215
 }
