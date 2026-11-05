@@ -1,3 +1,13 @@
 .venv/
 __pycache__/
 .pytest_cache/
+# External model/data artifacts and local Colab scratch outputs
+*.pth
+*.pt
+*.ckpt
+*.tif
+*.tiff
+/data/
+/outputs/
+/colab-local/
+.ipynb_checkpoints/
