@@ -130,3 +130,36 @@ Keep the user-reported preparation evidence above distinct from later agent-obse
 - Input/output/target shapes, component loading and gradient checks, runtime/memory and exceptions.
 - Checkpoint origin, immutable revision and expected/observed SHA-256, without committing weights.
 - Separate structural and pretrained status as required by the formal M1-1 specification. Structural success alone must retain `PRETRAINED_NOT_VERIFIED` until the checkpoint smoke succeeds.
+
+## M1-1 official checkpoint verification, 2026-11-05
+
+This observed run supersedes the earlier absent-checkpoint observation and pending pretrained status above. The existing smoke implementation was run from main base `c5abe91` after PR #11 merged.
+
+The official README links `Aerial_SwinB_SI` to `allenai/satlas-pretrain/aerial_swinb_si.pth`. The current main revision was resolved through the publisher API and checked again through its revision endpoint with `blobs=true`.
+
+- Full selected revision `b1f8de04dacf9f9ed9640fe32484947710b47ede`.
+- Publisher SHA-256 `f8abf21cadaab2a71859e9d172bec4e5d6b7cc9710882a2f6a4d8aae826db036`.
+- Downloaded local SHA-256 `f8abf21cadaab2a71859e9d172bec4e5d6b7cc9710882a2f6a4d8aae826db036`.
+- Publisher and local size both 504,439,674 bytes.
+- Fixed download URL https://huggingface.co/allenai/satlas-pretrain/resolve/b1f8de04dacf9f9ed9640fe32484947710b47ede/aerial_swinb_si.pth?download=true
+- External cache `C:\dev\ouem-model-cache\satlaspretrain\b1f8de04dacf9f9ed9640fe32484947710b47ede\aerial_swinb_si.pth`.
+
+Selection follows the current official README/loader target and freezes its resolved main revision. Older revisions can contain different bytes. Historical revisions were not exhaustively compared. The selected bytes passed the official constructor's strict loading for both backbone and FPN. The publisher file metadata distinguishes SHA-256 from the Xet storage hash. Only SHA-256 was used for content verification.
+
+References are the [official README](https://github.com/allenai/satlaspretrain_models/blob/main/README.md), [fixed distribution page](https://huggingface.co/allenai/satlas-pretrain/blob/b1f8de04dacf9f9ed9640fe32484947710b47ede/aerial_swinb_si.pth) and [revision metadata](https://huggingface.co/api/models/allenai/satlas-pretrain/revision/b1f8de04dacf9f9ed9640fe32484947710b47ede?blobs=true).
+
+```powershell
+$revision = 'b1f8de04dacf9f9ed9640fe32484947710b47ede'
+$checkpoint = "C:\dev\ouem-model-cache\satlaspretrain\$revision\aerial_swinb_si.pth"
+.\.venv\Scripts\python.exe scripts/m1_1_satlas_smoke.py --init checkpoint --device cpu --size 128 --checkpoint $checkpoint --sha256 f8abf21cadaab2a71859e9d172bec4e5d6b7cc9710882a2f6a4d8aae826db036 --checkpoint-source "https://huggingface.co/allenai/satlas-pretrain/resolve/$revision/aerial_swinb_si.pth" --output docs/implementation/M1_1_PRETRAINED_CPU_RESULT.json
+```
+
+Observed `PRETRAINED_PASS`, exit 0, in 12.83 seconds including imports, hashing, safe CPU deserialization and construction. Python 3.11.9, torch 2.7.1+cpu, torchvision 0.22.1+cpu and satlaspretrain-models 0.3.1 were recorded. Backbone and FPN loaded strictly. Upsample and SEGMENT Head initialized freshly. All three cases produced `[1,2,128,128]` probabilities with finite values and valid class sums, finite official CE losses and finite nonzero Head/FPN/Backbone gradients.
+
+| Mask | Official CE loss | Case seconds |
+| --- | --- | --- |
+| Mixed | 0.693265319 | 1.419 |
+| All background | 0.701357603 | 1.317 |
+| All canopy | 0.684756279 | 1.325 |
+
+The updated [result JSON](../implementation/M1_1_PRETRAINED_CPU_RESULT.json) contains component evidence and source fingerprints. Lightweight offline pytest completed with 8 passed in 8.98 seconds. Peak CPU memory remains unmeasured. Other input sizes, void/ignore-label semantics and exact upstream Git revision for the installed PyPI distribution remain open as described above.
