@@ -1,0 +1,837 @@
+{
+  "utc": "2026-11-05T11:26:52.653859+00:00",
+  "scope": "Offline investigation only; no new images, training pairs, validity rules or training",
+  "dataset_revision": "d97d4da0ebbb6e249ae95ac5e19656babd972eb2",
+  "versions": {
+    "numpy": "1.26.4",
+    "Pillow": "13.0.0",
+    "rasterio": "1.4.3"
+  },
+  "source_audit_sha256": "3737ff3653604744a4b7e25c9d7ef811f84da05eddfea87d568ec11c0f768744",
+  "method": {
+    "connectivity_primary": 4,
+    "connectivity_sensitivity": 8,
+    "near_black_maxchannel_thresholds": [
+      5,
+      10
+    ],
+    "thresholds_define_validity": false,
+    "geometric_capacity_mask": "border-connected <=5 only; hypothetical, not certified"
+  },
+  "recommendation": "A: exclude 2/9 from immediate expansion; replan next candidates without implementing validity handling now",
+  "production_rule_changed": false,
+  "new_imagery_acquired": false,
+  "new_training_pairs_generated": false,
+  "upstream_source_tiff_inspected": false,
+  "corpus_prevalence_estimated": false,
+  "samples": [
+    {
+      "image_id": 2,
+      "source_hashes": {
+        "rgb.bin": "c9295a6d7b825c68c1e98cb67229f2faac78157a3c23525f50c062dd3b2c23fa",
+        "annotation.bin": "de179a376b16f4950335de81e719ddd26c518a0a1277b6952e04feeb5efc8334",
+        "segments.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "coco_annotations.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "candidate-mask.png": "47409785b30cc38f1ec62f219ce1c46f885427442416c0768dc470497ef784cb",
+        "stac.json": "bb1f1f6c54c9254574d8c0dbec55c7d611ca4c06f54515eb94d018a96d20c6ea",
+        "preview.jpg": "5d9a8ad372180d32ccc9ee64dd73391af3599c109091a4ebfb77a1234d1902ea"
+      },
+      "label_qa": {
+        "categories": [],
+        "zero_pixels": 4194304,
+        "crowd_ids": [],
+        "segments_without_pixels": [],
+        "positive_pixels": 0
+      },
+      "exact_4": {
+        "connectivity": 4,
+        "components": 198,
+        "black_pixels": 1260884,
+        "border_components": 1,
+        "border_connected_pixels": 1260096,
+        "interior_components": 197,
+        "interior_pixels": 788,
+        "border_positive_label_pixels": 0,
+        "interior_positive_label_pixels": 0,
+        "largest": [
+          {
+            "area": 1260096,
+            "image_fraction": 0.3004302978515625,
+            "bbox_xyxy": [
+              0,
+              0,
+              918,
+              2048
+            ],
+            "touches_border": true,
+            "positive_label_pixels": 0,
+            "bbox_occupancy": 0.6702410130718954
+          },
+          {
+            "area": 93,
+            "image_fraction": 2.2172927856445312e-05,
+            "bbox_xyxy": [
+              513,
+              503,
+              520,
+              529
+            ],
+            "touches_border": false,
+            "positive_label_pixels": 0,
+            "bbox_occupancy": 0.510989010989011
+          },
+          {
+            "area": 30,
+            "image_fraction": 7.152557373046875e-06,
+            "bbox_xyxy": [
+              547,
+              721,
+              549,
+              745
+            ],
+            "touches_border": false,
+            "positive_label_pixels": 0,
+            "bbox_occupancy": 0.625
+          },
+          {
+            "area": 29,
+            "image_fraction": 6.9141387939453125e-06,
+            "bbox_xyxy": [
+              738,
+              1664,
+              742,
+              1677
+            ],
+            "touches_border": false,
+            "positive_label_pixels": 0,
+            "bbox_occupancy": 0.5576923076923077
+          },
+          {
+            "area": 17,
+            "image_fraction": 4.0531158447265625e-06,
+            "bbox_xyxy": [
+              469,
+              224,
+              471,
+              240
+            ],
+            "touches_border": false,
+            "positive_label_pixels": 0,
+            "bbox_occupancy": 0.53125
+          }
+        ]
+      },
+      "boundary": {
+        "black_nonblack_4edge_count": 5879,
+        "adjacent_nonblack_pixels": 4744,
+        "adjacent_nonblack_maxchannel_percentiles": [
+          1.0,
+          1.0,
+          2.0,
+          3.0,
+          130.0
+        ],
+        "interpretation": "pixel-edge/near-black statistics; JPEG ringing and dark real surfaces are not distinguished automatically"
+      },
+      "hypothetical_clear_square": {
+        "side_px": 1386,
+        "bbox_xyxy": [
+          662,
+          0,
+          2048,
+          1386
+        ],
+        "meaning": "avoids only hypothesized border-connected dark component; not a certified valid crop",
+        "ground_side_m": [
+          123.18902644564324,
+          123.18902588132578
+        ],
+        "approximate_pixels_at_050m": [
+          246,
+          246
+        ],
+        "sufficiency": "geometric only, not eligibility or verified coverage"
+      },
+      "nonblack_fraction": 0.6993818283081055,
+      "nonblack_meaning": "not a measured valid fraction",
+      "tiff": {
+        "shape": [
+          2048,
+          2048
+        ],
+        "bands": 3,
+        "dtypes": [
+          "uint8",
+          "uint8",
+          "uint8"
+        ],
+        "nodata": null,
+        "mask_flags": [
+          [
+            "all_valid"
+          ],
+          [
+            "all_valid"
+          ],
+          [
+            "all_valid"
+          ]
+        ],
+        "dataset_mask_values": [
+          255
+        ],
+        "band_mask_values": [
+          [
+            255
+          ],
+          [
+            255
+          ],
+          [
+            255
+          ]
+        ],
+        "color_interpretation": [
+          "red",
+          "green",
+          "blue"
+        ],
+        "alpha_present": false,
+        "sidecar_mask_present": false,
+        "internal_mask_exposed_by_gdal": false,
+        "tiff_ifd_frames": 1,
+        "tag_ids": [
+          256,
+          257,
+          258,
+          259,
+          262,
+          277,
+          284,
+          322,
+          323,
+          324,
+          325,
+          339,
+          347,
+          530,
+          532,
+          33550,
+          33922,
+          34735,
+          34737
+        ],
+        "selected_tags": {
+          "259": "7",
+          "262": "6",
+          "274": null,
+          "338": null,
+          "42112": null,
+          "42113": null
+        },
+        "description_tag_present": false,
+        "software_tag_present": false,
+        "crs": "EPSG:3395",
+        "transform": [
+          0.09999999999990905,
+          0.0,
+          -7828417.13929846,
+          0.0,
+          -0.09999999999990905,
+          -3148088.6967618233
+        ],
+        "bounds": [
+          -7828417.13929846,
+          -3148293.496761823,
+          -7828212.339298461,
+          -3148088.6967618233
+        ],
+        "area_or_point": "Area",
+        "gdal_tag_keys": [
+          "AREA_OR_POINT"
+        ],
+        "compression": "YCbCr JPEG",
+        "block_shapes": [
+          [
+            512,
+            512
+          ],
+          [
+            512,
+            512
+          ],
+          [
+            512,
+            512
+          ]
+        ]
+      },
+      "stac_geometry_pixel_centers": {
+        "inside_pixels": 4142078,
+        "outside_pixels": 52226,
+        "black_inside": 1208658,
+        "black_outside": 52226,
+        "meaning": "nominal STAC source extent only, not ground-truth image validity"
+      },
+      "diagnostic_hashes": {
+        "2-distribution.jpg": "f9d7c802f97200c47523e949061d8853c1f86c500b0368b4aac4609ba5f8d684",
+        "2-edge-detail.png": "7e74bc5300b06d0fbfd22fb9b6d04aac2bd78fa494984003d9c45a49eb7c97a6",
+        "2-interior-detail.png": "76545fb14e52459bf40fc9c506b058ed0bf675fd220d498448cc5191b9a2df9c"
+      },
+      "analysis_seconds": 2.770093100029044,
+      "exact_8": {
+        "connectivity": 8,
+        "components": 145,
+        "black_pixels": 1260884,
+        "border_components": 1,
+        "border_connected_pixels": 1260226,
+        "interior_components": 144,
+        "interior_pixels": 658,
+        "border_positive_label_pixels": 0,
+        "interior_positive_label_pixels": 0
+      },
+      "near_black_sensitivity": [
+        {
+          "threshold": 5,
+          "connectivity": 4,
+          "components": 30,
+          "black_pixels": 1272331,
+          "border_components": 2,
+          "border_connected_pixels": 1272284,
+          "interior_components": 28,
+          "interior_pixels": 47,
+          "border_positive_label_pixels": 0,
+          "interior_positive_label_pixels": 0
+        },
+        {
+          "threshold": 10,
+          "connectivity": 4,
+          "components": 10,
+          "black_pixels": 1274570,
+          "border_components": 1,
+          "border_connected_pixels": 1274560,
+          "interior_components": 9,
+          "interior_pixels": 10,
+          "border_positive_label_pixels": 0,
+          "interior_positive_label_pixels": 0
+        }
+      ],
+      "stac": {
+        "id": "5cb0ece9fa020e0006eb43d4",
+        "bbox": [
+          -70.323868,
+          -27.356447,
+          -70.312808,
+          -27.348651
+        ],
+        "geometry": {
+          "type": "MultiPolygon",
+          "coordinates": [
+            [
+              [
+                [
+                  -70.323776,
+                  -27.348651
+                ],
+                [
+                  -70.323868,
+                  -27.356344
+                ],
+                [
+                  -70.312899,
+                  -27.356447
+                ],
+                [
+                  -70.312808,
+                  -27.348755
+                ],
+                [
+                  -70.323776,
+                  -27.348651
+                ]
+              ]
+            ]
+          ]
+        },
+        "asset_keys": [
+          "metadata",
+          "thumbnail",
+          "visual"
+        ],
+        "source_raster_metadata": {
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "file:size": 76277167,
+          "proj:bbox": [
+            369061.99217000004,
+            6973400.22026,
+            370147.12475,
+            6974252.51348
+          ],
+          "proj:code": "EPSG:32719",
+          "proj:shape": [
+            20557,
+            26173
+          ],
+          "proj:transform": [
+            0.041460000000000004,
+            0.0,
+            369061.99217000004,
+            0.0,
+            -0.041460000000000004,
+            6974252.51348,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        "raster_band_nodata_declared": false,
+        "explicit_validity_asset_present": false,
+        "item_geometry_vs_projected_rectangle_max_corner_error_degrees": 4.627349454722207e-07,
+        "upstream_source_tiff_content_inspected": false
+      },
+      "causal_assessment": {
+        "dominant_border_region_category": 2,
+        "confidence": "high qualitative likelihood, not confirmed",
+        "meaning": "coverage/fill artifact likely; the exact source/processing stage is unresolved",
+        "small_internal_regions_category": 4,
+        "internal_interpretation": "mostly fringe-compatible fragments, unresolved",
+        "confirmed_outside_coverage": false
+      }
+    },
+    {
+      "image_id": 9,
+      "source_hashes": {
+        "rgb.bin": "d0f6b01d8f330fd10d1be1f8eff0efe1e07a698eb234ea5a6e77603534b3c98c",
+        "annotation.bin": "bdb7ea9fa86b510be4481b3188c9e88f5ff287edf4c29eb6051d093803c56905",
+        "segments.json": "920c07c41f67e76ccddd996fb685ea161029c42cdfc94913b57420730642b414",
+        "coco_annotations.json": "873eb9677ecabc72351807ec5757cb92c663cec3f68fa8f5ac78583b4fe261a7",
+        "candidate-mask.png": "794b5d2f2de08ee42a76de42c6f64001f9627904f3175b3b0e49abfebef439e2",
+        "stac.json": "01f2418ad2d7af50db29b2107021597117513f29aadf4105096ea6c276c5d63d",
+        "preview.jpg": "e77448790451f266c92e4833081b28e9073b4672b4bd13536b430c5754646ca9"
+      },
+      "label_qa": {
+        "categories": [
+          1,
+          2
+        ],
+        "zero_pixels": 3688615,
+        "crowd_ids": [],
+        "segments_without_pixels": [],
+        "positive_pixels": 505689
+      },
+      "exact_4": {
+        "connectivity": 4,
+        "components": 106,
+        "black_pixels": 17102,
+        "border_components": 4,
+        "border_connected_pixels": 16770,
+        "interior_components": 102,
+        "interior_pixels": 332,
+        "border_positive_label_pixels": 0,
+        "interior_positive_label_pixels": 3,
+        "largest": [
+          {
+            "area": 16762,
+            "image_fraction": 0.003996372222900391,
+            "bbox_xyxy": [
+              0,
+              0,
+              144,
+              217
+            ],
+            "touches_border": true,
+            "positive_label_pixels": 0,
+            "bbox_occupancy": 0.5364183307731695
+          },
+          {
+            "area": 65,
+            "image_fraction": 1.5497207641601562e-05,
+            "bbox_xyxy": [
+              1562,
+              1920,
+              1581,
+              1928
+            ],
+            "touches_border": false,
+            "positive_label_pixels": 0,
+            "bbox_occupancy": 0.4276315789473684
+          },
+          {
+            "area": 26,
+            "image_fraction": 6.198883056640625e-06,
+            "bbox_xyxy": [
+              1581,
+              1927,
+              1586,
+              1936
+            ],
+            "touches_border": false,
+            "positive_label_pixels": 0,
+            "bbox_occupancy": 0.5777777777777777
+          },
+          {
+            "area": 21,
+            "image_fraction": 5.0067901611328125e-06,
+            "bbox_xyxy": [
+              1941,
+              1840,
+              1945,
+              1846
+            ],
+            "touches_border": false,
+            "positive_label_pixels": 0,
+            "bbox_occupancy": 0.875
+          },
+          {
+            "area": 18,
+            "image_fraction": 4.291534423828125e-06,
+            "bbox_xyxy": [
+              84,
+              101,
+              88,
+              111
+            ],
+            "touches_border": false,
+            "positive_label_pixels": 0,
+            "bbox_occupancy": 0.45
+          }
+        ]
+      },
+      "boundary": {
+        "black_nonblack_4edge_count": 1375,
+        "adjacent_nonblack_pixels": 1062,
+        "adjacent_nonblack_maxchannel_percentiles": [
+          1.0,
+          1.0,
+          1.0,
+          2.0,
+          40.0
+        ],
+        "interpretation": "pixel-edge/near-black statistics; JPEG ringing and dark real surfaces are not distinguished automatically"
+      },
+      "hypothetical_clear_square": {
+        "side_px": 1950,
+        "bbox_xyxy": [
+          96,
+          95,
+          2046,
+          2045
+        ],
+        "meaning": "avoids only hypothesized border-connected dark component; not a certified valid crop",
+        "ground_side_m": [
+          146.07104681986377,
+          146.07104503298538
+        ],
+        "approximate_pixels_at_050m": [
+          292,
+          292
+        ],
+        "sufficiency": "geometric only, not eligibility or verified coverage"
+      },
+      "nonblack_fraction": 0.9959225654602051,
+      "nonblack_meaning": "not a measured valid fraction",
+      "tiff": {
+        "shape": [
+          2048,
+          2048
+        ],
+        "bands": 3,
+        "dtypes": [
+          "uint8",
+          "uint8",
+          "uint8"
+        ],
+        "nodata": null,
+        "mask_flags": [
+          [
+            "all_valid"
+          ],
+          [
+            "all_valid"
+          ],
+          [
+            "all_valid"
+          ]
+        ],
+        "dataset_mask_values": [
+          255
+        ],
+        "band_mask_values": [
+          [
+            255
+          ],
+          [
+            255
+          ],
+          [
+            255
+          ]
+        ],
+        "color_interpretation": [
+          "red",
+          "green",
+          "blue"
+        ],
+        "alpha_present": false,
+        "sidecar_mask_present": false,
+        "internal_mask_exposed_by_gdal": false,
+        "tiff_ifd_frames": 1,
+        "tag_ids": [
+          256,
+          257,
+          258,
+          259,
+          262,
+          277,
+          284,
+          322,
+          323,
+          324,
+          325,
+          339,
+          347,
+          530,
+          532,
+          33550,
+          33922,
+          34735,
+          34737
+        ],
+        "selected_tags": {
+          "259": "7",
+          "262": "6",
+          "274": null,
+          "338": null,
+          "42112": null,
+          "42113": null
+        },
+        "description_tag_present": false,
+        "software_tag_present": false,
+        "crs": "EPSG:3395",
+        "transform": [
+          0.10000000000013641,
+          0.0,
+          -9080257.806186315,
+          0.0,
+          -0.10000000000013641,
+          5070685.874426341
+        ],
+        "bounds": [
+          -9080257.806186315,
+          5070481.074426341,
+          -9080053.006186314,
+          5070685.874426341
+        ],
+        "area_or_point": "Area",
+        "gdal_tag_keys": [
+          "AREA_OR_POINT"
+        ],
+        "compression": "YCbCr JPEG",
+        "block_shapes": [
+          [
+            512,
+            512
+          ],
+          [
+            512,
+            512
+          ],
+          [
+            512,
+            512
+          ]
+        ]
+      },
+      "stac_geometry_pixel_centers": {
+        "inside_pixels": 4194304,
+        "outside_pixels": 0,
+        "black_inside": 17102,
+        "black_outside": 0,
+        "meaning": "nominal STAC source extent only, not ground-truth image validity"
+      },
+      "diagnostic_hashes": {
+        "9-distribution.jpg": "c871694ecebbdedae8c2b8358d2109431c4bf8b7cb5acbd59b394935ebe96f89",
+        "9-edge-detail.png": "57120134bb0b7200cbb8fd713ad31477a586a85973b40dfd0a97a633f40be112",
+        "9-interior-detail.png": "56e183fa262992f9b6ad9ad7a50cac9ceeb998e5d06eaebf79da042482f898a9",
+        "9-interior-positive-detail.png": "c2da64d8d58e278e3048638c88851770f9c65bebd361329b5b63628500d2706e"
+      },
+      "analysis_seconds": 3.1870277000125498,
+      "exact_8": {
+        "connectivity": 8,
+        "components": 56,
+        "black_pixels": 17102,
+        "border_components": 4,
+        "border_connected_pixels": 16859,
+        "interior_components": 52,
+        "interior_pixels": 243,
+        "border_positive_label_pixels": 0,
+        "interior_positive_label_pixels": 3
+      },
+      "near_black_sensitivity": [
+        {
+          "threshold": 5,
+          "connectivity": 4,
+          "components": 343,
+          "black_pixels": 21014,
+          "border_components": 3,
+          "border_connected_pixels": 19033,
+          "interior_components": 340,
+          "interior_pixels": 1981,
+          "border_positive_label_pixels": 0,
+          "interior_positive_label_pixels": 339
+        },
+        {
+          "threshold": 10,
+          "connectivity": 4,
+          "components": 642,
+          "black_pixels": 24265,
+          "border_components": 3,
+          "border_connected_pixels": 19870,
+          "interior_components": 639,
+          "interior_pixels": 4395,
+          "border_positive_label_pixels": 0,
+          "interior_positive_label_pixels": 1223
+        }
+      ],
+      "stac": {
+        "id": "5de875b7b332ff0007897508",
+        "bbox": [
+          -81.571183,
+          41.582012,
+          -81.564533,
+          41.588017
+        ],
+        "geometry": {
+          "type": "MultiPolygon",
+          "coordinates": [
+            [
+              [
+                [
+                  -81.571183,
+                  41.587985
+                ],
+                [
+                  -81.571131,
+                  41.582012
+                ],
+                [
+                  -81.564533,
+                  41.582045
+                ],
+                [
+                  -81.564585,
+                  41.588017
+                ],
+                [
+                  -81.571183,
+                  41.587985
+                ]
+              ]
+            ]
+          ]
+        },
+        "asset_keys": [
+          "metadata",
+          "thumbnail",
+          "visual"
+        ],
+        "source_raster_metadata": {
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "file:size": 9305029,
+          "proj:bbox": [
+            452391.9314111333,
+            4603526.681436667,
+            452941.9482411201,
+            4604189.79631394
+          ],
+          "proj:code": "EPSG:32617",
+          "proj:shape": [
+            9474,
+            7858
+          ],
+          "proj:transform": [
+            0.06999450623399918,
+            0.0,
+            452391.9314111333,
+            0.0,
+            -0.06999312616343649,
+            4604189.79631394,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        "raster_band_nodata_declared": false,
+        "explicit_validity_asset_present": false,
+        "item_geometry_vs_projected_rectangle_max_corner_error_degrees": 4.6012949894702615e-07,
+        "upstream_source_tiff_content_inspected": false
+      },
+      "causal_assessment": {
+        "dominant_border_region_category": 2,
+        "confidence": "high qualitative likelihood, not confirmed",
+        "meaning": "coverage/fill artifact likely; the exact source/processing stage is unresolved",
+        "small_internal_regions_category": 3,
+        "internal_interpretation": "shadow/dark surface plausible; three exact-black pixels carry positive canopy labels",
+        "confirmed_outside_coverage": false
+      }
+    }
+  ],
+  "references": [
+    {
+      "url": "https://github.com/Restor-Foundation/tcd/blob/05dab754a3fd15b83d6b7606de7310155f4e2df2/docs/dataset.md#data-format",
+      "finding": "Valid-pixel sampling threshold documented; no per-tile complete-validity or RGB-zero recovery guarantee there"
+    },
+    {
+      "url": "https://github.com/Restor-Foundation/tcd/blob/05dab754a3fd15b83d6b7606de7310155f4e2df2/tools/generate_dataset.py#L14",
+      "finding": "Exporter has no explicit nodata/mask writing; not proven to have produced the received HF TIFFs"
+    },
+    {
+      "url": "https://docs.openaerialmap.org/ecosystem/imagery-data/",
+      "finding": "COG and metadata layout; some historical uploads have .msk/.vrt, not inspected here"
+    },
+    {
+      "url": "https://docs.openaerialmap.org/uploader/uploader-form/",
+      "finding": "Contributor TIFF/metadata workflow; no universal black pixel validity rule found on this page"
+    },
+    {
+      "url": "https://rasterio.readthedocs.io/en/stable/topics/masks.html",
+      "finding": "All-valid fallback without mask/nodata; valid 8-bit dark data can also become zero"
+    },
+    {
+      "url": "https://github.com/radiantearth/stac-spec/blob/v1.1.0/item-spec/item-spec.md#geometry",
+      "finding": "Item footprint metadata does not independently validate the pixel coverage of these source snapshots"
+    },
+    {
+      "url": "https://github.com/allenai/satlaspretrain_models/blob/main/satlaspretrain_models/models/heads.py",
+      "finding": "Compared with installed 0.3.1: unreduced CE then global mean; ignore alone dilutes valid loss"
+    },
+    {
+      "url": "https://docs.pytorch.org/docs/2.7/generated/torch.nn.functional.cross_entropy.html",
+      "finding": "Default ignore_index=-100; distinction between unreduced output and reduced valid-target mean"
+    }
+  ],
+  "installed_head": {
+    "satlaspretrain-models": "0.3.1",
+    "sha256": "229f9a3f47c00f5bfa1a338d64b657be1999624d13e274888acdfbae99ec04fd"
+  },
+  "tests": {
+    "command": ".\\.venv\\Scripts\\python.exe -m pytest -q --disable-warnings",
+    "passed": 106,
+    "warnings": 75,
+    "new_diagnostic_tests": 4,
+    "real_model_training_or_gpu_experiment": false
+  },
+  "unresolved": [
+    "Authoritative source mask/alpha/sidecar and actual valid footprint",
+    "Stage introducing fill/coverage metadata loss",
+    "Validity of proposed crops",
+    "Per-component interpretation beyond viewed examples",
+    "Dataset-wide occurrence and false-hold rates"
+  ]
+}
