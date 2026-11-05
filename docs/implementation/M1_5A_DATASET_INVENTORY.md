@@ -90,3 +90,75 @@ Final offline tests passed with 60 tests in 11.03 seconds and 19 existing Affine
 Whole-corpus original-source rights/attribution, raw images, label pixels, actual embedded geometry, nodata and optical quality remain unverified beyond the existing two samples. New candidates remain provisional. The dataset-scale metadata audit and bounded expansion plan are PASS candidates for review, with raw QA/training eligibility deferred to M1-5B.
 
 The full real metadata cache was also reordered in reverse and candidate selection was rerun offline. Selected image IDs matched exactly. Published per-row disposition cache SHA-256 ties all exclusion reasons to the external audit artifact.
+
+## M1-5B implementation and pilot audit (2026-11-05)
+
+**Code implementation: PASS candidate. Real-data pilot: HOLD / NOT PASSED.** The new [single CLI](../../scripts/m1_5b_pilot.py) separates `plan`/`acquire` network operations from offline `prepare`/`verify`. [Sanitized measured results](M1_5B_PILOT_RESULT.json) contain hashes and geometry, not images or attribution contacts. No existing source, accepted pair, training/GPU script or formal design was changed. This section supplements the historical M1-5A selection above.
+
+### Reuse and gates
+
+The CLI reuses M1-5A role/split/overlap checks and pinned metadata; M1-2A `labels`/`save_pair`; M1-2B overlay/RLE checks; M1-2D `intervals`, exact area weights, output grid and `binary`. The old two-ID `audit`/`prepare`/`load_patch` wrappers stay unchanged: they intentionally accept only 661/1972, so new pairs are **not automatically connected to training**. No new dependency or venv change was needed: requests, pyarrow, NumPy, Pillow, rasterio and pyproj were already available. Python 3.11.9 on Windows was used; resolved versions are in the result JSON. A company PC can use the existing Windows CPU setup and install only missing data-audit packages after reviewing its environment.
+
+Only explicit IDs from the eleven proposed candidates are permitted. Image 1, existing IDs and Holdout IDs are rejected. The inventory `rows.json` must match the committed M1-5A SHA-256; acquisition revision/shard provenance and existing identities/folds/licenses are checked before network work. Missing cache is a stop, not permission to switch revision. Transfer/copy the completed M1-5A cache for offline use. If unavailable, its historical `m1_5a_inventory.py` reproduction commands above regenerate fixed-revision **metadata only** under their separate 128MiB budget; review that additional transfer first. M1-5B does not regenerate it automatically.
+
+Across all cached opposite-role metadata (including Holdout metadata only), gates reject common oam_id, an identical original metadata object key even across the migrated OAM bucket names, footprint intersection, and a conservative center-distance-minus-footprint-radii separation below 1km. The 1km threshold was declared before pixel acquisition as a proximity hold, not proof of survey independence. Exact identity aliases absent from metadata cannot be universally ruled out. No Holdout image/annotation column is requested. The existing Train 661 and Val 1972 roles and all eight accepted output hashes were rechecked unchanged.
+
+Rights gates require row CC-BY 4.0, exact STAC item ID and snapshot hash, source CC-BY-4.0, a named licensor, producer identity and matching original metadata object key. STAC provider/description data stays external with each raw pair. Annotation terms refer to the fixed official dataset documentation; no Restor noncommercial weights are used. These are corroborated source declarations with attribution retained, not final commercial legal approval. Manual attribution review remains necessary before training eligibility.
+
+### Budget and actual candidates
+
+Planning reads publisher metadata and exact Parquet footers first, then calculates required column ranges per target row group. Acquisition prefetches only those ranges, uses cached validated metadata without implicit image reads, extracts selected records and evicts that group's newly created column-cache files. Footer cache, original hashes and request accounting remain. Unselected records in those compressed column chunks are unavoidable row-group transfer overhead; only selected RGB/annotation pairs are decoded and saved.
+
+Limits are 256MiB response payload and 128MiB newly saved cache/products. `network.json` persists consumed bytes, including partial failures; response headers/TLS overhead are excluded. HTTP Range, Content-Range, content length and identity encoding must agree. There are no automatic retries or limit increases. Planning prioritizes 2 and 9, then remaining IDs ascending, to retain one Train and one Val before a second Train. Storage estimates reserve raw RGB/annotation allowance (6 bytes/source pixel plus 1MiB metadata per pair) plus the largest live compressed group; exact pre-write guards still apply. Estimates cannot guarantee arbitrary encoded metadata sizes. A 256KiB report reserve is kept. Do not restart failed acquisition blindly in a new cache: preserve counters and inspect partial artifacts.
+
+| Candidate | Shard / zero-based row group / row in group | Compressed selected columns | Actual disposition |
+| --- | --- | ---: | --- |
+| Train 2 | train-00000 / 2 / 31 (shard row 231) | 78,284,131 bytes | Acquired; HOLD unresolved black-border validity |
+| Train 3 | train-00003 / 1 / 60 (shard row 160) | 78,838,830 bytes | HOLD storage estimate; footer only, no image/annotation columns |
+| Val 9 | train-00000 / 5 / 3 (shard row 503) | 74,218,651 bytes | Acquired; HOLD unresolved black-border validity |
+
+All three would require 231,341,612 compressed column bytes, within transfer but over the conservative live-storage estimate. Two groups (100 + 96 encoded records) were fetched to extract just 2 pairs; the other 194 pairs were not decoded as RGB/PNG or saved as individual originals. Actual HTTP payload was **152,548,527 bytes (145.48MiB)**, including 45,745 bytes of API/footer work. Acquisition took 68.32s. Final newly saved pilot cache plus both fresh audit directories totalled **1,935,980 bytes (1.85MiB)** at the recorded observation. Peak disk usage was not separately measured; per-write guards bounded the temporary compressed cache. There was no all-corpus image download.
+
+### Actual source and visual findings
+
+Both originals are 2048 square RGB TIFF, annotations PNG, unrotated EPSG:3395 with projected ~0.10m spacing. Embedded bounds agree with float32 metadata rounding uncertainty; TIFF/PIL pixels agree; annotations have matching dimensions/orientation. IDs/categories are consistent, no crowd was present in these two records, and category 1/2 merging preserves the complete-background mask for 2. Known crowd remains positive by the accepted policy; future crowd RLE must match the panoptic pixels. Unknown IDs/categories/flags fail.
+
+| ID | Source local ground m/px E/N | Diagnostic proposed grid | Diagnostic mask coverage | Validity finding |
+| --- | --- | --- | --- | --- |
+| 2 | 0.088881 / 0.088881 | 364 square; ~0.500078m | 0%; all annotation background | 1,260,884 exactly black RGB pixels, including 3,391 border pixels |
+| 9 | 0.074908 / 0.074908 | 307 square; ~0.499714m | 12.0447% binary positive; mean fraction 12.0566% | 17,102 exactly black RGB pixels, including 354 border pixels |
+
+The source/overlay previews were actually viewed. Image 2 depicts dry terrain/buildings with a large sharp black wedge and an empty annotation. The empty mask is preserved; it does not establish ecological completeness or meaningful positive-mask alignment. Image 9 depicts shoreline, water, trees and buildings; the magenta mask broadly follows visible crowns, with some visible vegetation unlabelled. A small sharp black corner is present. These are visual diagnostics, not accuracy evaluation.
+
+Both TIFFs declare no nodata and GDAL marks all pixels valid. That does **not** establish coverage of the black wedges. The CLI therefore triggers `HOLD_UNMARKED_BLACK_BORDER_VALIDITY` when exact-black RGB occurs on a border. This is a conservative review trigger, **not** a rule that every black pixel is nodata. No footprint correction, crop, ignore label, black-to-background conversion or all-one valid_fraction is emitted for unresolved sources. Invalid pixel count is `null` (unknown), not zero. Both samples remain training-ineligible. No substitute candidate was fetched after discovering the issue.
+
+Proposed output grids and area fractions were computed diagnostically, with source bounds preserved. **No real training GeoTIFF products or output product hashes were created**, so real saved-product readback/determinism are NOT_VERIFIED. Offline verification repeated original hashes, geometry/labels and both HOLD reasons. Resolve actual source coverage/validity evidence and review the appropriate crop/validity policy separately before releasing these records. Do not simply mark the black pixels invalid by color or accept them as negatives. No full-data training is unblocked by this PR.
+
+### Standalone Windows commands
+
+Use PowerShell at the pinned repository checkout and its existing venv. Replace placeholders with external paths. The completed inventory cache must contain `rows.json`, `acquisition.json` and selected `*-stac.json` snapshots. No Codex, ChatGPT, API key or GitHub token is needed. Only the first two stages need internet.
+
+```powershell
+$Meta = '<existing-M1-5A-metadata-cache>'
+$Cache = '<fresh-external-M1-5B-cache>'
+$Out = '<fresh-external-M1-5B-pair-directory>'
+.\.venv\Scripts\python.exe scripts/m1_5b_pilot.py plan --inventory-cache $Meta --cache $Cache --ids 2 3 9 --transfer-mib 256 --storage-mib 128
+# Inspect plan.json; never continue after failure or auto-raise budgets.
+.\.venv\Scripts\python.exe scripts/m1_5b_pilot.py acquire --inventory-cache $Meta --cache $Cache --ids 2 3 9 --transfer-mib 256 --storage-mib 128
+.\.venv\Scripts\python.exe scripts/m1_5b_pilot.py prepare --inventory-cache $Meta --cache $Cache --output $Out --ids 2 3 9 --storage-mib 128
+# Fully offline, read-only reinspection; emits JSON to stdout:
+.\.venv\Scripts\python.exe scripts/m1_5b_pilot.py verify --inventory-cache $Meta --cache $Cache --output $Out --ids 2 3 9
+.\.venv\Scripts\python.exe -m pytest -q
+```
+
+Check `$LASTEXITCODE` and JSON status after each stage. Exit 0 means that stage completed as specified (raw acquisition still awaits QA); exit 1 means failure; exit 3 means eligibility remains HOLD. `prepare` reserves a fresh directory; `verify` reads the existing one. `acquire` requires a matching plan/budget and a new `raw/` subdirectory; repeated acquisition cannot overwrite originals. Errors and partial acquisitions are not accepted data. Copy the external cache and output manifest together for offline verification on another PC; do not edit hashes to bypass a mismatch.
+
+For a clean source, `prepare` writes shared-grid `rgb.tif`, `canopy_fraction.tif`, `canopy_mask.tif`, `valid_fraction.tif` under `train/<id>` or `val/<id>`, and `manifest.json`. RGB uses exact overlap-area averaging with fixed floor(x+0.5) uint8 rounding; coverage uses identical float64 weights then float32, with mask >=0.5. Uniform masks are retained. Nodata/unknown validity is held, with no invented ignore policy. The saved pixels/grid are read back and hashed.
+
+Clean sources still require an external review JSON passed with `--reviews <file>` to become training-eligible. Keys are image IDs as strings; each entry supplies the actual `preview_sha256`, `stac_sha256`, and `alignment`, `quality`, `attribution` verdicts. Only explicit `PASS` on all three, tied to the exact artifacts, permits eligibility. Record review notes. Review the actual preview and complete external attribution before entering those verdicts. A review file cannot override the black-border validity hold. Missing review yields generated-but-not-approved products.
+
+### Verification and next step
+
+Regression: **102 passed**, including 24 new offline tests, with 75 Affine-related deprecation warnings. Tests cover CLI bounds/IDs, source license/attribution holds, transfer/storage budgets, Range/cache/short reads, protected paths, category/ID rejection, source geometry, crop-free shared grids, 0.5 threshold, uniform labels, split/Holdout/original-object/proximity holds, black-border hold, SHA checks, deterministic synthetic conversion, actual saved-file readback and repeated output hashes. Tests forbid network and do not acquire real data. Real source inspection was a separate bounded execution.
+
+Next action is review of this validity finding and source coverage evidence. The code's valid-source path is tested, but **real-data pilot PASS requires at least one Train and one Val to finish rights, label/validity QA, conversion and saved-product verification**. That condition was not met here. Existing 661/1972 remain the only accepted training pair set; their loader/training behavior and all Satlas/GPU code are unchanged.

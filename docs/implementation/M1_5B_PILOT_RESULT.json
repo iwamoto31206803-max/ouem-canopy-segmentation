@@ -1,0 +1,397 @@
+{
+  "dataset": "restor/tcd",
+  "revision": "d97d4da0ebbb6e249ae95ac5e19656babd972eb2",
+  "official_code_revision": "05dab754a3fd15b83d6b7606de7310155f4e2df2",
+  "utc": "2026-11-05T10:39:23.477067+00:00",
+  "status": "REAL_PILOT_NOT_VERIFIED",
+  "stage": "prepare",
+  "samples": [
+    {
+      "image_id": 2,
+      "oam_id": "5cb0ece9fa020e0006eb43d4",
+      "split": "train",
+      "validation_fold": 2,
+      "status": "HOLD",
+      "training_eligible": false,
+      "rights": {
+        "stac_sha256": "bb1f1f6c54c9254574d8c0dbec55c7d611ca4c06f54515eb94d018a96d20c6ea",
+        "stac_url": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/5cb0ece9fa020e0006eb43d4",
+        "row_license": "CC-BY 4.0",
+        "image_license": "CC-BY-4.0",
+        "annotation_license": "CC BY 4.0",
+        "annotation_terms": "https://github.com/Restor-Foundation/tcd/blob/05dab754a3fd15b83d6b7606de7310155f4e2df2/docs/dataset.md",
+        "attribution": "named producer/licensor retained in external STAC; no contacts published",
+        "commercial_final_clearance": "NOT_ASSESSED"
+      },
+      "separation": {
+        "nearest_opposite_footprint_lower_bound_m": 676188.4298276933,
+        "proximity_hold_m": 1000,
+        "scope": "all cached opposite-role footprints, including holdout metadata; no holdout pixels"
+      },
+      "source_hashes": {
+        "rgb.bin": "c9295a6d7b825c68c1e98cb67229f2faac78157a3c23525f50c062dd3b2c23fa",
+        "annotation.bin": "de179a376b16f4950335de81e719ddd26c518a0a1277b6952e04feeb5efc8334",
+        "segments.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "coco_annotations.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "candidate-mask.png": "47409785b30cc38f1ec62f219ce1c46f885427442416c0768dc470497ef784cb",
+        "stac.json": "bb1f1f6c54c9254574d8c0dbec55c7d611ca4c06f54515eb94d018a96d20c6ea",
+        "preview.jpg": "5d9a8ad372180d32ccc9ee64dd73391af3599c109091a4ebfb77a1234d1902ea"
+      },
+      "source_crs": "EPSG:3395",
+      "source_transform": [
+        0.09999999999990905,
+        0.0,
+        -7828417.13929846,
+        0.0,
+        -0.09999999999990905,
+        -3148088.6967618233
+      ],
+      "source_bounds": [
+        -7828417.13929846,
+        -3148293.496761823,
+        -7828212.339298461,
+        -3148088.6967618233
+      ],
+      "source_wgs84_bounds": [
+        -70.32386766695026,
+        -27.355222015522784,
+        -70.32202791724839,
+        -27.35357929670739
+      ],
+      "input_shape": [
+        2048,
+        2048
+      ],
+      "source_ground_gsd": {
+        "latitude": -27.354400659193033,
+        "longitude": -70.32294779209934,
+        "east_m": 0.08888097146150306,
+        "north_m": 0.0888809710543476
+      },
+      "projected_pixel_m": [
+        0.09999999999990905,
+        0.09999999999990905
+      ],
+      "output_crs": "EPSG:3395",
+      "output_transform": [
+        0.5626373626368509,
+        0.0,
+        -7828417.13929846,
+        0.0,
+        -0.5626373626368509,
+        -3148088.6967618233
+      ],
+      "output_bounds": [
+        -7828417.13929846,
+        -3148293.496761823,
+        -7828212.339298461,
+        -3148088.6967618233
+      ],
+      "output_shape": [
+        364,
+        364
+      ],
+      "output_ground_gsd": {
+        "latitude": -27.354400659193033,
+        "longitude": -70.32294779209934,
+        "east_m": 0.5000775497001875,
+        "north_m": 0.5000775597422987
+      },
+      "target_ground_gsd_m": 0.5,
+      "gsd_error_m": {
+        "east_m": 7.754970018747365e-05,
+        "north_m": 7.755974229872731e-05
+      },
+      "nodata": null,
+      "validity": "GDAL all-valid flag is insufficient; black edge requires source validity evidence",
+      "pixel_definition": "outer bounds unchanged; centers col+0.5,row+0.5",
+      "label_qa": {
+        "categories": [],
+        "zero_pixels": 4194304,
+        "crowd_ids": [],
+        "segments_without_pixels": [],
+        "positive_pixels": 0
+      },
+      "source_formats": [
+        "TIFF",
+        "PNG"
+      ],
+      "canopy_fraction_mean": 0.0,
+      "binary_positive_pixels": 0,
+      "binary_canopy_ratio": 0.0,
+      "uniform_background": true,
+      "uniform_canopy": false,
+      "invalid_pixels": null,
+      "threshold": 0.5,
+      "rgb_method": "exact pixel-overlap area float64; floor(value+0.5) uint8",
+      "fraction_method": "same area weights float64 then float32; binary >=0.5",
+      "crowd_policy": "known categories 1/2 positive; ID0 annotation background, not nodata",
+      "exact_black_pixels": 1260884,
+      "black_border_pixels": 3391,
+      "gdal_all_valid": true,
+      "source_validity_hold": "HOLD_UNMARKED_BLACK_BORDER_VALIDITY",
+      "grid_status": "diagnostic proposed grid only; no training files written",
+      "coverage_scope": "diagnostic full rectangle, unresolved footprint included",
+      "pixel_qa": "PASS_IDS_DIMENSIONS",
+      "spatial_qa": "PASS_GRID_VALIDITY_UNRESOLVED",
+      "visual_qa": "NOT_ACCEPTED",
+      "validity_qa": "HOLD",
+      "reason": "HOLD_UNMARKED_BLACK_BORDER_VALIDITY"
+    },
+    {
+      "image_id": 9,
+      "oam_id": "5de875b7b332ff0007897508",
+      "split": "val",
+      "validation_fold": 0,
+      "status": "HOLD",
+      "training_eligible": false,
+      "rights": {
+        "stac_sha256": "01f2418ad2d7af50db29b2107021597117513f29aadf4105096ea6c276c5d63d",
+        "stac_url": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/5de875b7b332ff0007897508",
+        "row_license": "CC-BY 4.0",
+        "image_license": "CC-BY-4.0",
+        "annotation_license": "CC BY 4.0",
+        "annotation_terms": "https://github.com/Restor-Foundation/tcd/blob/05dab754a3fd15b83d6b7606de7310155f4e2df2/docs/dataset.md",
+        "attribution": "named producer/licensor retained in external STAC; no contacts published",
+        "commercial_final_clearance": "NOT_ASSESSED"
+      },
+      "separation": {
+        "nearest_opposite_footprint_lower_bound_m": 177394.31096818962,
+        "proximity_hold_m": 1000,
+        "scope": "all cached opposite-role footprints, including holdout metadata; no holdout pixels"
+      },
+      "source_hashes": {
+        "rgb.bin": "d0f6b01d8f330fd10d1be1f8eff0efe1e07a698eb234ea5a6e77603534b3c98c",
+        "annotation.bin": "bdb7ea9fa86b510be4481b3188c9e88f5ff287edf4c29eb6051d093803c56905",
+        "segments.json": "920c07c41f67e76ccddd996fb685ea161029c42cdfc94913b57420730642b414",
+        "coco_annotations.json": "873eb9677ecabc72351807ec5757cb92c663cec3f68fa8f5ac78583b4fe261a7",
+        "candidate-mask.png": "794b5d2f2de08ee42a76de42c6f64001f9627904f3175b3b0e49abfebef439e2",
+        "stac.json": "01f2418ad2d7af50db29b2107021597117513f29aadf4105096ea6c276c5d63d",
+        "preview.jpg": "e77448790451f266c92e4833081b28e9073b4672b4bd13536b430c5754646ca9"
+      },
+      "source_crs": "EPSG:3395",
+      "source_transform": [
+        0.10000000000013641,
+        0.0,
+        -9080257.806186315,
+        0.0,
+        -0.10000000000013641,
+        5070685.874426341
+      ],
+      "source_bounds": [
+        -9080257.806186315,
+        5070481.074426341,
+        -9080053.006186314,
+        5070685.874426341
+      ],
+      "source_wgs84_bounds": [
+        -81.56934371042762,
+        41.58387349318475,
+        -81.56750396072573,
+        41.58525477212526
+      ],
+      "input_shape": [
+        2048,
+        2048
+      ],
+      "source_ground_gsd": {
+        "latitude": 41.58456413637635,
+        "longitude": -81.56842383557668,
+        "east_m": 0.07490822913839168,
+        "north_m": 0.07490822822204378
+      },
+      "projected_pixel_m": [
+        0.10000000000013641,
+        0.10000000000013641
+      ],
+      "output_crs": "EPSG:3395",
+      "output_transform": [
+        0.6671009772011239,
+        0.0,
+        -9080257.806186315,
+        0.0,
+        -0.6671009771980904,
+        5070685.874426341
+      ],
+      "output_bounds": [
+        -9080257.806186315,
+        5070481.074426341,
+        -9080053.006186314,
+        5070685.874426341
+      ],
+      "output_shape": [
+        307,
+        307
+      ],
+      "output_ground_gsd": {
+        "latitude": 41.58456413637635,
+        "longitude": -81.56842383557668,
+        "east_m": 0.49971353202367225,
+        "north_m": 0.4997135129795849
+      },
+      "target_ground_gsd_m": 0.5,
+      "gsd_error_m": {
+        "east_m": -0.00028646797632775334,
+        "north_m": -0.000286487020415116
+      },
+      "nodata": null,
+      "validity": "GDAL all-valid flag is insufficient; black edge requires source validity evidence",
+      "pixel_definition": "outer bounds unchanged; centers col+0.5,row+0.5",
+      "label_qa": {
+        "categories": [
+          1,
+          2
+        ],
+        "zero_pixels": 3688615,
+        "crowd_ids": [],
+        "segments_without_pixels": [],
+        "positive_pixels": 505689
+      },
+      "source_formats": [
+        "TIFF",
+        "PNG"
+      ],
+      "canopy_fraction_mean": 0.12056565284729004,
+      "binary_positive_pixels": 11352,
+      "binary_canopy_ratio": 0.12044690129338242,
+      "uniform_background": false,
+      "uniform_canopy": false,
+      "invalid_pixels": null,
+      "threshold": 0.5,
+      "rgb_method": "exact pixel-overlap area float64; floor(value+0.5) uint8",
+      "fraction_method": "same area weights float64 then float32; binary >=0.5",
+      "crowd_policy": "known categories 1/2 positive; ID0 annotation background, not nodata",
+      "exact_black_pixels": 17102,
+      "black_border_pixels": 354,
+      "gdal_all_valid": true,
+      "source_validity_hold": "HOLD_UNMARKED_BLACK_BORDER_VALIDITY",
+      "grid_status": "diagnostic proposed grid only; no training files written",
+      "coverage_scope": "diagnostic full rectangle, unresolved footprint included",
+      "pixel_qa": "PASS_IDS_DIMENSIONS",
+      "spatial_qa": "PASS_GRID_VALIDITY_UNRESOLVED",
+      "visual_qa": "NOT_ACCEPTED",
+      "validity_qa": "HOLD",
+      "reason": "HOLD_UNMARKED_BLACK_BORDER_VALIDITY"
+    }
+  ],
+  "target_ground_gsd_m": 0.5,
+  "raw_manifest_sha256": "767da57b0e1cff7357ee4a4d6fb8faa5054bbddd0bd310e25c2547c4676472d3",
+  "versions": {
+    "numpy": "1.26.4",
+    "Pillow": "13.0.0",
+    "rasterio": "1.4.3",
+    "pyproj": "3.7.1",
+    "pyarrow": "18.1.0"
+  },
+  "network_bytes": 152548527,
+  "total_stored_bytes_before_manifest": 1915018,
+  "code_implementation_status": "PASS_CANDIDATE",
+  "real_data_pilot_status": "HOLD_NOT_PASSED",
+  "python": "3.11.9",
+  "operating_system": "Windows-10-10.0.26300-SP0",
+  "tests": {
+    "command": ".\\.venv\\Scripts\\python.exe -m pytest -q --disable-warnings",
+    "passed": 102,
+    "new_tests": 24,
+    "warnings": 75
+  },
+  "acquired_ids": [
+    2,
+    9
+  ],
+  "training_eligible_ids": [],
+  "generated_training_geotiffs": 0,
+  "candidate_holds": {
+    "3": "HOLD_STORAGE_ESTIMATE",
+    "1": "excluded by mandate; source license evidence missing"
+  },
+  "acquisition": {
+    "seconds": 68.32432940008584,
+    "payload_bytes": 152548527,
+    "transfer_limit_bytes": 268435456,
+    "storage_limit_bytes": 134217728,
+    "all_requested_column_bytes": 231341612,
+    "acquired_column_bytes": 152502782,
+    "metadata_footer_bytes": 45745,
+    "final_saved_bytes_at_observation": 1935980,
+    "peak_disk_usage": "NOT_MEASURED; dynamic pre-write storage gates enforced",
+    "groups": [
+      {
+        "shard": "data/train-00000-of-00007.parquet",
+        "group": 2,
+        "group_rows": 100,
+        "targets": [
+          {
+            "image_id": 2,
+            "index": 31
+          }
+        ],
+        "compressed_bytes": 78284131
+      },
+      {
+        "shard": "data/train-00000-of-00007.parquet",
+        "group": 5,
+        "group_rows": 96,
+        "targets": [
+          {
+            "image_id": 9,
+            "index": 3
+          }
+        ],
+        "compressed_bytes": 74218651
+      },
+      {
+        "shard": "data/train-00003-of-00007.parquet",
+        "group": 1,
+        "group_rows": 100,
+        "targets": [
+          {
+            "image_id": 3,
+            "index": 60
+          }
+        ],
+        "compressed_bytes": 78838830
+      }
+    ],
+    "full_shard_sha256_recomputed": false,
+    "accounting": "HTTP response bodies only, excluding headers/TLS; includes initial footer work",
+    "unselected_encoded_rows_in_acquired_groups": 194
+  },
+  "offline_verification": {
+    "status": "OFFLINE_REVERIFICATION_COMPLETE_HOLDS",
+    "held_source_ids": [
+      2,
+      9
+    ],
+    "verified_product_ids": [],
+    "exit_code": 3
+  },
+  "visual_inspection": {
+    "performed": true,
+    "method": "source/overlay previews actually viewed",
+    "2": "Dry terrain/buildings, large sharp black wedge; empty annotation unchanged. Positive-mask alignment not measurable.",
+    "9": "Shoreline, water, crowns and buildings; masks broadly align with crowns, some vegetation unlabelled; small sharp black corner."
+  },
+  "retained_attribution": "Complete STAC snapshots external under raw/<id>/stac.json; provider/contact values omitted from Git",
+  "existing_samples": {
+    "ids": [
+      661,
+      1972
+    ],
+    "roles_preserved": true,
+    "all_eight_output_hashes_reverified": true,
+    "pair_manifest_sha256": "a2376d1b1c3def2e2e9a7d0740a61fcccc242a49fda22b5028295e5ed1d50b1a"
+  },
+  "limitations": [
+    "No real training products were written; proposed grids and coverage are diagnostic only",
+    "GDAL all-valid is insufficient for visible unmarked black borders; invalid pixel count unresolved",
+    "No color-based nodata conversion, crop, ignore rule or replacement acquisition was introduced",
+    "Synthetic conversion/readback/determinism success is separate from the held real-data pilot",
+    "No training/GPU code changes; current real-data loader remains restricted to 661/1972"
+  ],
+  "external_record_hashes": {
+    "plan.json": "11e07d24221720ade07d334d2de416c7296481f9e2257bb15ca5a48bdfc5501b",
+    "raw_manifest.json": "767da57b0e1cff7357ee4a4d6fb8faa5054bbddd0bd310e25c2547c4676472d3",
+    "pair_audit_manifest.json": "897b774e2b795a1b83d1e85a28745f56947751b765286913cb6305a4641dbc99"
+  }
+}
