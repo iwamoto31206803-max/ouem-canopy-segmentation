@@ -1,0 +1,157 @@
+{
+  "status": "TRAINING_RESOURCE_AUDIT_PASS_CANDIDATE",
+  "utc": "2026-11-05T05:24:33.330732+00:00",
+  "device": "cpu",
+  "batch_size": 1,
+  "python": "3.11.9",
+  "platform": "Windows-10-10.0.26300-SP0",
+  "threads": 4,
+  "seed": 0,
+  "versions": {
+    "torch": "2.7.1+cpu",
+    "torchvision": "0.22.1+cpu",
+    "satlaspretrain-models": "0.3.1"
+  },
+  "backend": {
+    "torch_version": "2.7.1+cpu",
+    "cuda_available": false,
+    "cuda_build": null,
+    "hip_build": null,
+    "cuda_device_count": 0,
+    "gpu_vram_measurements": "NOT_MEASURED"
+  },
+  "memory_method": "Windows GetProcessMemoryInfo, bytes, process-lifetime peak",
+  "video_controllers": {
+    "Name": "AMD Radeon(TM) Graphics",
+    "DriverVersion": "32.0.21030.2001",
+    "AdapterRAM": 4293918720
+  },
+  "input": {
+    "image_id": 661,
+    "split": "train",
+    "crop": [
+      0,
+      0,
+      256,
+      256
+    ],
+    "hashes": {
+      "rgb.tif": "613bd41499495ba275347d6882e188d45a5a130c9c50ece72d3fad0418c22557",
+      "canopy_fraction.tif": "bc067ba75ee57eb6907d1e1e8b0ebb71a78928a671795c1d116c98a0d8e0234e",
+      "canopy_mask.tif": "b68c48d0dda494fe2d1255e4004b5a204cb0ce209859de11b3f62babbf14bd50",
+      "valid_fraction.tif": "e4623edadeeb4c06e950a578c3de578555b67c30a49e279fc63cfeeed68e96b4"
+    },
+    "pair_manifest_sha256": "a2376d1b1c3def2e2e9a7d0740a61fcccc242a49fda22b5028295e5ed1d50b1a"
+  },
+  "checkpoint": {
+    "filename": "aerial_swinb_si.pth",
+    "sha256": "f8abf21cadaab2a71859e9d172bec4e5d6b7cc9710882a2f6a4d8aae826db036",
+    "source": "https://huggingface.co/allenai/satlas-pretrain/resolve/b1f8de04dacf9f9ed9640fe32484947710b47ede/aerial_swinb_si.pth",
+    "revision": "b1f8de04dacf9f9ed9640fe32484947710b47ede",
+    "publisher_sha256": "f8abf21cadaab2a71859e9d172bec4e5d6b7cc9710882a2f6a4d8aae826db036",
+    "publisher_size_bytes": 504439674,
+    "local_size_bytes": 504439674
+  },
+  "memory": {
+    "before_load": {
+      "working_set_bytes": 316919808,
+      "peak_working_set_bytes": 316919808,
+      "committed_private_bytes": 803418112,
+      "peak_committed_private_bytes": 803418112
+    },
+    "checkpoint_loaded": {
+      "working_set_bytes": 826904576,
+      "peak_working_set_bytes": 826904576,
+      "committed_private_bytes": 1586135040,
+      "peak_committed_private_bytes": 1586135040
+    },
+    "model_ready": {
+      "working_set_bytes": 1190047744,
+      "peak_working_set_bytes": 1193353216,
+      "committed_private_bytes": 2171363328,
+      "peak_committed_private_bytes": 2175565824
+    },
+    "after_forward_loss": {
+      "working_set_bytes": 1411555328,
+      "peak_working_set_bytes": 1411555328,
+      "committed_private_bytes": 2242748416,
+      "peak_committed_private_bytes": 2242748416
+    },
+    "after_backward": {
+      "working_set_bytes": 1515819008,
+      "peak_working_set_bytes": 1515819008,
+      "committed_private_bytes": 2390294528,
+      "peak_committed_private_bytes": 2397954048
+    }
+  },
+  "parameters": {
+    "backbone": {
+      "total": 87930848,
+      "trainable": 87930848,
+      "parameter_bytes": 351723392,
+      "gradient_capacity_bytes": 351723392
+    },
+    "fpn": {
+      "total": 836608,
+      "trainable": 836608,
+      "parameter_bytes": 3346432,
+      "gradient_capacity_bytes": 3346432
+    },
+    "upsample": {
+      "total": 819712,
+      "trainable": 819712,
+      "parameter_bytes": 3278848,
+      "gradient_capacity_bytes": 3278848
+    },
+    "head": {
+      "total": 149890,
+      "trainable": 149890,
+      "parameter_bytes": 599560,
+      "gradient_capacity_bytes": 599560
+    },
+    "whole_model": {
+      "total": 89737058,
+      "trainable": 89737058,
+      "parameter_bytes": 358948232,
+      "gradient_capacity_bytes": 358948232
+    }
+  },
+  "fp32_all_layer_estimate": {
+    "unit": "bytes",
+    "fp32_adam_moments_bytes": 717896464,
+    "parameters_gradients_moments_bytes": 1435792928,
+    "exclusions": "activations, buffers, workspaces, temporary optimizer tensors, allocator and runtime"
+  },
+  "fp32_frozen_backbone_estimate": {
+    "unit": "bytes",
+    "fp32_adam_moments_bytes": 14449680,
+    "parameters_gradients_moments_bytes": 380622752,
+    "exclusions": "activations, buffers, workspaces, temporary optimizer tensors, allocator and runtime"
+  },
+  "loss": 0.6926024556159973,
+  "gradients": {
+    "backbone": {
+      "finite_nonzero_parameters": 289,
+      "example": "backbone.features.0.0.weight"
+    },
+    "fpn": {
+      "finite_nonzero_parameters": 10,
+      "example": "fpn.inner_blocks.0.0.weight"
+    },
+    "upsample": {
+      "finite_nonzero_parameters": 8,
+      "example": "layers.0.0.weight"
+    },
+    "head": {
+      "finite_nonzero_parameters": 4,
+      "example": "layers.0.0.weight"
+    }
+  },
+  "actual_gradient_tensor_bytes": 353069032,
+  "times": {
+    "checkpoint_load_and_construction_seconds": 2.3907367000356317,
+    "forward_including_official_ce_seconds": 0.7033244000049308,
+    "backward_seconds": 2.1644651000387967
+  },
+  "total_seconds": 9.302695299964398
+}
