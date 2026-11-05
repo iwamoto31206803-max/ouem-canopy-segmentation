@@ -263,3 +263,63 @@ def test_hold_is_nonzero_exit(tmp_path,monkeypatch,status):
     monkeypatch.setattr(pilot,'prepare',lambda args,report:report.update(status=status))
     assert pilot.main(['prepare','--inventory-cache',str(tmp_path/'meta'),'--cache',str(tmp_path/'cache'),
                        '--output',str(tmp_path/'output')])==3
+
+
+def test_border_audit_connectivity_and_internal_components():
+    from m1_5b2_border_audit import components,component_report
+    diagonal=np.eye(3,dtype=bool)
+    assert len(np.unique(components(diagonal,4)))-1==3
+    assert len(np.unique(components(diagonal,8)))-1==1
+    mask=np.zeros((8,8),dtype=bool); mask[:,0]=True; mask[3,4]=True
+    stats,border,interior=component_report(mask,np.ones((8,8),dtype=np.uint8))
+    assert stats['components']==2 and stats['border_connected_pixels']==8
+    assert stats['interior_pixels']==1 and stats['interior_positive_label_pixels']==1
+    assert stats['largest'][0]['bbox_xyxy']==[0,0,1,8]
+    assert not np.any(border & interior)
+
+
+def test_border_audit_union_find_against_independent_flood_fill():
+    from m1_5b2_border_audit import components
+    from collections import deque
+    rng=np.random.default_rng(0)
+    for connectivity in [4,8]:
+        for _ in range(10):
+            mask=rng.random((12,13))<.4
+            expected=np.zeros(mask.shape,dtype=int); number=0
+            for y,x in np.argwhere(mask):
+                if expected[y,x]: continue
+                number+=1; queue=deque([(y,x)]); expected[y,x]=number
+                while queue:
+                    r,c=queue.popleft()
+                    for dy,dx in [(-1,0),(1,0),(0,-1),(0,1)]+([] if connectivity==4 else [(-1,-1),(-1,1),(1,-1),(1,1)]):
+                        a,b=r+dy,c+dx
+                        if 0<=a<12 and 0<=b<13 and mask[a,b] and not expected[a,b]:
+                            expected[a,b]=number; queue.append((a,b))
+            observed=components(mask,connectivity)
+            for region in range(1,number+1):
+                ids=np.unique(observed[expected==region]); assert len(ids)==1 and ids[0]!=0
+                assert np.array_equal(observed==ids[0],expected==region)
+
+
+def test_border_audit_square_is_geometric_not_validity():
+    from m1_5b2_border_audit import largest_clear_square,analyze
+    blocked=np.zeros((5,7),dtype=bool); blocked[:,:3]=True
+    assert largest_clear_square(blocked)['side_px']==4
+    assert largest_clear_square(np.ones((3,3),dtype=bool))['side_px']==0
+    rgb=np.full((6,6,3),100,dtype=np.uint8); rgb[:,0]=0; rgb[:,1]=3; rgb[3,4]=0
+    result,*_=analyze(rgb,np.ones((6,6),dtype=np.uint8))
+    assert result['exact_4']['border_connected_pixels']==6
+    assert result['exact_4']['interior_positive_label_pixels']==1
+    assert result['near_black_sensitivity'][0]['border_connected_pixels']==12
+    assert result['hypothetical_clear_square']['side_px']==4
+    assert 'not a measured valid' in result['nonblack_meaning']
+
+
+def test_border_audit_empty_black_and_bad_inputs():
+    from m1_5b2_border_audit import analyze,components
+    result,*_=analyze(np.full((4,4,3),100,dtype=np.uint8),np.zeros((4,4),dtype=np.uint8))
+    assert result['exact_4']['components']==0 and result['boundary']['adjacent_nonblack_pixels']==0
+    assert result['hypothetical_clear_square']['side_px']==4
+    with pytest.raises(ValueError): components(np.zeros((4,4),dtype=np.uint8))
+    with pytest.raises(ValueError): components(np.zeros((4,4),dtype=bool),6)
+    with pytest.raises(ValueError): analyze(np.zeros((3,3,3),dtype=np.uint8),np.zeros((4,4)))

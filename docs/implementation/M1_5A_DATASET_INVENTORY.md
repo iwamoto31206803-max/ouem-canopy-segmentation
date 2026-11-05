@@ -162,3 +162,99 @@ Clean sources still require an external review JSON passed with `--reviews <file
 Regression: **102 passed**, including 24 new offline tests, with 75 Affine-related deprecation warnings. Tests cover CLI bounds/IDs, source license/attribution holds, transfer/storage budgets, Range/cache/short reads, protected paths, category/ID rejection, source geometry, crop-free shared grids, 0.5 threshold, uniform labels, split/Holdout/original-object/proximity holds, black-border hold, SHA checks, deterministic synthetic conversion, actual saved-file readback and repeated output hashes. Tests forbid network and do not acquire real data. Real source inspection was a separate bounded execution.
 
 Next action is review of this validity finding and source coverage evidence. The code's valid-source path is tested, but **real-data pilot PASS requires at least one Train and one Val to finish rights, label/validity QA, conversion and saved-product verification**. That condition was not met here. Existing 661/1972 remain the only accepted training pair set; their loader/training behavior and all Satlas/GPU code are unchanged.
+
+## M1-5B-2 black-border cause investigation (2026-11-05)
+
+**Recommendation: use option A now—exclude 2/9 from the next expansion pilot and plan the next approved candidates. Do not implement validity masking or change training/loss at this point.** The dominant wedges are highly likely coverage/fill artifacts, but that cause is not proven. Small interior black pixels can be ordinary dark/shadow pixels. Keep the current pilot HOLD; do not infer dataset-wide occurrence rates from these two purposively selected records.
+
+This is an investigation, not a new preprocessing method. [One offline diagnostic script](../../scripts/m1_5b2_border_audit.py) and extensions to the existing pilot tests reproduce the measurements. [Sanitized result JSON](M1_5B2_BORDER_RESULT.json) records raw hashes, component counts and metadata; all diagnostic images remain external. Existing M1-2D/M1-4/M1-6 and the M1-5B production CLI are unchanged. No new OAM-TCD imagery, upstream OAM raster, checkpoint, training pair, package or GPU operation was acquired/performed. Public documentation was read online.
+
+### Measurements and actual visual inspection
+
+Components use exact decoded RGB=(0,0,0), default 4-neighbor connectivity. Bounding boxes are pixel-edge [left,top,right,bottom), origin top-left. An independent 8-neighbor run and max-channel <=5/<=10 sensitivity checks expose connectivity/compression sensitivity. These thresholds are **diagnostics only**, not NoData/validity definitions. A row-run union/find avoids new scipy/OpenCV dependencies.
+
+| Measurement | Train 2 | Val 9 |
+| --- | ---: | ---: |
+| Exact black pixels (reproduces PR #25) | 1,260,884 | 17,102 |
+| 4-connected components | 198 | 106 |
+| Border-connected components / pixels | 1 / 1,260,096 | 4 / 16,770 |
+| Largest component pixels / image area | 1,260,096 / 30.0430% | 16,762 / 0.399637% |
+| Largest component bbox | [0,0,918,2048) | [0,0,144,217) |
+| Interior components / pixels | 197 / 788 | 102 / 332 |
+| Positive GT pixels on border / interior black | 0 / 0 | 0 / 3 |
+| 8-connected components / interior pixels | 145 / 658 | 56 / 243 |
+| <=5 border-connected pixels | 1,272,284 | 19,033 |
+| <=10 border-connected pixels | 1,274,560 | 19,870 |
+
+The exterior count here is the **entire connected component**, distinct from PR #25's outermost-row/column counts (3,391 and 354). Most of image 2's black area is one smooth left wedge reaching top and bottom; image 9's dominant black component is a straight-edged top-left triangle. Both lack normal scene texture. Enlarged transitions show a narrow near-black fringe; JPEG/YCbCr encoding and reprojection are plausible contributors, not a traced processing history. The max-channel median among nonblack pixels directly adjacent to exact-black pixels is 2 for 2, 1 for 9, consistent with why exact-zero connectivity fragments at the boundary. Higher values also occur; this is not a universal validity classifier.
+
+Source/distribution/annotation-overlays and enlarged boundary/interior contexts were actually viewed. Image 2's sampled interior component sits near the wedge fringe, so “interior component” does not imply a real isolated ground object. For image 9 the largest sampled interior dark region is in a tree-shadow/building/road context. Three exact-black pixels are labelled canopy at (row,col)=(845,1947),(1840,1742),(1841,1742); enlarged canopy context was viewed. A black-pixel-only mask would remove annotated positives as well as suspicious fill. GT membership is not itself a validity guarantee, but demonstrates that black and annotation background are not equivalent. Image 2 remains uniformly background; no positive-mask alignment can be tested there. Image 9's main crown overlays broadly align, without establishing complete ecological GT or accuracy.
+
+### Is enough usable context left?
+
+Exact nonblack fractions are ~69.94% (2) and ~99.59% (9). These are **not certified valid fractions**. As a geometric upper-bound-style diagnostic, compute the largest axis-aligned square avoiding only border-connected <=5 regions, retaining all other pixels provisionally. No crop is written or accepted:
+
+- 2: 1,386px square at [662,0,2048,1386), ~123.19m per side, about 246px at 0.50m. Under this hypothesis it does not support the existing 256px Train context without another policy change. This does not prove a valid crop exists.
+- 9: 1,950px square at [96,95,2046,2045), ~146.07m, about 292px at 0.50m. Geometrically sufficient for a 224px Val crop, but validity and the crop boundary are not certified.
+
+Near-black sensitivity can include legitimate shadows; the diagnostic is not an exact bound on true usable area. The larger nonblack rectangle can contain unknown invalid pixels. Certification of a fully valid region remains unresolved for both.
+
+### TIFF and source-STAC findings
+
+The **cached OAM-TCD tile originals**, not the upstream full OAM mosaics, were inspected byte-for-byte after SHA verification against PR #25. Both are 2048x2048, 3 uint8 RGB bands, EPSG:3395, north-up ~0.10m projected intervals. Affine/bounds remain those in the prior result. Compression tag 259=7 (JPEG), photometric tag 262=6 (YCbCr), tiled 512 square, AREA_OR_POINT=Area. No alpha/ExtraSamples, GDAL NoData tag 42113 or GDAL metadata tag 42112; no TIFF description/software tags. Pillow exposes one IFD frame; GDAL exposes no internal validity mask, no .msk sidecar and all band mask flags are all_valid. Dataset and band masks contain only 255. This describes what the decoder exposes, not a forensic guarantee about an upstream file.
+
+[Rasterio's mask documentation](https://rasterio.readthedocs.io/en/stable/topics/masks.html#dataset-masks) explains that in the absence of explicit mask/alpha/nodata it returns an all-255 dataset mask. Thus this flag is a fallback, not independent evidence of complete image coverage. The same [official discussion](https://rasterio.readthedocs.io/en/stable/topics/masks.html#reading-dataset-masks) explains that valid 8-bit dark data may become zero. Neither marking every zero invalid nor accepting every 255 mask pixel resolves this case.
+
+The hash-pinned external STAC snapshots contain bbox, MultiPolygon geometry, projection/file/alternate asset metadata, and visual/metadata/thumbnail assets. No explicit validity asset or raster-band nodata declaration was found. Their original asset CRSs are EPSG:32719 for 2 and EPSG:32617 for 9, rather than the distributed tile's EPSG:3395. Source proj:geometry is a projected rectangle; transforming its corners to WGS84 agrees with the Item geometry within 4.63e-7 and 4.60e-7 degrees respectively, consistent with rounded nominal raster extent. Full source mosaics/headers, actual alpha/NoData and optional historical .msk/.vrt files were **not** retrieved or inspected.
+
+Rasterizing Item geometry at the tile's pixel centers gives:
+
+- 2: 52,226 centers outside nominal Item geometry (all black), but **1,208,658 black pixels also lie inside it**.
+- 9: every tile center lies inside Item geometry, including **all 17,102 black pixels**.
+
+Consequently neither the catalog bbox nor this nominal geometry identifies the black fill. The [STAC 1.1 Item specification](https://github.com/radiantearth/stac-spec/blob/v1.1.0/item-spec/item-spec.md#geometry) describes an asset footprint; it does not certify the accuracy of these particular provider-supplied geometries as pixel-level valid masks. The measurements, rather than an assumption about the field name, determine our limitation here.
+
+### Official material reviewed and causal confidence
+
+Reviewed on 2026-11-05; scope is the following documents/code, not an exhaustive claim about all upstream material:
+
+- [Fixed TCD dataset documentation, Data format](https://github.com/Restor-Foundation/tcd/blob/05dab754a3fd15b83d6b7606de7310155f4e2df2/docs/dataset.md#data-format): tiles are sampled with a valid-pixel threshold. It does not state that every released tile is entirely valid or specify a recoverable zero/coverage mask rule there. This is compatible with some incomplete-coverage tiles surviving selection, but does not identify the valid mask of 2/9.
+- [Fixed official GeoTIFF exporter](https://github.com/Restor-Foundation/tcd/blob/05dab754a3fd15b83d6b7606de7310155f4e2df2/tools/generate_dataset.py#L14): save_geotiff writes pixels/geometry without explicit nodata/mask handling. **It is not established that this exporter created the cached HF TIFF bytes.** It cannot prove which stage lost or introduced coverage information.
+- [OAM data layout](https://docs.openaerialmap.org/ecosystem/imagery-data/): publishes COGs and metadata; mentions some older uploads also have .msk/.vrt files. [Uploader documentation](https://docs.openaerialmap.org/uploader/uploader-form/) describes contributed TIFFs and metadata. These pages do not provide a universal black-border/NoData validity guarantee. Optional sidecars are a future evidence lead, not a mask we have inspected.
+
+| Region | User's causal category | Confidence and limit |
+| --- | --- | --- |
+| 2 dominant exterior wedge | **2: likely coverage-outside/fill, not confirmed** | High qualitative likelihood from shape, constant color and sharp terrain boundary; exact stage/source coverage is unknown |
+| 9 dominant exterior triangle | **2: likely coverage-outside/fill, not confirmed** | High qualitative likelihood from geometric boundary against textured water; Item geometry does not resolve it |
+| 2 small internal fragments | **4: unresolved**, often compatible with the same fringe | Exact-zero islands merge under near-black/8-connectivity; their status cannot be inferred from connectivity alone |
+| 9 internal dark pixels | **3: real dark surface/shadow plausible** | Enlarged shadow/canopy context and three positive GT pixels oppose blanket zero masking; not every small component individually reviewed |
+
+**Category 1 (confirmed outside-coverage fill) was not established.** No probability percentage is invented. We cannot distinguish upstream orthomosaic padding from later reprojection/resampling/RGB/JPEG serialization or a combination. The encoding fact does not prove the JPEG stage introduced the geometric wedge.
+
+### A/B/C comparison and decision
+
+| Option | Quality | Implementation / existing-code effect | Nationwide expansion implication |
+| --- | --- | --- | --- |
+| **A: exclude entire affected images; use other candidates** | Avoids invented labels/validity, loses useful pixels and may bias coverage if widely used | Low: maintain HOLD/exclusion audit and replan explicit candidates; no preprocessing/loader/loss change | Practical initial path while suitable alternatives exist; log exclusions and revisit if a larger audit shows material coverage loss |
+| B: crop a proven valid region | Retains known-valid context only if evidence establishes it; changes extent/context; 2's hypothetical crop is too small for current 256px Train context | Moderate: review the coverage evidence and deterministic crop, matching RGB/GT/affine/bounds/GSD/manifests; reverify size/selection | Source-specific exceptions can be costly; useful for scarce/valuable sources, not justified just by these two cases |
+| C: validity-aware labels/loss | Can retain more data with a reliable source mask; color-only validity can discard real shadows/canopy | High: source validity, valid-weighted resampling/partial pixels, loader, loss denominator, metrics and provenance/tests need a separately reviewed contract | Potentially reusable once authoritative masks/policies exist, but present metadata is insufficient and no incidence/benefit has been measured |
+
+For C, the installed official Satlas 0.3.1 Head uses unreduced CE followed by mean over **all** output pixels; [official head source](https://github.com/allenai/satlaspretrain_models/blob/main/satlaspretrain_models/models/heads.py) was checked alongside the installed source. [PyTorch 2.7 CE](https://docs.pytorch.org/docs/2.7/generated/torch.nn.functional.cross_entropy.html) defaults ignore_index=-100, but an ignored zero loss still participates in the Head's subsequent denominator. Existing test `test_official_ignore_default_is_zero_but_mean_diluted` covers this. Merely writing -100 is not a valid-area mean; all-invalid rejection, denominator/evaluation masking and invalid-context influence need review. Existing loader also rejects non-0/1 targets and valid_fraction !=1. Do not change the official architecture or silently override this loss contract here.
+
+**No immediate validity-processing implementation is necessary to expand the pilot. Prefer A.** Propose Train 3 and Val 576 as the next unacquired approved-list entries, subject to a fresh footer/cost/rights/split plan. This is a proposal, not acquisition or training approval; neither was fetched here. Earlier Train 3's storage HOLD concerned the three-candidate budget, not observed image quality. Do not auto-increase budgets or fetch replacements in this investigation. Revisit B/C only if alternatives are insufficient, valuable sources require recovery, or a wider bounded audit demonstrates a material need and valid masks can be evidenced.
+
+The current “one exact-black edge pixel => HOLD” rule should remain a **temporary review trigger**, not a permanent automatic exclusion or black-to-NoData rule. Rasterio's dark-zero warning, the observed interior positives and lossy fringe show why color alone is insufficient. A later triage proposal should prioritize explicit mask/alpha/nodata evidence, then inspect connected area/shape, near-black sensitivity and actual context. No universal pixel/percentage cutoff can be selected from two cases. Leave the production rule unchanged for this PR; record a manual, per-source decision when advancing candidates. HOLD and final exclusion are different decisions.
+
+### Reproduction, tests and unresolved items
+
+```powershell
+# Existing pilot cache only; fresh external diagnostics directory required.
+.\.venv\Scripts\python.exe scripts/m1_5b2_border_audit.py --cache '<existing-M1-5B-cache>' --output '<fresh-external-border-diagnostics>'
+.\.venv\Scripts\python.exe -m pytest -q --disable-warnings
+```
+
+The diagnostic CLI is completely offline and checks raw_manifest plus every original/annotation/segment/STAC/preview hash against the prior public record. A raw/distribution/GT triptych and edge/interior details are created externally; none are masks for training. Geometry rasterization uses pixel-center membership, all_touched=False. The square calculation assesses only geometric capacity under a stated hypothesis and writes no crop. No dependencies were installed. Results are reproducible from the cache without Codex or ChatGPT.
+
+Regression result: **106 passed**, including four new diagnostic tests, with 75 existing/reused Affine warnings. Tests independently compare run-union components with flood-fill on synthetic arrays (4/8 connectivity), distinguish exterior/interior and annotated dark pixels, check square capacity/threshold sensitivity, and validate empty/bad inputs. No real model training or GPU experiment was performed.
+
+Unresolved: true source valid-data mask/footprint, exact processing stage of fill/coverage loss, source-side alpha/nodata/sidecars, per-component ecological interpretation, certified crop suitability, B/C semantics and corpus-wide incidence. Evidence that would establish category 1 or justify B/C would include an authoritative original coverage mask or documented processing trace spatially matched to the tile; a bbox or an RGB-zero threshold alone is insufficient. These unknowns do not block the reviewed A-first replacement plan, but they do block using 2/9 as all-valid training pairs.
