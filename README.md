@@ -32,6 +32,10 @@ Ai2 explicitly publishes SatlasPretrain checkpoint weights under **ODC-BY**; its
 
 Do not present model visualizations, historical 10cm OAM-TCD benchmark scores or past scale-up observations as demonstrated GSI accuracy. Quantitative claims need independent target-domain canopy reference labels; GT54 is reserved and its land-cover classes are not automatically canopy GT.
 
+## Development setup
+
+See [Windows CPU development environment](docs/development/WINDOWS_CPU_SETUP.md) for the user-observed GEEKOM-A6 setup, reproduction commands and checks still pending before M1-1 acceptance.
+
 ## Project history
 
 This repository was formerly `oam-tcd-poc`. Prior model inference, scale/edge-effect experiments, scratch-route investigations and the original OAM-TCD adaptation A/B/C plan remain available in Git history and historical documents. They are **not** the current implementation mandate.
