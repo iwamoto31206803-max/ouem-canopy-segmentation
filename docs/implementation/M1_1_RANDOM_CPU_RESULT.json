@@ -1,0 +1,118 @@
+{
+  "mode": "random",
+  "device": "cpu",
+  "size": 128,
+  "seed": 0,
+  "threads": 4,
+  "python": "3.11.9",
+  "platform": "Windows-10-10.0.26300-SP0",
+  "utc": "2026-11-05T01:40:05.011107+00:00",
+  "status": "STRUCTURAL_PASS",
+  "pretrained_status": "PRETRAINED_NOT_VERIFIED",
+  "versions": {
+    "torch": "2.7.1+cpu",
+    "torchvision": "0.22.1+cpu",
+    "satlaspretrain-models": "0.3.1",
+    "pytest": "8.4.2"
+  },
+  "official_source_sha256": {
+    "model": "216db2fccf27b7be5034eee3826ea95186ba8cc81fe78d8b0269a123b208b627",
+    "heads": "229f9a3f47c00f5bfa1a338d64b657be1999624d13e274888acdfbae99ec04fd",
+    "fpn": "003b4855c31f763ce85dca3bd2e04938f7458aa87b7c41bc66d8deb1bc60839c",
+    "backbones": "b8db9c8e9261d9f940d557cf830c131fbda6b4d848badca37fdc7d0001906d73",
+    "utils": "68fb5344a63fbf5abb424b6b9ff7abaddfa1f881db96dc9d723e3db3014e553d"
+  },
+  "torch_cuda_build": null,
+  "components": {
+    "backbone": "random",
+    "fpn": "random",
+    "upsample": "random",
+    "head": "random"
+  },
+  "input_shape": [
+    1,
+    3,
+    128,
+    128
+  ],
+  "target_shape": [
+    1,
+    128,
+    128
+  ],
+  "cases": {
+    "mixed": {
+      "output_shape": [
+        1,
+        2,
+        128,
+        128
+      ],
+      "loss": 0.6933080554008484,
+      "gradients": {
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "backbone": {
+          "finite_nonzero_parameters": 289,
+          "example": "backbone.features.0.0.weight"
+        }
+      },
+      "seconds": 1.3645864999853075
+    },
+    "background": {
+      "output_shape": [
+        1,
+        2,
+        128,
+        128
+      ],
+      "loss": 0.7024779915809631,
+      "gradients": {
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "backbone": {
+          "finite_nonzero_parameters": 273,
+          "example": "backbone.features.0.0.weight"
+        }
+      },
+      "seconds": 1.324049900053069
+    },
+    "canopy": {
+      "output_shape": [
+        1,
+        2,
+        128,
+        128
+      ],
+      "loss": 0.6843729019165039,
+      "gradients": {
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "backbone": {
+          "finite_nonzero_parameters": 313,
+          "example": "backbone.features.0.0.weight"
+        }
+      },
+      "seconds": 1.275865500094369
+    }
+  },
+  "total_seconds": 13.612781800096855
+}

@@ -81,16 +81,45 @@ git status --short --branch
 
 Compare with the observed table. A successful import and clean `pip check` establish basic environment readiness only. Git status depends on any current development changes; the historical clean-tree observation is not a promise that this command always returns a clean tree.
 
-## Not yet verified
+## M1-1 observed CPU execution, 2026-11-05
 
-- Official Satlas model construction and `Aerial_SwinB_SI` backbone/FPN/head wiring.
-- Synthetic two-class forward, loss and backward, including gradients in backbone, FPN and head, and uniform-mask cases.
-- Supported input/output sizes; 128 x 128 remains an initial smoke candidate.
+Codex successfully used the existing venv in this session. Python was 3.11.9, torch 2.7.1+cpu, torchvision 0.22.1+cpu, satlaspretrain-models 0.3.1 and pytest 8.4.2. `pip check` returned `No broken requirements found`. The installed official Model, SimpleHead, Upsample and state-dict prefix conversion sources were inspected directly.
+
+Run the lightweight offline suite and explicitly opt into the full CPU smoke from the repository root.
+
+The final lightweight suite completed with 8 passed in 8.38 seconds. It covers deterministic inputs, uniform masks, malformed outputs/loss, missing/nonfinite gradients, digest rejection before deserialization, safe CPU load options, absent-checkpoint reporting and official strict FPN loading with missing-key rejection.
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest -q
+.\.venv\Scripts\python.exe scripts/m1_1_satlas_smoke.py --init random --device cpu --size 128 --threads 4 --output docs/implementation/M1_1_RANDOM_CPU_RESULT.json
+```
+
+The random run obtained `STRUCTURAL_PASS / PRETRAINED_NOT_VERIFIED` in 13.61 seconds including imports and construction. With batch 1, RGB `[1,3,128,128]`, long targets `[1,128,128]`, each probability output was `[1,2,128,128]`. Mixed, all-background and all-canopy cases passed finite/range/probability-sum/loss checks and backward checks in head, FPN and backbone. Forward/backward and validation took approximately 1.36, 1.32 and 1.28 seconds respectively. Four CPU threads were selected to bound parallel resource use. Each case releases its graph and clears gradients before the next case. Peak memory remains unmeasured. The observed size needed no adjustment.
+
+The script uses the official Model and loss, unfreezes parameters for gradient verification, and performs sequential cases without optimizer updates. A seeded CPU generator produces 8-bit RGB divided by 255 and preserves uniform masks. The ordinary pytest suite uses small tensors and a small official FPN fixture. Full Swin execution occurs through the explicit CLI command.
+
+The [random result](../implementation/M1_1_RANDOM_CPU_RESULT.json) records component evidence, shapes, timings, versions and SHA-256 fingerprints of the installed official source files. The [environment snapshot](M1_1_CPU_ENVIRONMENT.txt) records observed resolved dependencies. The setup commands above pin the primary packages. To reproduce the complete observed dependency versions, use the snapshot as constraints for both installation commands with `-c docs/development/M1_1_CPU_ENVIRONMENT.txt`. Distribution artifact hashes and the exact Git commit corresponding to the installed PyPI distribution remain unverified.
+
+For a locally supplied publisher-origin checkpoint, replace the placeholders before running.
+
+```powershell
+.\.venv\Scripts\python.exe scripts/m1_1_satlas_smoke.py --init checkpoint --device cpu --size 128 --checkpoint '<local-checkpoint-path>' --sha256 '<expected-64-digit-SHA256>' --checkpoint-source '<publisher-URL-and-immutable-revision>'
+```
+
+The script validates the digest before `torch.load(..., map_location="cpu", weights_only=True)`. The official constructor uses strict component state-dict loading for backbone and FPN. Upsample and Head are initialized afresh. Unsupported file structures or component mismatches produce a failure record. Missing files/dependencies produce `NOT_VERIFIED` and exit code 2, verification failures produce `FAIL` and exit code 1. Successful runs exit 0. OS-level termination may prevent a result file from being emitted and requires a separate failure record.
+
+A CLI invocation with an intentionally absent checkpoint produced `NOT_VERIFIED / PRETRAINED_NOT_VERIFIED`. Its [result record](../implementation/M1_1_PRETRAINED_CPU_RESULT.json) captures that missing-file observation. Official checkpoint loading awaits a supplied artifact and independently obtained expected digest. A locally calculated hash identifies file bytes and requires publisher provenance for authenticity.
+
+Attribution follows the formal specification. Ai2 publishes loader code under Apache-2.0 and designates checkpoint weights ODC-BY in its README. Upstream ImageNet weight lineage remains an unresolved review item. See the [official package](https://github.com/allenai/satlaspretrain_models) and [lineage investigation](../research/P0_SATLAS_AERIAL_INITIALIZATION_LINEAGE_v0.1.md).
+
+## Remaining verification
+
+- Input sizes beyond the observed 128 x 128 case.
 - Official checkpoint acquisition, source revision, SHA-256 verification and safe loading of both backbone and FPN.
-- CPU runtime and peak memory use on GEEKOM-A6.
-- Exact transitive dependency versions and equivalence between the installed distribution and the reviewed upstream source revision.
+- Peak CPU memory use on GEEKOM-A6.
+- Equivalence between the installed distribution and a pinned upstream Git revision.
 
-No `STRUCTURAL_PASS` or `PRETRAINED_PASS` is asserted. These environment observations are not M1-1 implementation acceptance, training readiness, model-quality evidence, GPU feasibility or commercial rights signoff.
+Structural verification is complete for the recorded synthetic configuration. Pretrained verification and void/nodata/ignore-label semantics remain pending under the M1-1 specification and subsequent data QA gates.
 
 ## Updates during M1-1
 
