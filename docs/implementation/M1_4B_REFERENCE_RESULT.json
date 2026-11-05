@@ -1,0 +1,401 @@
+{
+  "series": "reference",
+  "status": "STEP21_MEASURED",
+  "utc": "2026-11-05T06:37:16.139068+00:00",
+  "gpu_vram": "NOT_MEASURED",
+  "versions": {
+    "torch": "2.7.1+cpu",
+    "torchvision": "0.22.1+cpu",
+    "satlaspretrain-models": "0.3.1"
+  },
+  "python": "3.11.9",
+  "config": {
+    "seed": 0,
+    "threads": 4,
+    "batch_size": 1,
+    "patch_size": 256,
+    "lr": 0.0001,
+    "weight_decay": 0.01,
+    "betas": [
+      0.9,
+      0.999
+    ],
+    "eps": 1e-08,
+    "steps": 20,
+    "dtype": "float32",
+    "device": "cpu"
+  },
+  "provenance": "PROVENANCE_VERIFIED",
+  "dataset_revision": "d97d4da0ebbb6e249ae95ac5e19656babd972eb2",
+  "inputs": [
+    {
+      "image_id": 661,
+      "oam_id": "60f0a29989ec130007b828a8",
+      "split": "train",
+      "hashes": {
+        "rgb.tif": "613bd41499495ba275347d6882e188d45a5a130c9c50ece72d3fad0418c22557",
+        "canopy_fraction.tif": "bc067ba75ee57eb6907d1e1e8b0ebb71a78928a671795c1d116c98a0d8e0234e",
+        "canopy_mask.tif": "b68c48d0dda494fe2d1255e4004b5a204cb0ce209859de11b3f62babbf14bd50",
+        "valid_fraction.tif": "e4623edadeeb4c06e950a578c3de578555b67c30a49e279fc63cfeeed68e96b4"
+      },
+      "license": "CC-BY-4.0",
+      "attribution": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/60f0a29989ec130007b828a8"
+    },
+    {
+      "image_id": 1972,
+      "oam_id": "5bba1c4f9ed15b0006d24f3b",
+      "split": "val",
+      "hashes": {
+        "rgb.tif": "1fae6803ad979b740973bf14ba0374f058a5e9d466337da31dddebc911dea4bf",
+        "canopy_fraction.tif": "74f451310aa9ac988681d235c36fa9e9f530470ffad535105c773ffa2facbd59",
+        "canopy_mask.tif": "c5a8872779da640c8a290187c9bb5325c9edede563e9a6a54933cf7e28ddb70d",
+        "valid_fraction.tif": "34627479a78415c879158a63615bb60ea3d2552e2759039cd86f840e5ebd7255"
+      },
+      "license": "CC-BY-4.0",
+      "attribution": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/5bba1c4f9ed15b0006d24f3b"
+    }
+  ],
+  "trained_sha256": "0f07c0d43a02a4c33073f86899d46ed6c60bfb31f3cbaa8861079f5b77dd8047",
+  "initial_checkpoint": {
+    "filename": "aerial_swinb_si.pth",
+    "sha256": "f8abf21cadaab2a71859e9d172bec4e5d6b7cc9710882a2f6a4d8aae826db036",
+    "source": "https://huggingface.co/allenai/satlas-pretrain/resolve/b1f8de04dacf9f9ed9640fe32484947710b47ede/aerial_swinb_si.pth",
+    "revision": "b1f8de04dacf9f9ed9640fe32484947710b47ede",
+    "publisher_sha256": "f8abf21cadaab2a71859e9d172bec4e5d6b7cc9710882a2f6a4d8aae826db036",
+    "publisher_size_bytes": 504439674,
+    "local_size_bytes": 504439674
+  },
+  "platform": "Windows-10-10.0.26300-SP0",
+  "runtime_flags": {
+    "deterministic_algorithms": false,
+    "mkldnn_enabled": true,
+    "threads": 4
+  },
+  "initial_eval": {
+    "train": {
+      "ce": 0.6926009058952332,
+      "tp": 34601,
+      "fp": 30713,
+      "fn": 25,
+      "iou": 0.5295612115275716,
+      "f1": 0.692435461276766,
+      "precision": 0.529763909728389,
+      "recall": 0.9992779991913591
+    },
+    "val": {
+      "ce": 0.6912980079650879,
+      "tp": 30224,
+      "fp": 19869,
+      "fn": 63,
+      "iou": 0.6025998883483531,
+      "f1": 0.7520278676287634,
+      "precision": 0.6033577545764878,
+      "recall": 0.9979198996269026
+    }
+  },
+  "reference_steps": [
+    {
+      "step": 1,
+      "loss": 0.6926024556159973,
+      "seconds": 4.21200850000605,
+      "memory": {
+        "working_set_bytes": 2077233152,
+        "peak_working_set_bytes": 2077233152,
+        "committed_private_bytes": 3237662720,
+        "peak_committed_private_bytes": 3241857024
+      }
+    },
+    {
+      "step": 2,
+      "loss": 0.6909927129745483,
+      "seconds": 3.980345700052567,
+      "memory": {
+        "working_set_bytes": 2354737152,
+        "peak_working_set_bytes": 2415095808,
+        "committed_private_bytes": 3490115584,
+        "peak_committed_private_bytes": 3561951232
+      }
+    },
+    {
+      "step": 3,
+      "loss": 0.6885052919387817,
+      "seconds": 4.212539000087418,
+      "memory": {
+        "working_set_bytes": 2316988416,
+        "peak_working_set_bytes": 2415095808,
+        "committed_private_bytes": 3490250752,
+        "peak_committed_private_bytes": 3570601984
+      }
+    },
+    {
+      "step": 4,
+      "loss": 0.6828262805938721,
+      "seconds": 4.483416000031866,
+      "memory": {
+        "working_set_bytes": 2317045760,
+        "peak_working_set_bytes": 2415095808,
+        "committed_private_bytes": 3490385920,
+        "peak_committed_private_bytes": 3570601984
+      }
+    },
+    {
+      "step": 5,
+      "loss": 0.6751675605773926,
+      "seconds": 4.5066215000115335,
+      "memory": {
+        "working_set_bytes": 2317062144,
+        "peak_working_set_bytes": 2415095808,
+        "committed_private_bytes": 3490385920,
+        "peak_committed_private_bytes": 3570601984
+      }
+    },
+    {
+      "step": 6,
+      "loss": 0.6547252535820007,
+      "seconds": 4.557521300041117,
+      "memory": {
+        "working_set_bytes": 2321248256,
+        "peak_working_set_bytes": 2415095808,
+        "committed_private_bytes": 3490385920,
+        "peak_committed_private_bytes": 3570601984
+      }
+    },
+    {
+      "step": 7,
+      "loss": 0.6263112425804138,
+      "seconds": 4.327141799964011,
+      "memory": {
+        "working_set_bytes": 2321252352,
+        "peak_working_set_bytes": 2415095808,
+        "committed_private_bytes": 3490385920,
+        "peak_committed_private_bytes": 3570872320
+      }
+    },
+    {
+      "step": 8,
+      "loss": 0.5967005491256714,
+      "seconds": 4.266499199904501,
+      "memory": {
+        "working_set_bytes": 2317058048,
+        "peak_working_set_bytes": 2415095808,
+        "committed_private_bytes": 3490385920,
+        "peak_committed_private_bytes": 3570872320
+      }
+    },
+    {
+      "step": 9,
+      "loss": 0.555192232131958,
+      "seconds": 4.012313100043684,
+      "memory": {
+        "working_set_bytes": 2317086720,
+        "peak_working_set_bytes": 2415095808,
+        "committed_private_bytes": 3490385920,
+        "peak_committed_private_bytes": 3570872320
+      }
+    },
+    {
+      "step": 10,
+      "loss": 0.5475771427154541,
+      "seconds": 4.16779029997997,
+      "memory": {
+        "working_set_bytes": 2317090816,
+        "peak_working_set_bytes": 2415095808,
+        "committed_private_bytes": 3490385920,
+        "peak_committed_private_bytes": 3570872320
+      }
+    },
+    {
+      "step": 11,
+      "loss": 0.5183326005935669,
+      "seconds": 4.444991800002754,
+      "memory": {
+        "working_set_bytes": 2317094912,
+        "peak_working_set_bytes": 2415095808,
+        "committed_private_bytes": 3490385920,
+        "peak_committed_private_bytes": 3570872320
+      }
+    },
+    {
+      "step": 12,
+      "loss": 0.5066977143287659,
+      "seconds": 4.270601300057024,
+      "memory": {
+        "working_set_bytes": 2317029376,
+        "peak_working_set_bytes": 2415095808,
+        "committed_private_bytes": 3490271232,
+        "peak_committed_private_bytes": 3570872320
+      }
+    },
+    {
+      "step": 13,
+      "loss": 0.4946011006832123,
+      "seconds": 3.858840800006874,
+      "memory": {
+        "working_set_bytes": 2317029376,
+        "peak_working_set_bytes": 2415095808,
+        "committed_private_bytes": 3490271232,
+        "peak_committed_private_bytes": 3570872320
+      }
+    },
+    {
+      "step": 14,
+      "loss": 0.47925540804862976,
+      "seconds": 4.337572199990973,
+      "memory": {
+        "working_set_bytes": 2321215488,
+        "peak_working_set_bytes": 2415095808,
+        "committed_private_bytes": 3490271232,
+        "peak_committed_private_bytes": 3570872320
+      }
+    },
+    {
+      "step": 15,
+      "loss": 0.47153937816619873,
+      "seconds": 4.059173199930228,
+      "memory": {
+        "working_set_bytes": 2317025280,
+        "peak_working_set_bytes": 2415095808,
+        "committed_private_bytes": 3490271232,
+        "peak_committed_private_bytes": 3570872320
+      }
+    },
+    {
+      "step": 16,
+      "loss": 0.45460349321365356,
+      "seconds": 4.393433499964885,
+      "memory": {
+        "working_set_bytes": 2317094912,
+        "peak_working_set_bytes": 2415095808,
+        "committed_private_bytes": 3490271232,
+        "peak_committed_private_bytes": 3570872320
+      }
+    },
+    {
+      "step": 17,
+      "loss": 0.4449959993362427,
+      "seconds": 4.27572290005628,
+      "memory": {
+        "working_set_bytes": 2317094912,
+        "peak_working_set_bytes": 2415095808,
+        "committed_private_bytes": 3490271232,
+        "peak_committed_private_bytes": 3570872320
+      }
+    },
+    {
+      "step": 18,
+      "loss": 0.4275483787059784,
+      "seconds": 4.403264500084333,
+      "memory": {
+        "working_set_bytes": 2317156352,
+        "peak_working_set_bytes": 2415095808,
+        "committed_private_bytes": 3490271232,
+        "peak_committed_private_bytes": 3570872320
+      }
+    },
+    {
+      "step": 19,
+      "loss": 0.39937764406204224,
+      "seconds": 4.238320300006308,
+      "memory": {
+        "working_set_bytes": 2317164544,
+        "peak_working_set_bytes": 2415095808,
+        "committed_private_bytes": 3490271232,
+        "peak_committed_private_bytes": 3570872320
+      }
+    },
+    {
+      "step": 20,
+      "loss": 0.3766815960407257,
+      "seconds": 4.444124900037423,
+      "memory": {
+        "working_set_bytes": 2317160448,
+        "peak_working_set_bytes": 2415095808,
+        "committed_private_bytes": 3490271232,
+        "peak_committed_private_bytes": 3570872320
+      }
+    }
+  ],
+  "step20_final_eval": {
+    "train": {
+      "ce": 0.323572039604187,
+      "tp": 32850,
+      "fp": 4215,
+      "fn": 1776,
+      "iou": 0.8457557735382714,
+      "f1": 0.9164330250659078,
+      "precision": 0.8862808579522461,
+      "recall": 0.9487090625541501
+    },
+    "val": {
+      "ce": 0.5468147993087769,
+      "tp": 25111,
+      "fp": 3395,
+      "fn": 5176,
+      "iou": 0.7455317380203076,
+      "f1": 0.8542173387988365,
+      "precision": 0.8809022661895741,
+      "recall": 0.8291015947436193
+    }
+  },
+  "step20_state": {
+    "model": "b2181dd99b78ad8c215295b5254ec8c302beb2668c8e49a7398c1f3e1e0c5bbe",
+    "optimizer": "8de786825ce4cf20dea7d7c205874216e7611b2c92c8938289bdc96aa87c1f1c",
+    "rng": "10122e6adb3f5d57a99e1f26d3164bc6026d3d4248ba1c172e86b4967f66fdde"
+  },
+  "step20_comparison": {
+    "model": true,
+    "optimizer": true,
+    "rng": true
+  },
+  "step20_status": "STEP20_BASELINE_MATCH",
+  "step21": {
+    "loss": 0.32750430703163147,
+    "gradients": {
+      "backbone": {
+        "finite_nonzero_parameters": 311,
+        "example": "backbone.features.0.0.weight"
+      },
+      "fpn": {
+        "finite_nonzero_parameters": 10,
+        "example": "fpn.inner_blocks.0.0.weight"
+      },
+      "upsample": {
+        "finite_nonzero_parameters": 8,
+        "example": "layers.0.0.weight"
+      },
+      "head": {
+        "finite_nonzero_parameters": 4,
+        "example": "layers.0.0.weight"
+      }
+    },
+    "gradient_fingerprint": "2dbf7c8ba5762cad1d98cb6634a0fa6f1878211d03492f3ef2b9223954a4ec65",
+    "after": {
+      "model": "545f1d442b8d5acc83d0cf185c1af71724d01948d432318bc9fd012b183df926",
+      "optimizer": "d601ccc703ab82763af089f7485fbf2dd3f87f9e5d123fb76789fc05a4a30daa",
+      "rng": "1b1abe5e27a1f689a3c3c00baeb50b1aaab113cce3975ff00f3f16ff2bfe6bae"
+    },
+    "updated_parameter_count": 419,
+    "updated_parameter_names_fingerprint": "84ef87f028ca38868d0bf8d7bb8d6e5e97609727f1bc060549013a9be10e59d1",
+    "seconds": 6.20205950003583,
+    "memory_before": {
+      "working_set_bytes": 2319310848,
+      "peak_working_set_bytes": 2415095808,
+      "committed_private_bytes": 3491393536,
+      "peak_committed_private_bytes": 3570872320
+    },
+    "memory_after": {
+      "working_set_bytes": 2301997056,
+      "peak_working_set_bytes": 2415095808,
+      "committed_private_bytes": 3497181184,
+      "peak_committed_private_bytes": 3570872320
+    }
+  },
+  "original_checkpoint_preserved": true,
+  "total_seconds": 101.57769880001433,
+  "final_memory": {
+    "working_set_bytes": 2301997056,
+    "peak_working_set_bytes": 2415095808,
+    "committed_private_bytes": 3497181184,
+    "peak_committed_private_bytes": 3570872320
+  }
+}
