@@ -1,0 +1,142 @@
+{
+  "series": "resumed",
+  "status": "STEP21_CONTINUATION_MATCH",
+  "utc": "2026-11-05T06:39:16.194079+00:00",
+  "gpu_vram": "NOT_MEASURED",
+  "versions": {
+    "torch": "2.7.1+cpu",
+    "torchvision": "0.22.1+cpu",
+    "satlaspretrain-models": "0.3.1"
+  },
+  "python": "3.11.9",
+  "config": {
+    "seed": 0,
+    "threads": 4,
+    "batch_size": 1,
+    "patch_size": 256,
+    "lr": 0.0001,
+    "weight_decay": 0.01,
+    "betas": [
+      0.9,
+      0.999
+    ],
+    "eps": 1e-08,
+    "steps": 20,
+    "dtype": "float32",
+    "device": "cpu"
+  },
+  "provenance": "PROVENANCE_VERIFIED",
+  "dataset_revision": "d97d4da0ebbb6e249ae95ac5e19656babd972eb2",
+  "inputs": [
+    {
+      "image_id": 661,
+      "oam_id": "60f0a29989ec130007b828a8",
+      "split": "train",
+      "hashes": {
+        "rgb.tif": "613bd41499495ba275347d6882e188d45a5a130c9c50ece72d3fad0418c22557",
+        "canopy_fraction.tif": "bc067ba75ee57eb6907d1e1e8b0ebb71a78928a671795c1d116c98a0d8e0234e",
+        "canopy_mask.tif": "b68c48d0dda494fe2d1255e4004b5a204cb0ce209859de11b3f62babbf14bd50",
+        "valid_fraction.tif": "e4623edadeeb4c06e950a578c3de578555b67c30a49e279fc63cfeeed68e96b4"
+      },
+      "license": "CC-BY-4.0",
+      "attribution": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/60f0a29989ec130007b828a8"
+    },
+    {
+      "image_id": 1972,
+      "oam_id": "5bba1c4f9ed15b0006d24f3b",
+      "split": "val",
+      "hashes": {
+        "rgb.tif": "1fae6803ad979b740973bf14ba0374f058a5e9d466337da31dddebc911dea4bf",
+        "canopy_fraction.tif": "74f451310aa9ac988681d235c36fa9e9f530470ffad535105c773ffa2facbd59",
+        "canopy_mask.tif": "c5a8872779da640c8a290187c9bb5325c9edede563e9a6a54933cf7e28ddb70d",
+        "valid_fraction.tif": "34627479a78415c879158a63615bb60ea3d2552e2759039cd86f840e5ebd7255"
+      },
+      "license": "CC-BY-4.0",
+      "attribution": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/5bba1c4f9ed15b0006d24f3b"
+    }
+  ],
+  "trained_sha256": "0f07c0d43a02a4c33073f86899d46ed6c60bfb31f3cbaa8861079f5b77dd8047",
+  "initial_checkpoint": {
+    "filename": "aerial_swinb_si.pth",
+    "sha256": "f8abf21cadaab2a71859e9d172bec4e5d6b7cc9710882a2f6a4d8aae826db036",
+    "source": "https://huggingface.co/allenai/satlas-pretrain/resolve/b1f8de04dacf9f9ed9640fe32484947710b47ede/aerial_swinb_si.pth",
+    "revision": "b1f8de04dacf9f9ed9640fe32484947710b47ede",
+    "publisher_sha256": "f8abf21cadaab2a71859e9d172bec4e5d6b7cc9710882a2f6a4d8aae826db036",
+    "publisher_size_bytes": 504439674,
+    "local_size_bytes": 504439674
+  },
+  "platform": "Windows-10-10.0.26300-SP0",
+  "runtime_flags": {
+    "deterministic_algorithms": false,
+    "mkldnn_enabled": true,
+    "threads": 4
+  },
+  "step20_state": {
+    "model": "b2181dd99b78ad8c215295b5254ec8c302beb2668c8e49a7398c1f3e1e0c5bbe",
+    "optimizer": "8de786825ce4cf20dea7d7c205874216e7611b2c92c8938289bdc96aa87c1f1c",
+    "rng": "10122e6adb3f5d57a99e1f26d3164bc6026d3d4248ba1c172e86b4967f66fdde"
+  },
+  "step20_comparison": {
+    "model": true,
+    "optimizer": true,
+    "rng": true
+  },
+  "step20_status": "STEP20_BASELINE_MATCH",
+  "step21": {
+    "loss": 0.32750430703163147,
+    "gradients": {
+      "backbone": {
+        "finite_nonzero_parameters": 311,
+        "example": "backbone.features.0.0.weight"
+      },
+      "fpn": {
+        "finite_nonzero_parameters": 10,
+        "example": "fpn.inner_blocks.0.0.weight"
+      },
+      "upsample": {
+        "finite_nonzero_parameters": 8,
+        "example": "layers.0.0.weight"
+      },
+      "head": {
+        "finite_nonzero_parameters": 4,
+        "example": "layers.0.0.weight"
+      }
+    },
+    "gradient_fingerprint": "2dbf7c8ba5762cad1d98cb6634a0fa6f1878211d03492f3ef2b9223954a4ec65",
+    "after": {
+      "model": "545f1d442b8d5acc83d0cf185c1af71724d01948d432318bc9fd012b183df926",
+      "optimizer": "d601ccc703ab82763af089f7485fbf2dd3f87f9e5d123fb76789fc05a4a30daa",
+      "rng": "1b1abe5e27a1f689a3c3c00baeb50b1aaab113cce3975ff00f3f16ff2bfe6bae"
+    },
+    "updated_parameter_count": 419,
+    "updated_parameter_names_fingerprint": "84ef87f028ca38868d0bf8d7bb8d6e5e97609727f1bc060549013a9be10e59d1",
+    "seconds": 6.165152099914849,
+    "memory_before": {
+      "working_set_bytes": 1761845248,
+      "peak_working_set_bytes": 1778622464,
+      "committed_private_bytes": 3128090624,
+      "peak_committed_private_bytes": 3144970240
+    },
+    "memory_after": {
+      "working_set_bytes": 2143272960,
+      "peak_working_set_bytes": 2160046080,
+      "committed_private_bytes": 3539501056,
+      "peak_committed_private_bytes": 3556384768
+    }
+  },
+  "step21_comparison": {
+    "loss": true,
+    "gradient_fingerprint": true,
+    "after": true,
+    "updated_parameter_count": true,
+    "updated_parameter_names_fingerprint": true
+  },
+  "original_checkpoint_preserved": true,
+  "total_seconds": 13.39078569994308,
+  "final_memory": {
+    "working_set_bytes": 2143293440,
+    "peak_working_set_bytes": 2160046080,
+    "committed_private_bytes": 3539501056,
+    "peak_committed_private_bytes": 3556384768
+  }
+}
