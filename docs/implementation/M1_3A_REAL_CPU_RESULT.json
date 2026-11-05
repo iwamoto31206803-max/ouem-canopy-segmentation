@@ -1,0 +1,160 @@
+{
+  "status": "REAL_DATA_CPU_PASS",
+  "utc": "2026-11-05T04:40:08.390831+00:00",
+  "device": "cpu",
+  "batch": 1,
+  "threads": 4,
+  "seed": 0,
+  "python": "3.11.9",
+  "platform": "Windows-10-10.0.26300-SP0",
+  "versions": {
+    "torch": "2.7.1+cpu",
+    "torchvision": "0.22.1+cpu",
+    "satlaspretrain-models": "0.3.1",
+    "rasterio": "1.4.3",
+    "numpy": "1.26.4"
+  },
+  "checkpoint": {
+    "filename": "aerial_swinb_si.pth",
+    "sha256": "f8abf21cadaab2a71859e9d172bec4e5d6b7cc9710882a2f6a4d8aae826db036",
+    "source": "https://huggingface.co/allenai/satlas-pretrain/resolve/b1f8de04dacf9f9ed9640fe32484947710b47ede/aerial_swinb_si.pth",
+    "revision": "b1f8de04dacf9f9ed9640fe32484947710b47ede",
+    "publisher_sha256": "f8abf21cadaab2a71859e9d172bec4e5d6b7cc9710882a2f6a4d8aae826db036",
+    "publisher_size_bytes": 504439674,
+    "local_size_bytes": 504439674
+  },
+  "pair_manifest_sha256": "a2376d1b1c3def2e2e9a7d0740a61fcccc242a49fda22b5028295e5ed1d50b1a",
+  "official_head_source_sha256": "229f9a3f47c00f5bfa1a338d64b657be1999624d13e274888acdfbae99ec04fd",
+  "components": {
+    "backbone": "strict_loaded",
+    "fpn": "strict_loaded",
+    "upsample": "random",
+    "head": "random"
+  },
+  "cases": [
+    {
+      "image_id": 661,
+      "split": "train",
+      "model_mode": "train",
+      "crop": [
+        0,
+        0,
+        256,
+        256
+      ],
+      "input_shape": [
+        1,
+        3,
+        256,
+        256
+      ],
+      "target_shape": [
+        1,
+        256,
+        256
+      ],
+      "output_shape": [
+        1,
+        2,
+        256,
+        256
+      ],
+      "input_dtype": "torch.float32",
+      "target_dtype": "torch.int64",
+      "input_range": [
+        0.019607843831181526,
+        1.0
+      ],
+      "target_values": [
+        0,
+        1
+      ],
+      "loss": 0.6926024556159973,
+      "gradients": {
+        "backbone": {
+          "finite_nonzero_parameters": 289,
+          "example": "backbone.features.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        }
+      },
+      "seconds": 3.20819500007201,
+      "source_hashes": {
+        "rgb.tif": "613bd41499495ba275347d6882e188d45a5a130c9c50ece72d3fad0418c22557",
+        "canopy_fraction.tif": "bc067ba75ee57eb6907d1e1e8b0ebb71a78928a671795c1d116c98a0d8e0234e",
+        "canopy_mask.tif": "b68c48d0dda494fe2d1255e4004b5a204cb0ce209859de11b3f62babbf14bd50",
+        "valid_fraction.tif": "e4623edadeeb4c06e950a578c3de578555b67c30a49e279fc63cfeeed68e96b4"
+      },
+      "padding": false
+    },
+    {
+      "image_id": 1972,
+      "split": "val",
+      "model_mode": "eval",
+      "crop": [
+        0,
+        0,
+        224,
+        224
+      ],
+      "input_shape": [
+        1,
+        3,
+        224,
+        224
+      ],
+      "target_shape": [
+        1,
+        224,
+        224
+      ],
+      "output_shape": [
+        1,
+        2,
+        224,
+        224
+      ],
+      "input_dtype": "torch.float32",
+      "target_dtype": "torch.int64",
+      "input_range": [
+        0.09803921729326248,
+        0.8823529481887817
+      ],
+      "target_values": [
+        0,
+        1
+      ],
+      "loss": 0.6912980079650879,
+      "gradients": {
+        "backbone": {
+          "finite_nonzero_parameters": 397,
+          "example": "backbone.features.0.0.weight"
+        },
+        "fpn": {
+          "finite_nonzero_parameters": 10,
+          "example": "fpn.inner_blocks.0.0.weight"
+        },
+        "head": {
+          "finite_nonzero_parameters": 4,
+          "example": "layers.0.0.weight"
+        }
+      },
+      "seconds": 2.704322600038722,
+      "source_hashes": {
+        "rgb.tif": "1fae6803ad979b740973bf14ba0374f058a5e9d466337da31dddebc911dea4bf",
+        "canopy_fraction.tif": "74f451310aa9ac988681d235c36fa9e9f530470ffad535105c773ffa2facbd59",
+        "canopy_mask.tif": "c5a8872779da640c8a290187c9bb5325c9edede563e9a6a54933cf7e28ddb70d",
+        "valid_fraction.tif": "34627479a78415c879158a63615bb60ea3d2552e2759039cd86f840e5ebd7255"
+      },
+      "padding": false
+    }
+  ],
+  "total_seconds": 15.277498499955982,
+  "memory_measurement": "NOT_MEASURED"
+}
