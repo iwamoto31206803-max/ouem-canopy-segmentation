@@ -745,6 +745,75 @@ Regression: **124 passed,100 warnings**. Three new offline tests cover input-ord
 
 **Next scale:** a few-dozen-image stage is technically feasible using the same manifests and explicit bounded batches, after this pilot's review. It still requires source-bound rights and actual visual coverage/label receipts per image; metadata-only automatic acceptance is not justified. Any quota/selection change should be approved and recorded before imagery inspection. Keep per-image HOLD/REVIEW/FAIL separate from PASS_CANDIDATE, retain source-generation isolation, and do not use this batch's quality outcomes to tune Val selection or claim dataset-wide defect prevalence. Training integration, full semantic category crosswalk, exhaustive annotation accuracy and final commercial rights decisions remain outside this stage.
 
+## M1-7 G0 — Frozen Zenodo10 smoke dataset (2026-11-06)
+
+**G0 technical admission: Train7 / Val3, all40 products PASS.** The new [combined manifest](M1_7_G0_MANIFEST.json) records `accepted_for_M1_7_smoke` after checking existing evidence and actual bytes; promotion is submitted for this PR's review. This acceptance is only for the functional tiny smoke dataset specified in [the active plan](../ACTIVE_EXPERIMENT_PLAN.md), not model accuracy, population representativeness or commercial clearance.
+
+- Dataset ID: `ouem-zenodo10-e3db510b1125931d`
+- Exact manifest SHA256: `c2f4ccd56da8770cd73ef1db299d67d5528dcab8ea0051da1c2d5f8174a850ca`
+- Generation: `zenodo-11617167-v1.0.0`
+- Train accepted: **3,661,1022,1280,2243,493,1358**.
+- Val accepted: **1972,269,3785**.
+- No other IDs, Held sources, Holdout or historical HF products are included.
+
+The manifest records each image's accepted state, source/output hashes, exact grid, fold/source group, rights/STAC URL+hash and externally retained attribution reference, original ledger pointer/run-manifest hash, hash-bound review receipt and its visual basis/preview hash. Original category-crosswalk limitations are explicit. The original M1-5D-2/D-3 ledger and their external manifests were **not changed**. Ten source groups are distinct; global original-object/footprint/1km separation was rechecked against official metadata, and the portable verifier additionally rejects overlap within the frozen Train/Val set.
+
+### What was actually verified
+
+`scripts/m1_7_dataset.py freeze` verified the hash-pinned D2/D3 repeat-run manifests against the unchanged public ledger, both private review receipts against the run hashes, and original JSONL/COCO hashes. For each image it rechecked Zenodo TIFF/PNG hashes, source grid, binary encoding/positive count, raster coverage flags plus the **existing actual visual-review record**, STAC license/source/producer/licensor/object-key evidence and all four output hashes. It did not declare acceptance from `training_eligible=true` alone. No new visual survey is claimed: G0 checks the already recorded, source-bound review evidence, with its original limitations.
+
+All40 products were checked for CRS, affine, bounds, shape, channels/dtype, finite/ranged fractions, inclusive0.5 threshold consistency and `valid_fraction==1`. The existing TIFFs were copied byte-for-byte to a fresh external `m1-7-g0-zenodo10-01` directory; source hashes were checked before/after copying. There was **no resampling, label edit, regeneration or original-file attribute change**. A second fresh `m1-7-g0-transfer-check-01` copy passed the same verifier with the same manifest SHA and all40 product hashes. Original input bytes, previous manifests/products and checkpoints were never opened for writing. Git contains no TIFFs, original imagery, private STAC contacts or checkpoints.
+
+Folder layout is portable: `manifest.json`, `manifest.sha256`, and `train/<image_id>/` / `val/<image_id>/` containing the four named TIFFs. Windows absolute paths are absent. The checksum sidecar is a convenience only: verify against the trusted SHA above from reviewed Git, **not a self-provided sidecar**. `.gitattributes` disables line-ending conversion for this one manifest because Windows autocrlf would otherwise change its SHA. Hash pinning detects mutation; it does not physically prevent a filesystem owner from editing files. Always create fresh outputs, never overwrite this dataset, and assign a new reviewed manifest identity to any future change.
+
+### Windows reproduction / transfer
+
+```powershell
+# Existing venv; staging checks private evidence, originals and prior outputs.
+.\.venv\Scripts\python.exe scripts/m1_7_dataset.py freeze --zenodo '<Zenodo-root>' --d2-root '<D2-repeat-run>' --d3-root '<D3-repeat-run>' --d2-evidence '<D2-evidence.json>' --d3-evidence '<D3-evidence.json>' --output '<new-external-dataset-root>'
+# Verify an existing or transferred dataset without source archives/private evidence.
+.\.venv\Scripts\python.exe scripts/m1_7_dataset.py verify --root '<dataset-root>' --manifest '<dataset-root>\manifest.json' --expected-sha256 c2f4ccd56da8770cd73ef1db299d67d5528dcab8ea0051da1c2d5f8174a850ca
+.\.venv\Scripts\python.exe -m pytest -q --disable-warnings
+```
+
+Actual source arguments used the existing external D2/D3 repeat-run directories, `m1-5d2-evidence-02/evidence.json`, and `m1-5d3-evidence-01/evidence.json`; no source path is embedded in the frozen manifest. Freeze fails closed on evidence/integrity/admission errors before copying; if an I/O error occurs during copying, the incomplete directory is not a verified accepted dataset and must not be used. Use a different fresh destination after diagnosis.
+
+Copy the whole frozen directory to a new Drive location using ordinary byte copies (not image import/export). Retain relative paths. After copying, run `verify` with the trusted SHA; it checks exactly40 TIFFs and refuses extras/missing paths. Keep provider attribution originals in the established external rights archive, independently of this40-product transfer package.
+
+### Colab-side verification cells (not yet executed on Colab)
+
+```python
+from google.colab import drive
+drive.mount('/content/drive')
+```
+
+```bash
+!git clone https://github.com/iwamoto31206803-max/ouem-canopy-segmentation.git /content/ouem-canopy-segmentation
+!git -C /content/ouem-canopy-segmentation checkout <reviewed-G0-commit-SHA>
+```
+
+```python
+# Verify dependencies; only install missing numpy/rasterio if necessary.
+# This verifier does not import torch, Satlas, pyarrow or private source evidence.
+import numpy, rasterio, shutil
+from pathlib import Path
+source = Path('/content/drive/MyDrive/<your-frozen-dataset-folder>')
+local = Path('/content/zenodo10-g0')
+if local.exists():
+    raise FileExistsError('Use a fresh destination')
+shutil.copytree(source, local)
+```
+
+```bash
+!python /content/ouem-canopy-segmentation/scripts/m1_7_dataset.py verify --root /content/zenodo10-g0 --manifest /content/zenodo10-g0/manifest.json --expected-sha256 c2f4ccd56da8770cd73ef1db299d67d5528dcab8ea0051da1c2d5f8174a850ca
+```
+
+Local Windows portable verification and independent-directory transfer verification PASS; actual Drive transfer and Colab execution are **NOT_VERIFIED**. No GPU or learning ran. Regression: **143 passed,291 warnings**;19 new small offline tests cover exact IDs/roles, source-generation/HF rejection, bad/missing/extra files, trusted manifest SHA, source-group/Holdout/fold leakage, missing rights/visual/promotion evidence, invalid grids/labels/fractions/validity, cross-role overlap and relocation.
+
+### G1 handoff boundary
+
+After G0 PR review/merge and transferred-package verification, implement a separately reviewed Zenodo-aware input path: the old M1-6/M1-3A loaders remain HF/two-image specific and must not be passed a fabricated legacy manifest. Begin G1 with a224×224 all-valid batch1 patch as planned (minimum frozen dimension230), verify official initializer hash/versions and measure an actual GPU optimizer step/resources. Those operations, full training and GPU acceptance are **not performed by G0**. Frozen data admission does not resolve per-ID Panoptic category mapping, absolute positional accuracy, annotation completeness or commercial final clearance.
+
 ## M1-5D — Deferred black-border recovery research note (2026-11-06)
 
 **Decision: DEFER recovery implementation and keep all current HOLD decisions unchanged.** The project now prioritizes (1) a compact review of scientific comparisons / evaluation design, then (2) a small GPU fine-tuning and reproducibility run using *already quality-reviewed Zenodo samples*, then (3) deciding whether a larger clean-only dataset is sufficient. Investigate border recovery only if subsequent evidence shows that the additional data are valuable enough to justify the complexity. This is not permission to relax coverage gates or mix dataset generations. The M1-5D-3 pilot identified **7 new PASS_CANDIDATE (Train5, Val2)** among 18 screened images; **11 HOLD**, mostly artificial-looking edge-connected black areas. Together with M1-5D-2 this gives **10 candidate images (Train7, Val3)**; formal dataset acceptance and sufficiently representative Val evaluation are separate steps. The observed 11/18 hold rate is **not a population prevalence estimate**.
