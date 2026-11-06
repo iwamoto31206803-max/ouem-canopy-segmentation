@@ -676,3 +676,71 @@ Offline regression: **121 passed, 95 warnings**, nine new adapter tests. Coverag
 ### M1-5D-3 entry conditions
 
 Review this source-generation implementation and its three representative results first. Next select only a small explicitly authorized, rights-cleared new Train/Val set; obtain hash-bound STAC/attribution and individual coverage/alignment review, exclude known4235, preserve group/footprint isolation, and repeat output SHA/readback checks. An authoritative per-ID crosswalk remains absent: the approved official binary semantics and limited claims apply; contradictory encoding/categories or suspicious labels still HOLD. No training integration, new acquisition, large generation, GPU execution or old-data replacement was performed here.
+
+## M1-5D-3 — Bounded new Train/Val pilot (2026-11-06)
+
+**Result: five new Train and two new Val PASS_CANDIDATE, pending PR review; eleven HOLD.** No final automatic admission or training. Reused the adapter from M1-5D-2 with a small `--screen` option and deterministic metadata selection; no new script, document, dependency or separate pipeline. Historical preprocessing, training/GPU code and checkpoints remain unchanged.
+
+### Selection fixed before examining imagery
+
+Seed0; official train rows only; explicit `CC-BY 4.0`; one image per oam_id; exclude protected/known-HOLD IDs **2/3/9/576/661/1401/1972/4235 and their source groups**. Use the existing opposite-role footprint, original-object and conservative 1km proximity gate against all metadata (including Holdout metadata only). No Holdout pixels are read. Candidate priority is the least-used `(biome, floor(longitude/30), floor(latitude/20))` cell followed by SHA256 of `seed:oam_id:image_id`; image ID breaks ties. These geographic centers are derived from CRS/bounds, not the swapped auxiliary lat/lon fields. Input order does not affect selection. Quality/cover rate/model output never enters the rank.
+
+Initial budget is **Train8 + Val4**. Before inspecting those images, reserve candidates were also fixed: extend the same metadata rule to Train12/Val6 and take at most four/two new source groups, excluding initial source groups. Only one reserve batch is allowed, for **18 unique screened images total**. The CLI restricts explicit screening IDs to that seed's initial/reserve plan; repeating a command cannot add a different image outside the plan. The actual reserve batch was used because only three initial Train images passed automatic screening. Count and seed changes are not a license for indefinite quality-based search.
+
+Initial metadata exclusions:190 unresolved-license rows,439 Holdout rows,62 protected/known-HOLD-source rows. Candidate1941 was additionally rejected for opposite-split footprint overlap. Remaining eligible but unselected metadata are outside the bounded quota, not quality failures. Full image IDs, oam IDs, folds, ranking reasons and separation measurements are retained in `M1_5B_PILOT_RESULT.json:m1_5d3.selection`.
+
+| Batch | Train candidates in fixed order | Val candidates in fixed order |
+| --- | --- | --- |
+| Initial | 502,2679,74,1022,1280,2243,2850,2892 | 4118,269,1115,3785 |
+| Reserve | 4582,2351,493,1358 | 3909,388 |
+
+### Two-stage inspection and rights
+
+`--screen` checks source filenames/hashes, RGB TIFF/PNG formats/type/shape/orientation, embedded CRS/affine/bounds, nodata/mask/alpha, decoder agreement, allowed COCO categories, canonical binary coverage and uniform-mask flags. It reuses M1-5B-2's four-connected black-component analysis, including size/bbox/occupancy and border connectivity. No diagnostic array becomes a training-validity mask. A conservative, predeclared **border-connected exact-black area >=1%** triggers HOLD pending coverage resolution; it is neither a calibrated NoData classifier nor an acceptance threshold. Below1% still requires actual visual review. The code never records ALL_VALID or PASS merely from a successful screen; its successful status is REVIEW_REQUIRED. Per-image failures do not prevent later images' diagnostics.
+
+Ten candidates hit that coverage HOLD: **502,2679,74,2850,2892,1115,4582,2351,3909,388**. Their source/preview hashes and component measurements are recorded, but they were not independently visually certified, rights-cleared or archive-member-authenticated as new training inputs. No claim about the whole OAM-TCD failure frequency is justified by this source-unique, bounded pilot.
+
+Eight auto-screen survivors were actually viewed as RGB / binary mask / overlay. **4118 HOLD:** visible artificial-looking bottom-right black wedge,14,550 border-connected pixels (0.347%), despite passing the1% auto trigger. This illustrates why the trigger cannot replace visual review. Its area was not relabelled, cropped or declared background-valid.
+
+The other seven scenes/overlays were viewed, then their reduced overlays were viewed again. 1022: palm/tree groups and small fields/gardens;1280: urban blocks and scattered trees;2243: dense vegetation, road and rocky channel;493: open settlement with sparse trees/palms;1358: sports courts, parking and tree groups;269: residential vegetation;3785: roads, parking/buildings and trees. Masks broadly follow visible crowns without an obvious gross transformation shift; this is not quantified accuracy or a claim of complete annotation. 3785 has204 internal exact-black pixels in46 components, none touching the border. An additional enlarged view of its largest component shows a building/tree-shadow region; the inspected dark pixels were retained as imagery, not converted to NoData. All-valid coverage remains the explicitly reviewed engineering assumption, not survey-certified coverage.
+
+No matching STAC snapshots for these seven were found in the existing inventory caches. Only their seven official OAM STAC JSONs were fetched; all returned HTTP200. Requests were bounded in advance to18, each body256KiB and cumulative4MiB; actual response-body bytes were **27,315** across seven requests (headers/wire compression excluded). No image or additional archive was downloaded. Snapshots, provider/producer attribution and contact-bearing metadata stay external. Each exact source ID, explicit CC BY 4.0, named licensor/producer, original metadata object key, SHA256 and tile containment in STAC bbox passed. Bbox containment is not itself image-validity proof. Final commercial rights clearance is not asserted.
+
+The official images/masks archive MD5s were independently rechecked, and all **14 selected TIFF/PNG archive-member SHA256s** match the local sources. Metadata and COCO hashes equal the previously authenticated M1-5C records. No historical HF source SHA or affine was borrowed. The external review receipt binds each new source hash, STAC hash and actually inspected preview; category crosswalk remains unavailable and per-ID category verification remains NOT_VERIFIED. Canonical `any(channel != 0)` semantics, known category set1/2 and literal uniform labels are retained. Crowd RLE disagreement alone is not a blocking gate and was not newly independently measured here.
+
+### Generated products and reproducibility
+
+| Image / split | Output H×W | Binary canopy fraction | Status |
+| --- | --- | --- | --- |
+| 1022 / Train | 407×407 | 0.329118 | PASS_CANDIDATE |
+| 1280 / Train | 310×311 | 0.121564 | PASS_CANDIDATE |
+| 2243 / Train | 391×389 | 0.761945 | PASS_CANDIDATE |
+| 493 / Train | 404×405 | 0.081757 | PASS_CANDIDATE |
+| 1358 / Train | 272×272 | 0.232794 | PASS_CANDIDATE |
+| 269 / Val | 410×410 | 0.219643 | PASS_CANDIDATE |
+| 3785 / Val | 328×328 | 0.126850 | PASS_CANDIDATE |
+
+Each new output has RGB, canopy_fraction, canopy_mask and valid_fraction: **28 TIFFs per run**, two independent fresh runs. All28 output hashes match between runs. Both output sets passed independent readback, grid/bounds/dtype/range/validity checks; M1-2D exact-area aggregation and inclusive threshold0.5 are unchanged. Ground intervals, source/output grids, hashes and unthresholded coverage means are in the result JSON. The binary canopy fractions above describe teachers, not model performance. Combined generated outputs/previews/manifests occupy9,477,506bytes in the two run directories. Originals remain in place, read-only.
+
+Old Zenodo3/661/1972 first/repeat manifests and products were rehashed/readback checked unchanged, as were HF Train3/661 and Val1972 products. Existing HOLD records and all earlier result keys remain intact. No checkpoint was opened for writing. No model, optimizer, GPU or training run was involved.
+
+### Reproduce / batch review operation
+
+```powershell
+# Fresh external directories; seed0 fixes both initial and reserve plans.
+.\.venv\Scripts\python.exe scripts/m1_5d_zenodo_prepare.py --screen --seed 0 --zenodo '<Zenodo-root>' --output '<fresh-initial-screen>'
+# Only if initial results require reserve; do not search beyond this batch.
+.\.venv\Scripts\python.exe scripts/m1_5d_zenodo_prepare.py --screen --seed 0 --ids 4582 2351 493 1358 3909 388 --zenodo '<Zenodo-root>' --output '<fresh-reserve-screen>'
+# Inspect every survivor's source/binary/overlay. Preserve HOLD; no automatic ALL_VALID.
+# Authenticate selected source members, obtain individual STAC and retain the external
+# source-bound review receipt using the M1-5D-2 evidence.json schema above.
+.\.venv\Scripts\python.exe scripts/m1_5d_zenodo_prepare.py --zenodo '<Zenodo-root>' --evidence '<reviewed-evidence.json>' --ids 1022 1280 2243 493 1358 269 3785 --output '<fresh-pairs>'
+# Re-run the same command with another fresh --output, compare all output_hashes.
+.\.venv\Scripts\python.exe -m pytest -q --disable-warnings
+```
+
+Screen commands intentionally exit1 with REVIEW_REQUIRED/HOLD; this is not a complete-data success. Image-specific failed screens remain recorded. Prepare exits0 only if all requested images are PASS_CANDIDATE, and that remains subject to PR acceptance. Actual external directories are `m1-5d3-screen-01`, `m1-5d3-reserve-01`, `m1-5d3-rights-01`, `m1-5d3-rights-reserve-01`, `m1-5d3-auth-01`, `m1-5d3-detail-01`, `m1-5d3-evidence-01`, `m1-5d3-pairs-01`, `m1-5d3-pairs-repeat-01` under the local audit root. No image or personal STAC contents are committed.
+
+Regression: **124 passed,100 warnings**. Three new offline tests cover input-order-independent seeded/quota/source-diverse selection, recorded spatial rejection and screen-only REVIEW_REQUIRED behavior with no training TIFFs, plus rejection of targets outside the fixed plan. Existing121 tests continue to cover conversion, source generation, rights, split/holdout, hash, mask/uniform/threshold and save/readback/determinism behavior. CLI help was executed; actual screen and prepare commands were exercised. No new dependency installation.
+
+**Next scale:** a few-dozen-image stage is technically feasible using the same manifests and explicit bounded batches, after this pilot's review. It still requires source-bound rights and actual visual coverage/label receipts per image; metadata-only automatic acceptance is not justified. Any quota/selection change should be approved and recorded before imagery inspection. Keep per-image HOLD/REVIEW/FAIL separate from PASS_CANDIDATE, retain source-generation isolation, and do not use this batch's quality outcomes to tune Val selection or claim dataset-wide defect prevalence. Training integration, full semantic category crosswalk, exhaustive annotation accuracy and final commercial rights decisions remain outside this stage.
