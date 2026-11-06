@@ -7,7 +7,7 @@
 
 **Next outcome:** Finish M1 by producing and evaluating a reproducibly fine-tuned, usable source-domain 2D canopy model; then perform an early, lightweight M2 qualitative suitability review on real Japanese GSI RGB scenes. Do not require new Japan/GSI GT or nationwide precision claims for M1/M2.
 
-**First accepted-data expansion target: approximately 100 images total, including existing Zenodo10**, provisionally Train 80 / Val 20. Prefer distinct `oam_id` sources and coarse geography/scene diversity; preserve existing fold roles. Quality/rights/split separation take priority over any numeric ratio. Accept fewer than 100 rather than admitting HOLD; modestly exceed 100 only if the approved resource budget and QA allow. No automatic use of official test/holdout or GT54. A second expansion to 200–500 remains hypothetical, not approved work.
+**First accepted-data expansion target: approximately 100 images total, aiming to include the existing Zenodo10 after R1 requalification**, provisionally Train 80 / Val 20. The ten historical samples are accepted for G0–G3 smoke only, not automatically for general training; retain their archived data and manifest unchanged. Prefer distinct `oam_id` sources and coarse geography/scene diversity; preserve existing fold roles. Quality/rights/split separation take priority over any numeric ratio. Accept fewer than 100 rather than admitting HOLD; modestly exceed 100 only if the approved resource budget and QA allow. No automatic use of official test/holdout or GT54. A second expansion to 200–500 remains hypothetical, not approved work.
 
 ## B. Sequenced work packages and gates
 
@@ -21,7 +21,7 @@
 
 **R1a: General dataset contract.**
 - Define a versioned, manifest-driven schema for arbitrary accepted sample counts and image dimensions; immutable dataset identity; per-product SHA; pin Zenodo source/revision and source-byte rights; independent `oam_id`/fold/footprint checks; Tree/Canopy label and valid-area semantics.
-- Keep legacy Zenodo10 verifier as a frozen regression fixture, not a target for refactoring. Contract must state whether training supports only verified all-valid sources initially; ambiguous validity stays HOLD until separately reviewed.
+- Keep legacy Zenodo10 verifier as a frozen regression fixture, not a target for refactoring. Test compatibility on all ten without automatically promoting their smoke-only acceptance; record separate R1 PASS/HOLD decisions against explicit label/rights/validity rules (the old manifest marks per-ID category validation `NOT_VERIFIED`). Contract must state whether training supports only verified all-valid sources initially; ambiguous validity stays HOLD until separately reviewed.
 - Keep source/license assertions explicitly per sample, including attribution evidence. Do not silently infer missing/unknown row rights from archive-level claims. Preserve unaltered uniform 0/1 masks.
 - **Gate:** schema and validators tested on existing ten plus synthetic multi-size, malformed, conflicting-rights, duplicate-scene and holdout examples.
 
@@ -32,7 +32,7 @@
 - Begin with image-level manual review to measure automatic QA misses, then allow risk-triggered review plus a **predeclared random audit of normal cases** only after evidence justifies reduced manual intensity. A clean automated report is not proof of annotation completeness.
 - Suspect sharp black borders, ambiguous validity, unknown licenses, unknown IDs and spatial cross-split contamination => `HOLD`, **not** automatic black-to-NoData conversion, cropping or acceptance. Existing HOLD remediation is separately gated if clean supply proves insufficient.
 - Retain exact source IDs and avoid cherry-picking based on current Val3 model predictions or numerical outcomes.
-- **Gate:** ~100 distinct-source QA-accepted samples (target, not hard floor), grouped Train/Val manifest, hash-verified products and auditable PASS/HOLD reasons. Record actual accepted count and diversity rather than claiming all candidate pixels are perfect.
+- **Gate:** ~100 distinct-source R1 QA-accepted samples (target, not hard floor; count legacy ten only after R1 acceptance), grouped Train/Val manifest, hash-verified products and auditable PASS/HOLD reasons. Record actual accepted count and diversity rather than claiming all candidate pixels are perfect.
 
 ### R2 — Generalized, restartable GPU Trainer (can begin after R1a contract)
 
