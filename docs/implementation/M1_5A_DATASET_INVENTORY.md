@@ -1091,11 +1091,22 @@ subprocess.run([sys.executable,str(repo/'scripts/m1_7_dataset.py'),'verify','--r
 
 Cell2: verify/copy the official **initial**, not trained, checkpoint. A local file is reused only if its fixed SHA matches. Preflight saves the20-entry plan without constructing/training the large model. Ensure storage for both step10/20 checkpoints and copies; exact sizes are measured at save, not assumed here.
 
+Treat `pip check` as a diagnostic: display and retain its stdout/stderr/returncode, rather than stopping unconditionally on a nonzero code. The known Colab report `ipython 7.34.0 requires jedi` alone is not a training-dependency gate. Inspect the entire output; missing/incompatible torch, torchvision, Satlas0.3.1, numpy, rasterio or their required dependencies must be investigated and resolved **before training**. The separate imports/version/CUDA checks below and the G2 preflight remain mandatory; import success alone does not certify model/operator compatibility. If a training-relevant conflict or import/operator failure remains, stop and diagnose it, make only an explicitly justified dependency correction, record the reason and resulting versions, then rerun these checks and preflight. **Never unconditionally reinstall the working CUDA PyTorch/torchvision**, and do not ignore other conflicts merely because the known ipython/jedi message is present.
+
 ```python
-import torch, torchvision, satlaspretrain_models
+pip_check = subprocess.run([sys.executable,'-m','pip','check'], capture_output=True, text=True, check=False)
+print('pip check stdout:', pip_check.stdout, sep='\n')
+print('pip check stderr:', pip_check.stderr, sep='\n')
+print('pip check returncode:', pip_check.returncode)
+import torch, torchvision, satlaspretrain_models, numpy, rasterio
 from importlib.metadata import version
-print(sys.version, torch.__version__, torch.version.cuda, version('satlaspretrain-models'))
-subprocess.run([sys.executable,'-m','pip','check'],check=True)
+print('Python:', sys.version, 'CUDA build:', torch.version.cuda)
+versions = {name: version(name) for name in ['torch','torchvision','satlaspretrain-models','numpy','rasterio']}
+print(json.dumps(versions, indent=2))
+if versions['satlaspretrain-models'] != '0.3.1':
+    raise RuntimeError('SatlasPretrain 0.3.1 is required; inspect dependencies before proceeding')
+if not torch.cuda.is_available():
+    raise RuntimeError('CUDA unavailable; inspect runtime/installed build, no CPU fallback')
 def sha(path):
     with path.open('rb') as f: return hashlib.file_digest(f,'sha256').hexdigest()
 initial = Path('/content/aerial_swinb_si.pth')
