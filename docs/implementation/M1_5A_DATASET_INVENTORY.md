@@ -913,6 +913,124 @@ Colab PASS requires: trusted ZIP SHA+size, canonical41 members and all hashes, t
 
 Windows measured packaging, safe unpack/report, independent G0 verify on source/extracted sets: **PASS**. Regression: **161 passed,472 warnings**,18 added transfer cases. Tests cover deterministic packing, ZIP pin, mutation/missing/extra/unsafe/duplicate/link/directory members, limits, no overwrite, prepack rejection and FAIL reports for partial output. Drive upload/authentication, actual Colab execution and GPU/model training remain **NOT_VERIFIED / NOT_RUN**. No new dependency was installed.
 
+## M1-7 G1-B — Zenodo one-step CUDA implementation (2026-11-06)
+
+**Implementation and CPU tests only. Actual Satlas CUDA forward/CE/backward/optimizer/VRAM/checkpoint/Drive restore are NOT_VERIFIED; user runs after PR review/merge.** The user reports G1-A Drive→Colab verification succeeded; Codex did not independently execute that Colab run. Do not convert CPU surrogate tests into GPU acceptance.
+
+One new `scripts/m1_7_g1b_gpu_smoke.py` keeps the HF-only M1-3A/M1-6 routes unchanged. It reuses M1-6 safe SHA/weights_only checkpoint I/O, CUDA timing/memory, M1-4 finite-state/fingerprint helpers and M1-1 probability/gradient checks. It calls G0 full `verify` before every selected patch, including restore. It never calls old HF input validation or training. No new dependency, alternative model/loss, data acquisition or GPU execution was introduced by Codex.
+
+### Fixed experiment / acceptance boundaries
+
+- `ouem-zenodo10-e3db510b1125931d`, generation `zenodo-11617167-v1.0.0`, manifest `c2f4ccd56da8770cd73ef1db299d67d5528dcab8ea0051da1c2d5f8174a850ca`; G1-A PASS receipt is checked as context, **not a substitute for checking all40 actual files**.
+- Default Train image3, deterministic top-left224×224, batch1. CLI image whitelist contains only the seven frozen Train IDs. The crop helper supports explicit role/ID for later separate G2 work, but this runner never uses Val targets in model execution.
+- RGB uint8→float32/255, RGB channel order unchanged, `[1,3,224,224]`; target long `[1,224,224]`, literal0/1. RGB, mask, fraction and validity undergo identical crop. All-valid only; no padding, ignore-mask invention or uniform-label edits.
+- Seed0, CPU threads4, FP32, TF32/AMP disabled, AdamW lr1e-4/decay0.01/betas(0.9,0.999)/eps1e-8, all parameters trainable, no scheduler/augmentation. **Exactly one optimizer step**; no CLI option for additional steps. No automatic fallback/AMP/freeze/patch reduction on OOM.
+- Aerial_SwinB_SI official initializer revision `b1f8de04dacf9f9ed9640fe32484947710b47ede`, SHA `f8abf21cadaab2a71859e9d172bec4e5d6b7cc9710882a2f6a4d8aae826db036`. Local file only, safe CPU deserialization, pinned Satlas0.3.1 official strict Backbone/FPN loading, fresh Upsample and official SEGMENT2 Head. Local official0.3.1 source was inspected; actual Colab Python/PyTorch/CUDA compatibility remains a runtime gate.
+
+`--preflight-only` checks CUDA/environment/imports, G1-A receipt, fixed dataset/all40 products and initializer SHA; it **does not construct the large model or train**. Step mode repeats those gates, then constructs the model and performs initial eval/no_grad loss, train-mode forward+official CE, backward and one AdamW update. These two losses are labelled by mode; no improvement claim is inferred by comparing eval-mode and train-mode values.
+
+The result records Python/torch/CUDA build/GPU/VRAM/package versions, clean Git SHA, official source hashes and initializer provenance; dataset/manifest/selected file hashes/crop/tensor fingerprint/positive rate; CUDA-synchronized forward/backward/step durations and allocated/reserved/current/peak snapshots. Nonfinite probability/loss/gradients/parameters/optimizer states and absent component gradients stop execution. Finite nonzero component representatives are copied before update and compared after it (name, changed, max delta); unused/zero-gradient parameters are not incorrectly required to update. Unreached measurements are NOT_MEASURED.
+
+### Checkpoint / restore contract
+
+After one successful step, exclusive-save `zenodo10_step1.pth` in the fresh local run directory, hash it, then byte-copy into the explicitly supplied **fresh** backup directory and check both copies' SHA. The path is caller-configured: the CLI cannot certify that an arbitrary filesystem path really is durable Drive storage. The user must mount/authenticate Drive and inspect the destination. It records backup path and SHA without storing credentials. If backup fails after the optimizer step, the run is FAIL_STOPPED with the completed-step/checkpoint evidence retained locally: diagnose/recover the saved artifact, do not silently repeat training or overwrite an old destination.
+
+Saved state: distinct Zenodo G1-B kind, exact configuration/step1, model/AdamW, CPU/CUDA/Python RNG, Git/environment/official source hashes, initializer, G1-A receipt reference, frozen dataset/manifest/crop/input tensor identity, full model/optimizer/RNG fingerprints. NumPy RNG is not used by this deterministic path. `weights_only=True`, map_location CPU, strict model load, AdamW/RNG restore and full fingerprints are used in **restore-only** mode. Different dataset/patch/initializer/config/step/kind is always rejected. Environment/Git changes fail by default; `--allow-environment-change` explicitly logs differences but does not bypass data/config/state checks. Restore never takes another optimizer step and **does not establish continuation determinism or CPU/GPU bitwise equality**.
+
+### User-run Colab cells (review/merge first)
+
+Use the already verified `/content/zenodo10-g0` from G1-A; after a session reset rerun G1-A transfer/unpack first. Manually select a GPU runtime. Do not register another service or infer that free T4 memory will suffice. Cell1 creates a separate reviewed clone, leaving the G1-A checkout intact, and mounts Drive through user authentication:
+
+```python
+from pathlib import Path
+import subprocess, sys, json, shutil, hashlib, os
+COMMIT = '<full-reviewed-G1-B-commit-SHA>'
+if len(COMMIT)!=40 or any(c not in '0123456789abcdef' for c in COMMIT):
+    raise ValueError('Set the reviewed full commit SHA')
+repo = Path('/content/ouem-canopy-segmentation-g1b')
+if not repo.exists():
+    subprocess.run(['git','clone','https://github.com/iwamoto31206803-max/ouem-canopy-segmentation.git',str(repo)],check=True)
+if subprocess.check_output(['git','-C',str(repo),'status','--porcelain'],text=True).strip():
+    raise RuntimeError('Existing checkout has changes; do not discard them')
+subprocess.run(['git','-C',str(repo),'fetch','origin',COMMIT],check=True)
+subprocess.run(['git','-C',str(repo),'checkout',COMMIT],check=True)
+from google.colab import drive
+drive.mount('/content/drive')
+if not os.path.ismount('/content/drive'):
+    raise RuntimeError('Confirm the actual Drive mount before using a backup path')
+base = Path('/content/drive/MyDrive/OUEM_Canopy_Segmentation')
+dataset = Path('/content/zenodo10-g0')
+g1a_result = base/'02_datasets/zenodo10_g0/zenodo10-g1a-result-01.json'
+print(json.loads(g1a_result.read_text()))
+```
+
+Cell2: inspect installed packages. If Satlas0.3.1 is missing, a separate user-run `%pip install --no-deps satlaspretrain-models==0.3.1` avoids replacing the working CUDA torch. Inspect/import and `pip check`; install only genuinely missing auxiliary dependencies and record versions/reason. Do not unconditionally reinstall/downgrade torch/torchvision or claim compatibility from import alone.
+
+```python
+from importlib.metadata import version, PackageNotFoundError
+for name in ['torch','torchvision','satlaspretrain-models','numpy','rasterio','pyproj','requests','matplotlib']:
+    try: print(name, version(name))
+    except PackageNotFoundError: print(name, 'MISSING: resolve before preflight')
+subprocess.run([sys.executable,'-m','pip','check'],check=True)
+# The CLI itself tests imports and CUDA and records the actual versions.
+expected_initial = 'f8abf21cadaab2a71859e9d172bec4e5d6b7cc9710882a2f6a4d8aae826db036'
+def sha(path):
+    with path.open('rb') as f: return hashlib.file_digest(f,'sha256').hexdigest()
+initial = Path('/content/aerial_swinb_si.pth')
+if not initial.exists():
+    source = base/'01_pretrained/aerial_swinb_si.pth'
+    assert sha(source)==expected_initial
+    with source.open('rb') as src, initial.open('xb') as dst: shutil.copyfileobj(src,dst,1024**2)
+assert sha(initial)==expected_initial
+common = [sys.executable,str(repo/'scripts/m1_7_g1b_gpu_smoke.py'),
+          '--data',str(dataset),'--checkpoint',str(initial),'--g1a-result',str(g1a_result),'--image-id','3']
+preflight = Path('/content/g1b-preflight-01')
+subprocess.run(common+['--preflight-only','--output',str(preflight)],check=True)
+assert json.loads((preflight/'result.json').read_text())['status']=='PREFLIGHT_PASS_GPU_STEP_NOT_RUN'
+```
+
+Cell3: the **only training invocation**, one step. Fresh local/Drive directories are required. Do not rerun it automatically after an error; inspect the stage, exception and VRAM first.
+
+```python
+run = Path('/content/g1b-step1-01')
+backup = base/'03_experiments/m1-7-g1b-step1-01'  # configurable fresh Drive destination
+subprocess.run(common+['--output',str(run),'--backup',str(backup)],check=True)
+step = json.loads((run/'result.json').read_text())
+assert step['status']=='ZENODO_GPU_STEP1_PASS_RESTORE_PENDING'
+assert step['completed_steps']==1 and all(v['changed'] for v in step['updates'].values())
+assert step['backup_checkpoint']['sha256']==step['saved_checkpoint']['sha256']
+# Persist the JSON too; exclusive creation prevents an old result being replaced.
+with (run/'result.json').open('rb') as src, (backup/'step_result.json').open('xb') as dst:
+    shutil.copyfileobj(src,dst)
+assert sha(backup/'step_result.json')==sha(run/'result.json')
+print(step)
+```
+
+Cell4 starts a **different Python process** after the step process has exited/freed its GPU allocations. It reads the backed-up checkpoint, not an unverified replacement, and performs no training:
+
+```python
+restore = Path('/content/g1b-restore-01')
+subprocess.run(common+['--output',str(restore),'--restore',str(backup/'zenodo10_step1.pth'),
+                      '--restore-sha256',step['saved_checkpoint']['sha256']],check=True)
+reloaded = json.loads((restore/'result.json').read_text())
+assert reloaded['status']=='ZENODO_GPU_CHECKPOINT_STATE_RESTORE_PASS'
+assert all(v=='PASS' for v in reloaded['restore_checks'].values())
+with (restore/'result.json').open('rb') as src, (backup/'restore_result.json').open('xb') as dst:
+    shutil.copyfileobj(src,dst)
+assert sha(backup/'restore_result.json')==sha(restore/'result.json')
+print(reloaded)
+```
+
+If a later session is used, recover `step` from backed-up `step_result.json`, remount Drive, restore the frozen data via G1-A and use the exact reviewed commit/environment by default. Checkpoint restore success only certifies state loading/fingerprint equality. Do not add another optimizer step or claim deterministic continuation from it.
+
+### Codex verification and remaining acceptance
+
+Local CPU real-data loader: all40 hashes/grid/label gates PASS, image3 Train/fold3 `[0,0,224,224]`; RGB float32 `[1,3,224,224]`, range0.03137255–0.97647059; target int64 `[1,224,224]`, positive fraction **0.2072305530**, valid fraction1. The existing Windows G1-A receipt was checked and official initializer SHA independently rechecked. Python3.11.9 / torch2.7.1+cpu; actual `torch.cuda.is_available()==False`. No real-data model forward/backward/update was run by Codex in this stage.
+
+Regression: **167 passed,482 warnings**, six added CPU-only tests (including tiny four-component surrogates) cover loader/deterministic crop/uniform preservation/role and bad-hash rejection, G1-A receipt, missing-CUDA/CLI protection, one-step finite update/save/backup, model/optimizer/CPU-CUDA-Python RNG fingerprint mismatch and data/config/environment rejection, emulated step→restore orchestration and OOM stop without fallback. Existing G0/G1-A negative label/HF/holdout/hash/grid tests also pass; the new loader always invokes those gates. CPU-surrogate PASS strings are test control flow only, **not real Satlas/CUDA evidence**.
+
+User G1-B acceptance requires actual import/data/initializer gates, official-model CUDA forward/CE/backward, finite nonzero component gradients, all four active representative updates and finite optimizer state, measured time/VRAM, safe local checkpoint plus Drive SHA match, and separate-process state restore. Until the user supplies those JSONs, GPU optimizer/checkpoint/restore and actual Python3.13/PyTorch2.11/Satlas CUDA compatibility remain **NOT_VERIFIED**, VRAM/timing/loss are **NOT_MEASURED**. This is not G2 multi-image learning, accuracy evaluation or any change to the G0 dataset.
+
 ## M1-5D — Deferred black-border recovery research note (2026-11-06)
 
 **Decision: DEFER recovery implementation and keep all current HOLD decisions unchanged.** The project now prioritizes (1) a compact review of scientific comparisons / evaluation design, then (2) a small GPU fine-tuning and reproducibility run using *already quality-reviewed Zenodo samples*, then (3) deciding whether a larger clean-only dataset is sufficient. Investigate border recovery only if subsequent evidence shows that the additional data are valuable enough to justify the complexity. This is not permission to relax coverage gates or mix dataset generations. The M1-5D-3 pilot identified **7 new PASS_CANDIDATE (Train5, Val2)** among 18 screened images; **11 HOLD**, mostly artificial-looking edge-connected black areas. Together with M1-5D-2 this gives **10 candidate images (Train7, Val3)**; formal dataset acceptance and sufficiently representative Val evaluation are separate steps. The observed 11/18 hold rate is **not a population prevalence estimate**.
