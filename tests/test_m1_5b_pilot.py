@@ -323,3 +323,74 @@ def test_border_audit_empty_black_and_bad_inputs():
     with pytest.raises(ValueError): components(np.zeros((4,4),dtype=np.uint8))
     with pytest.raises(ValueError): components(np.zeros((4,4),dtype=bool),6)
     with pytest.raises(ValueError): analyze(np.zeros((3,3,3),dtype=np.uint8),np.zeros((4,4)))
+
+
+def test_zenodo_json_lines_and_duplicates(tmp_path):
+    from m1_5c_zenodo_audit import json_lines
+    path=tmp_path/'train_meta.json'; path.write_text('{"image_id":3}\n{"image_id":661}\n')
+    assert [r['image_id'] for r in json_lines(path)]==[3,661]
+    path.write_text('{"image_id":3}\n{"image_id":3}\n')
+    with pytest.raises(ValueError,match='Duplicate'):json_lines(path)
+
+
+def test_zenodo_metadata_roles_unknown_license_and_leak():
+    from m1_5c_zenodo_audit import metadata_audit,partition
+    rows=[dict(image_id=i,oam_id=str(i),validation_fold=f,license='CC-BY 4.0')
+          for i,f in [(3,3),(661,2),(1972,0),(4235,0)]]
+    hf=copy.deepcopy(rows); rows[0]['license']=None
+    result=metadata_audit(rows,[],hf)
+    assert result['train_explicit_cc_by']==3
+    assert result['metadata_mismatch_ids']['license']==[3]
+    assert result['protected_roles_preserved']
+    assert partition(dict(validation_fold=-1),'test')=='holdout'
+    with pytest.raises(ValueError):partition(dict(validation_fold=0),'test')
+    rows[0]['oam_id']=rows[-1]['oam_id']
+    with pytest.raises(ValueError,match='crosses'):metadata_audit(rows,[],hf)
+
+
+def test_zenodo_pixel_exactness_and_id_comparison():
+    from m1_5c_zenodo_audit import pixel_comparison,panoptic_ids
+    rgb=np.zeros((2,2,3),dtype=np.uint8); rgb[0,0]=[1,2,3]
+    assert panoptic_ids(rgb)[0,0]==1+256*2+65536*3
+    assert pixel_comparison(rgb,rgb)['status']=='PASS'
+    changed=rgb.copy();changed[0,0,0]+=1
+    result=pixel_comparison(changed,rgb)
+    assert result['status']=='FAIL' and result['changed_pixels']==1 and result['changed_values']==1
+    assert pixel_comparison(rgb,rgb.astype(np.uint16))['status']=='FAIL'
+    assert pixel_comparison(rgb,rgb[:1])['status']=='FAIL'
+    with pytest.raises(ValueError):panoptic_ids(np.zeros((2,2),dtype=np.uint8))
+
+
+def test_zenodo_coco_stream_only_selected_records(tmp_path):
+    from m1_5c_zenodo_audit import coco_annotation_summary
+    path=tmp_path/'train.json'
+    path.write_text(json.dumps(dict(images=[],annotations=[
+        dict(image_id=3,id=99,category_id=1,iscrowd=1,segmentation={'counts':[0,4],'size':[2,2]}),
+        dict(image_id=999,id=1,category_id=2,iscrowd=0),
+        dict(image_id=3,id=100,category_id=2,iscrowd=0)],licenses=[])))
+    result=coco_annotation_summary(path,[3])
+    assert set(result)=={3} and result[3]['ids']==[99,100]
+    assert result[3]['categories']==[1,2] and result[3]['crowd']==1
+    path.write_text('{"annotations":[{"id":')
+    with pytest.raises(ValueError,match='Truncated'):coco_annotation_summary(path,[3])
+
+
+def test_zenodo_canonical_panoptic_without_crowd_equality_gate():
+    from m1_5c_zenodo_audit import panoptic_ids
+    rgb=np.full((2,2,3),100,dtype=np.uint8); annotation=np.zeros_like(rgb);annotation[0,0]=[7,0,0]
+    segments=[dict(id=7,category_id=1,iscrowd=1)]
+    # No COCO RLE gate: canonical map is validated directly, per PR29/audit scope.
+    mask,_=pilot.labels(rgb,annotation,segments)
+    assert mask.tolist()==[[1,0],[0,0]] and panoptic_ids(annotation)[0,0]==7
+    with pytest.raises(ValueError,match='Unmapped'):pilot.labels(rgb,annotation,[])
+    with pytest.raises(ValueError,match='category'):pilot.labels(rgb,annotation,[dict(id=7,category_id=3,iscrowd=1)])
+
+
+def test_zenodo_missing_reference_remains_not_comparable(tmp_path):
+    from m1_5c_zenodo_audit import available_reference
+    missing=tmp_path/'missing'; partial=tmp_path/'partial'; partial.mkdir()
+    (partial/'rgb.bin').write_bytes(b'placeholder')
+    assert available_reference([missing,partial]) is None
+    complete=tmp_path/'complete';complete.mkdir()
+    for name in ['rgb.bin','annotation.bin','segments.json']:(complete/name).write_bytes(b'placeholder')
+    assert available_reference([missing,partial,complete])==complete
