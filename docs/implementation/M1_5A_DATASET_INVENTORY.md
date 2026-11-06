@@ -614,3 +614,65 @@ Keep the existing latitude-aware **local-ground 0.50m target**, exact pixel-over
 4. **M1-5D-4: training integration**: approved Zenodo-only manifests feed multi-sample loader; leave model architecture and checkpoint optimizer code intact, attach new data-generation provenance. Compare within dataset generation; assess external GSI qualitatively as separate domain evidence, not a replacement for a proper Val set.
 
 **Success for M1-5D-1:** one minimal documentation PR with a clear canonical-source decision and no retroactive rewriting; engineering assumptions/limitations and ordered follow-up acceptance criteria explicit. **Not yet claimed:** new category-ground-truth mapping, complete Zenodo sample QA, true-source positional accuracy, accepted new Val, trained model quality.
+
+## M1-5D-2 — Local Zenodo adapter and representative generation (2026-11-06)
+
+Implemented `scripts/m1_5d_zenodo_prepare.py`: a small offline CLI using the existing M1-5C JSONL/COCO streaming readers, M1-5B STAC rights/separation/fresh-output/readback gates, and M1-2D `intervals`, `output_grid`, `reduce_area`, `binary`. One new adapter script keeps the historical two-image HF preprocessing and the read-only compatibility-audit CLI unchanged; it introduces no new dependency or training framework. Tests extend the existing pilot test file. M1-2D, M1-5B and M1-6 production scripts are unchanged.
+
+### Input contract and external evidence
+
+Only local files are read. Resolve each exact `<oam_id>_<image_id>.tif/.png` from its JSONL row. All metadata IDs must be unique across train/test, each oam_id must have one fold/partition, and protected roles remain fixed. Explicit selected IDs in test metadata are rejected before any image read. Opposite-role footprints (including Holdout metadata), original-object keys, source groups and the existing 1km conservative proximity gate are checked. TIFF CRS/affine are authoritative; metadata bounds must agree within 1e-8 projected units, without repair. Unsupported rotation, orientation, nodata, alpha, partial dataset masks, shape/type/reader disagreements fail the gate.
+
+Use an external, reviewed `evidence.json`, not an automatically generated all-valid declaration. It binds the exact Zenodo generation, both metadata hashes, selected COCO JSON hash, externally authenticated archive receipt, each source TIFF/PNG hash and the STAC snapshot hash/URL. Source hashes must come from the authenticated archive/audit chain. It also records manual coverage/alignment/quality review of those same sources. Minimal schema (placeholders must be replaced with actual evidence):
+
+```json
+{
+  "source_generation": "zenodo-11617167-v1.0.0",
+  "metadata_hashes": {"train_meta.json": "<sha256>", "test_meta.json": "<sha256>"},
+  "coco_sha256": "<sha256 of archives/dataset/holdout/train.json>",
+  "archive_evidence": {"reference": "<authenticated official archive receipt with MD5 and source-member checks>"},
+  "samples": {
+    "3": {
+      "source_hashes": {"<oam_id>_3.tif": "<sha256>", "<oam_id>_3.png": "<sha256>"},
+      "stac_path": "<external absolute path or path relative to evidence.json>/<oam_id>-stac.json",
+      "source_evidence": {"snapshot_sha256": "<sha256>", "url": "<official STAC URL>"},
+      "review": {"coverage": "ALL_VALID", "alignment": "PASS", "quality": "PASS", "black_wedge": false, "basis": "<specific inspection and evidence reference>"}
+    }
+  }
+}
+```
+
+Archive authentication is a prerequisite receipt, not automatically re-run by the CLI. The CLI verifies metadata/COCO/source/STAC SHA256 against that trusted receipt; it cannot independently authenticate a fabricated review or receipt. Source STAC ID, explicit CC BY 4.0, producer/licensor attribution and original metadata object key are rechecked offline. Raw STAC and names/contacts remain external; the public manifest retains hashes/URLs and a reference to the externally retained attribution. Commercial final clearance remains outside this stage.
+
+The default selection is 3/661/1972 only. Add one `samples` entry for every explicitly selected image. `None`, unknown, NC and SA row licenses cannot pass. Missing or insufficient evidence yields HOLD, not a substituted permissive policy. RGB zero never becomes NoData. All-valid raster flags alone are insufficient: explicit source-bound coverage/alignment/quality review is required before a valid_fraction of one can be generated. Any black pixels additionally require `black_pixels_reviewed: true`; this permits reviewed isolated pixels, not an automatic black-pixel exclusion. Obvious/unresolved wedges must never receive an ALL_VALID review. 4235 is explicitly blocked even if a receipt claims otherwise.
+
+Binary labels follow `np.any(panoptic_rgb != 0, axis=2)` exactly after RGB uint8, format, dimensions and allowed COCO categories {1,2} checks. Empty COCO categories with positive PNG pixels are rejected. COCO IDs are never matched to Panoptic IDs. Every generated record explicitly says `category_crosswalk_status=not_available` and `category_level_per_id_validation=NOT_VERIFIED`. Uniform masks are retained. Crowd remains in the canonical union; cross-format RLE equality is not a blocking gate. This adapter does not implement an independent Crowd RLE diagnostic, and therefore does not claim that comparison was newly executed.
+
+### Reproduction and measured results
+
+PowerShell (existing venv, no install or network):
+
+```powershell
+.\.venv\Scripts\python.exe scripts/m1_5d_zenodo_prepare.py --help
+.\.venv\Scripts\python.exe scripts/m1_5d_zenodo_prepare.py --zenodo '<Zenodo-root>' --evidence '<external-reviewed-evidence.json>' --ids 3 661 1972 --output '<fresh-external-output>'
+# Repeat with a different, fresh --output and compare each sample's output_hashes.
+.\.venv\Scripts\python.exe -m pytest -q --disable-warnings
+```
+
+Destinations must be fresh, outside this repository and outside/away from protected input/evidence roots. Existing destinations are rejected; source data is never rewritten. A failed image receives HOLD in manifest.json; successful siblings remain recorded. CLI exits 1 if any selected image is held, 0 only for all PASS_CANDIDATE. Global metadata/hash/partition failures raise before generation. Partially written outputs of a failed image are not training-eligible; inspect its HOLD receipt and use a new destination after resolving the issue.
+
+Actual outputs: external `m1-5d2-pairs-01` and `m1-5d2-pairs-repeat-01` under the local audit root; reviewed evidence in `m1-5d2-evidence-02`. No local absolute paths, raw images or STAC personal data are required in Git. Full sanitized measurements and all 12 hashes are appended under `M1_5B_PILOT_RESULT.json:m1_5d2`.
+
+| Image / role | Zenodo output H×W | Ground GSD E / N (m) | Binary canopy area ratio | Result |
+| --- | --- | --- | --- | --- |
+| 3 / Train | 394×394 | 0.499788 / 0.500093 | 0.252905 | PASS candidate |
+| 661 / Train | 263×264 | 0.499173 / 0.500459 | 0.524801 | PASS candidate |
+| 1972 / Val | 230×230 | 0.500697 / 0.500697 | 0.606560 | PASS candidate |
+
+All three source TIFF/PNG hashes match M1-5C's authenticated Zenodo originals; source STAC evidence matches prior accepted rights snapshots. No exact-black pixels were present in these three sources. Source/label previews were re-viewed and all three reduced overlays were actually viewed: no obvious artificial missing-image region, orientation change or gross label shift. This limited visual check is not absolute geodetic certification or complete ecological annotation validation. All four products per image share bounds, CRS, affine and shape; exact readback, dtype/range/validity, thresholding and SHA checks passed. Two fresh runs produced identical hashes for **all 12 TIFFs**. Old HF Train3/661 and Val1972 output hashes and readback were independently rechecked unchanged. The source generation differs and old HF manifests must not be substituted.
+
+Offline regression: **121 passed, 95 warnings**, nine new adapter tests. Coverage includes JSONL/duplicate/group isolation, Holdout rejection without reading its pixels, unknown license/category, source/hash/generation rejection, RGB-PNG dimensions/type, uniform masks, black-pixel review, footprint leakage, fresh-output protection, area reduction/grid/readback and determinism. Initial fixture failure correctly detected a shared original-object URL; the fixture was corrected to independent source objects. During real evidence setup, selecting a historical list entry by position triggered the STAC hash gate before generation; explicit image_id lookup fixed the setup, with no source change.
+
+### M1-5D-3 entry conditions
+
+Review this source-generation implementation and its three representative results first. Next select only a small explicitly authorized, rights-cleared new Train/Val set; obtain hash-bound STAC/attribution and individual coverage/alignment review, exclude known4235, preserve group/footprint isolation, and repeat output SHA/readback checks. An authoritative per-ID crosswalk remains absent: the approved official binary semantics and limited claims apply; contradictory encoding/categories or suspicious labels still HOLD. No training integration, new acquisition, large generation, GPU execution or old-data replacement was performed here.
