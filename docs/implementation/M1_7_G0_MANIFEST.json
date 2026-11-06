@@ -1,0 +1,1250 @@
+{
+  "acceptance": "accepted_for_M1_7_smoke",
+  "dataset_id": "ouem-zenodo10-e3db510b1125931d",
+  "ledger_sha256": "56ab0f81f0a19c9fd00f0dd392cef2703a2685af6126a49ad8dff3f7e640206f",
+  "samples": [
+    {
+      "acceptance_evidence": {
+        "ledger_pointer": "m1_5d2/result/samples/image_id=3",
+        "review_basis": "M1-5C hash-bound source/overlay preview re-viewed 2026-11-06; no artificial fill or gross shift seen; raster validity checked separately, not survey accuracy",
+        "review_preview_sha256": "232d55b0701facf536b842c2a4ff75c65c661157c0862f0f48354b806a11df09",
+        "review_receipt_sha256": "78fd6f3adcf3b905290b39814a1b052eeec773afd14bb7e1ab117d21002bc6b7",
+        "run_manifest_sha256": "1f79a84b3725595b1c6a9860e70b96aa3682117b66e5684b48c5e8b33a8123ed",
+        "separation": {
+          "nearest_opposite_footprint_lower_bound_m": 1568809.5873724886,
+          "proximity_hold_m": 1000,
+          "scope": "all cached opposite-role footprints, including holdout metadata; no holdout pixels"
+        },
+        "source_checks": "original SHA/grid/PNG label, STAC rights, source-bound visual receipt, product SHA/grid/threshold/validity PASS"
+      },
+      "binary_canopy_ratio": 0.2529052539359427,
+      "canopy_fraction_mean": 0.2528707981109619,
+      "category_crosswalk_status": "not_available",
+      "category_level_per_id_validation": "NOT_VERIFIED",
+      "coco_categories": [
+        1,
+        2
+      ],
+      "crowd_policy": "canonical binary retained; cross-format disagreement alone WARN",
+      "edge_black_pixels": 0,
+      "exact_black_pixels": 0,
+      "fraction_method": "same area weights; float32",
+      "gsd_error_m": {
+        "east_m": -0.00021228964339836676,
+        "north_m": 9.283647921332072e-05
+      },
+      "image_id": 3,
+      "input_shape": [
+        2048,
+        2048
+      ],
+      "oam_id": "5fb52130d89ab70006abca33",
+      "official_split": "train",
+      "output_bounds": [
+        3211017.5,
+        -1787409.875,
+        3211222.25,
+        -1787205.0
+      ],
+      "output_crs": "EPSG:3395",
+      "output_ground_gsd": {
+        "east_m": 0.49978771035660163,
+        "latitude": -15.950951306119327,
+        "longitude": 28.84598062852467,
+        "north_m": 0.5000928364792133
+      },
+      "output_hashes": {
+        "canopy_fraction.tif": "c24ed22e7d7d91bea4ad99d77552856c60de059ccd3347d2d46227000c3483d1",
+        "canopy_mask.tif": "4983b7c3a433bbcc711eb485e9c7ef974112152170bc3045c47cc25e7a8f3d51",
+        "rgb.tif": "e33adf868d426e0f02f5367ded1a2cbca1dee7c1d8d7c3c66b170d5aad6c6b78",
+        "valid_fraction.tif": "23fb49b85ea7c26cca320edabe4d983c2914b9cef8620324571b7fb3fbc8f7ad"
+      },
+      "output_shape": [
+        394,
+        394
+      ],
+      "output_transform": [
+        0.5196700507614214,
+        0.0,
+        3211017.5,
+        0.0,
+        -0.5199873096446701,
+        -1787205.0
+      ],
+      "pixel_definition": "outer edges preserved; centers col+0.5,row+0.5",
+      "preview_sha256": "9722ddd3ba3e609ebaf03bff2fe0f9723b2400253f8e63b1257d391b0b0ae53f",
+      "rgb_method": "exact overlap area float64; floor(value+0.5) uint8",
+      "rights": {
+        "annotation_license": "CC BY 4.0",
+        "annotation_terms": "https://github.com/Restor-Foundation/tcd/blob/05dab754a3fd15b83d6b7606de7310155f4e2df2/docs/dataset.md",
+        "attribution": "named producer/licensor retained in external STAC; no contacts published",
+        "commercial_final_clearance": "NOT_ASSESSED",
+        "image_license": "CC-BY-4.0",
+        "row_license": "CC-BY 4.0",
+        "stac_sha256": "2476a47f5ed65434b8340189e96c36e6ae19e9e722b0884dc55ca07e9244f5ec",
+        "stac_url": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/5fb52130d89ab70006abca33"
+      },
+      "semantic_policy": "upstream_nonzero_binary_with_review",
+      "separation": {
+        "nearest_opposite_footprint_lower_bound_m": 1568809.5873724886,
+        "proximity_hold_m": 1000,
+        "scope": "all cached opposite-role footprints, including holdout metadata; no holdout pixels"
+      },
+      "source_bounds": [
+        3211017.5,
+        -1787409.875,
+        3211222.25,
+        -1787205.0
+      ],
+      "source_crs": "EPSG:3395",
+      "source_generation": "zenodo-11617167-v1.0.0",
+      "source_ground_gsd": {
+        "east_m": 0.0961505651432739,
+        "latitude": -15.950951306119327,
+        "longitude": 28.84598062852467,
+        "north_m": 0.0962092654991526
+      },
+      "source_hashes": {
+        "5fb52130d89ab70006abca33_3.png": "73c12f6d9f6d8d67e3dbbe1300846728df7983288f246384de01b431ad8d2dff",
+        "5fb52130d89ab70006abca33_3.tif": "425c59ac00dea930dd1664a8bc3cfa5b044c3434305fd56e257aa8a7700254a1"
+      },
+      "source_positive_pixels": 1060617,
+      "source_transform": [
+        0.0999755859375,
+        0.0,
+        3211017.5,
+        0.0,
+        -0.10003662109375,
+        -1787205.0
+      ],
+      "split": "train",
+      "status": "accepted_for_M1_7_smoke",
+      "threshold": 0.5,
+      "training_eligible": true,
+      "uniform_background": false,
+      "uniform_canopy": false,
+      "validation_fold": 3,
+      "validity": "raster checks plus source-bound all-valid visual review",
+      "validity_basis": "M1-5C hash-bound source/overlay preview re-viewed 2026-11-06; no artificial fill or gross shift seen; raster validity checked separately, not survey accuracy"
+    },
+    {
+      "acceptance_evidence": {
+        "ledger_pointer": "m1_5d3/result/samples/image_id=269",
+        "review_basis": "2026-11-06 actual source/RGB-binary-overlay visual inspection. Dense residential scene with scattered trees; masks broadly follow vegetation, no fill/rotation seen.",
+        "review_preview_sha256": "ebe8e938c4cb78605d583e1cc2ef1a6b7cc850eb28fc65a6943e36128c267dbc",
+        "review_receipt_sha256": "e784dab59b1888a92436651f1280a19973e8fc753afd015175d9d6ec43c96deb",
+        "run_manifest_sha256": "a95b3a6350d80d7cc03fae768de62576dad482cd0418ffbc5ea421937f5c84b0",
+        "separation": {
+          "nearest_opposite_footprint_lower_bound_m": 3170.177354929791,
+          "proximity_hold_m": 1000,
+          "scope": "all cached opposite-role footprints, including holdout metadata; no holdout pixels"
+        },
+        "source_checks": "original SHA/grid/PNG label, STAC rights, source-bound visual receipt, product SHA/grid/threshold/validity PASS"
+      },
+      "binary_canopy_ratio": 0.2196430696014277,
+      "canopy_fraction_mean": 0.2203686237335205,
+      "category_crosswalk_status": "not_available",
+      "category_level_per_id_validation": "NOT_VERIFIED",
+      "coco_categories": [
+        1,
+        2
+      ],
+      "crowd_policy": "canonical binary retained; cross-format disagreement alone WARN",
+      "edge_black_pixels": 0,
+      "exact_black_pixels": 0,
+      "fraction_method": "same area weights; float32",
+      "gsd_error_m": {
+        "east_m": -0.00046454726888622844,
+        "north_m": -0.0004931291968415241
+      },
+      "image_id": 269,
+      "input_shape": [
+        2048,
+        2048
+      ],
+      "oam_id": "59e62b943d6412ef7220a29d",
+      "official_split": "train",
+      "output_bounds": [
+        750978.0,
+        34098.64453125,
+        751182.8125,
+        34303.4453125
+      ],
+      "output_crs": "EPSG:3395",
+      "output_ground_gsd": {
+        "east_m": 0.49953545273111377,
+        "latitude": 0.3093022886940436,
+        "longitude": 6.747070085370743,
+        "north_m": 0.4995068708031585
+      },
+      "output_hashes": {
+        "canopy_fraction.tif": "b79713675ac88a2d491db676780af94d485d37c3d603081944363bd129078e5c",
+        "canopy_mask.tif": "9f62ed7e3395631e2ad995f970d33c96794242d0f21bfa0f9bdb45af4ea18c6a",
+        "rgb.tif": "ad6a71951aad676f338ef75f9c21c76aeada3b7161129121bb05965227f47129",
+        "valid_fraction.tif": "f720a43ab17b8baed4773447d2a98efda06f12f6544b6e54baabbb3c1d29a304"
+      },
+      "output_shape": [
+        410,
+        410
+      ],
+      "output_transform": [
+        0.4995426829268293,
+        0.0,
+        750978.0,
+        0.0,
+        -0.4995141006097561,
+        34303.4453125
+      ],
+      "pixel_definition": "outer edges preserved; centers col+0.5,row+0.5",
+      "preview_sha256": "8162674d99a3499f492aeb775f24c77be2f689eb13a75f85ea3b75f6b5764b0a",
+      "rgb_method": "exact overlap area float64; floor(value+0.5) uint8",
+      "rights": {
+        "annotation_license": "CC BY 4.0",
+        "annotation_terms": "https://github.com/Restor-Foundation/tcd/blob/05dab754a3fd15b83d6b7606de7310155f4e2df2/docs/dataset.md",
+        "attribution": "named producer/licensor retained in external STAC; no contacts published",
+        "commercial_final_clearance": "NOT_ASSESSED",
+        "image_license": "CC-BY-4.0",
+        "row_license": "CC-BY 4.0",
+        "stac_sha256": "9235e14caca521f1e03752fa2562b43c58460bfc8f750d7d81ea9602a1ecf68e",
+        "stac_url": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/59e62b943d6412ef7220a29d"
+      },
+      "semantic_policy": "upstream_nonzero_binary_with_review",
+      "separation": {
+        "nearest_opposite_footprint_lower_bound_m": 3170.177354929791,
+        "proximity_hold_m": 1000,
+        "scope": "all cached opposite-role footprints, including holdout metadata; no holdout pixels"
+      },
+      "source_bounds": [
+        750978.0,
+        34098.64453125,
+        751182.8125,
+        34303.4453125
+      ],
+      "source_crs": "EPSG:3395",
+      "source_generation": "zenodo-11617167-v1.0.0",
+      "source_ground_gsd": {
+        "east_m": 0.10000465603382358,
+        "latitude": 0.3093022886940436,
+        "longitude": 6.747070085370743,
+        "north_m": 0.09999893411415124
+      },
+      "source_hashes": {
+        "59e62b943d6412ef7220a29d_269.png": "0a02809322570ed7d58f0b34d8504b50f5aca0b8e56833db69a8bdc7c1fa547c",
+        "59e62b943d6412ef7220a29d_269.tif": "4d0d07ee6c0c8372d3d2b532e691db27cd7c6ad7f0674b7cd37e3015a89c80fa"
+      },
+      "source_positive_pixels": 924293,
+      "source_transform": [
+        0.100006103515625,
+        0.0,
+        750978.0,
+        0.0,
+        -0.10000038146972656,
+        34303.4453125
+      ],
+      "split": "val",
+      "status": "accepted_for_M1_7_smoke",
+      "threshold": 0.5,
+      "training_eligible": true,
+      "uniform_background": false,
+      "uniform_canopy": false,
+      "validation_fold": 0,
+      "validity": "raster checks plus source-bound all-valid visual review",
+      "validity_basis": "2026-11-06 actual source/RGB-binary-overlay visual inspection. Dense residential scene with scattered trees; masks broadly follow vegetation, no fill/rotation seen."
+    },
+    {
+      "acceptance_evidence": {
+        "ledger_pointer": "m1_5d3/result/samples/image_id=493",
+        "review_basis": "2026-11-06 actual source/RGB-binary-overlay visual inspection. Open settlement and sparse palms/trees; sparse teacher broadly follows crowns; no artificial missing coverage.",
+        "review_preview_sha256": "d86254aa1f11f640d2501a8c1f09deef113774a4e0dd04cce1b2510cbf2bd70c",
+        "review_receipt_sha256": "e784dab59b1888a92436651f1280a19973e8fc753afd015175d9d6ec43c96deb",
+        "run_manifest_sha256": "a95b3a6350d80d7cc03fae768de62576dad482cd0418ffbc5ea421937f5c84b0",
+        "separation": {
+          "nearest_opposite_footprint_lower_bound_m": 116553.69263377022,
+          "proximity_hold_m": 1000,
+          "scope": "all cached opposite-role footprints, including holdout metadata; no holdout pixels"
+        },
+        "source_checks": "original SHA/grid/PNG label, STAC rights, source-bound visual receipt, product SHA/grid/threshold/validity PASS"
+      },
+      "binary_canopy_ratio": 0.08175650898423176,
+      "canopy_fraction_mean": 0.08202195167541504,
+      "category_crosswalk_status": "not_available",
+      "category_level_per_id_validation": "NOT_VERIFIED",
+      "coco_categories": [
+        1,
+        2
+      ],
+      "crowd_policy": "canonical binary retained; cross-format disagreement alone WARN",
+      "edge_black_pixels": 0,
+      "exact_black_pixels": 11,
+      "fraction_method": "same area weights; float32",
+      "gsd_error_m": {
+        "east_m": -0.0004891329304311243,
+        "north_m": 0.00013661547890009285
+      },
+      "image_id": 493,
+      "input_shape": [
+        2048,
+        2048
+      ],
+      "oam_id": "59e62be83d6412ef7220c45c",
+      "official_split": "train",
+      "output_bounds": [
+        13900619.0,
+        -1037178.375,
+        13900824.0,
+        -1036973.625
+      ],
+      "output_crs": "EPSG:3395",
+      "output_ground_gsd": {
+        "east_m": 0.4995108670695689,
+        "latitude": -9.336843367649271,
+        "longitude": 124.8723058373884,
+        "north_m": 0.5001366154789001
+      },
+      "output_hashes": {
+        "canopy_fraction.tif": "16eb92efd896025c025ac29263dd2ac9a7eda455e1f3fe790d74cf2550f1175e",
+        "canopy_mask.tif": "9d1a1be79803b163724c9dbd47ccb85cf4aae4b9a62745d15997b33b1121907b",
+        "rgb.tif": "4adcf69c4dc90521979d9103df94eedceacf3954dbf856cf94c0f18b639e100f",
+        "valid_fraction.tif": "536d10255d5a9e616382ec76ff7323e54375fac39eaf57137aea8a39b3c416a1"
+      },
+      "output_shape": [
+        404,
+        405
+      ],
+      "output_transform": [
+        0.5061728395061729,
+        0.0,
+        13900619.0,
+        0.0,
+        -0.5068069306930693,
+        -1036973.625
+      ],
+      "pixel_definition": "outer edges preserved; centers col+0.5,row+0.5",
+      "preview_sha256": "b8e1a7e5e27dfbe0f5b2c17d71f5c1ca9c19ab125362c5374944353aee0d0ad6",
+      "rgb_method": "exact overlap area float64; floor(value+0.5) uint8",
+      "rights": {
+        "annotation_license": "CC BY 4.0",
+        "annotation_terms": "https://github.com/Restor-Foundation/tcd/blob/05dab754a3fd15b83d6b7606de7310155f4e2df2/docs/dataset.md",
+        "attribution": "named producer/licensor retained in external STAC; no contacts published",
+        "commercial_final_clearance": "NOT_ASSESSED",
+        "image_license": "CC-BY-4.0",
+        "row_license": "CC-BY 4.0",
+        "stac_sha256": "d7b34fdb8335066369ccf242d68b18c3dfbe435cd409c5da0c2cce88a62b3ecf",
+        "stac_url": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/59e62be83d6412ef7220c45c"
+      },
+      "semantic_policy": "upstream_nonzero_binary_with_review",
+      "separation": {
+        "nearest_opposite_footprint_lower_bound_m": 116553.69263377022,
+        "proximity_hold_m": 1000,
+        "scope": "all cached opposite-role footprints, including holdout metadata; no holdout pixels"
+      },
+      "source_bounds": [
+        13900619.0,
+        -1037178.375,
+        13900824.0,
+        -1036973.625
+      ],
+      "source_crs": "EPSG:3395",
+      "source_generation": "zenodo-11617167-v1.0.0",
+      "source_ground_gsd": {
+        "east_m": 0.09878022639924698,
+        "latitude": -9.336843367649271,
+        "longitude": 124.8723058373884,
+        "north_m": 0.09865976159007253
+      },
+      "source_hashes": {
+        "59e62be83d6412ef7220c45c_493.png": "018e188a62432d239cad29b38d33d3102017509ade2c1f84313178c24fc8f549",
+        "59e62be83d6412ef7220c45c_493.tif": "7dafb4112342288b35bafabe479c93227d5f7fb040f921beab3f1a43b9cc8e07"
+      },
+      "source_positive_pixels": 344025,
+      "source_transform": [
+        0.10009765625,
+        0.0,
+        13900619.0,
+        0.0,
+        -0.0999755859375,
+        -1036973.625
+      ],
+      "split": "train",
+      "status": "accepted_for_M1_7_smoke",
+      "threshold": 0.5,
+      "training_eligible": true,
+      "uniform_background": false,
+      "uniform_canopy": false,
+      "validation_fold": 4,
+      "validity": "raster checks plus source-bound all-valid visual review",
+      "validity_basis": "2026-11-06 actual source/RGB-binary-overlay visual inspection. Open settlement and sparse palms/trees; sparse teacher broadly follows crowns; no artificial missing coverage."
+    },
+    {
+      "acceptance_evidence": {
+        "ledger_pointer": "m1_5d2/result/samples/image_id=661",
+        "review_basis": "M1-5C hash-bound source/overlay preview re-viewed 2026-11-06; no artificial fill or gross shift seen; raster validity checked separately, not survey accuracy",
+        "review_preview_sha256": "f2d7a055982a998ac2e592c9800e5b6e8328b0121fe5a8e90528e3e299682f13",
+        "review_receipt_sha256": "78fd6f3adcf3b905290b39814a1b052eeec773afd14bb7e1ab117d21002bc6b7",
+        "run_manifest_sha256": "1f79a84b3725595b1c6a9860e70b96aa3682117b66e5684b48c5e8b33a8123ed",
+        "separation": {
+          "nearest_opposite_footprint_lower_bound_m": 229224.81132600224,
+          "proximity_hold_m": 1000,
+          "scope": "all cached opposite-role footprints, including holdout metadata; no holdout pixels"
+        },
+        "source_checks": "original SHA/grid/PNG label, STAC rights, source-bound visual receipt, product SHA/grid/threshold/validity PASS"
+      },
+      "binary_canopy_ratio": 0.5248012443829935,
+      "canopy_fraction_mean": 0.5245494842529297,
+      "category_crosswalk_status": "not_available",
+      "category_level_per_id_validation": "NOT_VERIFIED",
+      "coco_categories": [
+        1,
+        2
+      ],
+      "crowd_policy": "canonical binary retained; cross-format disagreement alone WARN",
+      "edge_black_pixels": 0,
+      "exact_black_pixels": 0,
+      "fraction_method": "same area weights; float32",
+      "gsd_error_m": {
+        "east_m": -0.0008269565571623061,
+        "north_m": 0.0004592090786240677
+      },
+      "image_id": 661,
+      "input_shape": [
+        2048,
+        2048
+      ],
+      "oam_id": "60f0a29989ec130007b828a8",
+      "official_split": "train",
+      "output_bounds": [
+        3497317.75,
+        6419001.5,
+        3497522.5,
+        6419206.0
+      ],
+      "output_crs": "EPSG:3395",
+      "output_ground_gsd": {
+        "east_m": 0.4991730434428377,
+        "latitude": 50.032294286674535,
+        "longitude": 31.41785953274707,
+        "north_m": 0.5004592090786241
+      },
+      "output_hashes": {
+        "canopy_fraction.tif": "97baec8574afe2dd0bc5d83322b49f3d9fbc47e9b097477aa72aea15020f2e1f",
+        "canopy_mask.tif": "c6753a7f5b8b9c29c02ea92288628f03f3e7a52a60dfa6aa999815f24abcf89f",
+        "rgb.tif": "d6682cda62eedbe481c99971dec845e83bc16eb8f2a207d9291e85d7dbcd2fe2",
+        "valid_fraction.tif": "d1b9557bd5fdcffb8b7e4653975a04ca294524b7ea9bc7f22a550fd5c6dfd7af"
+      },
+      "output_shape": [
+        263,
+        264
+      ],
+      "output_transform": [
+        0.7755681818181818,
+        0.0,
+        3497317.75,
+        0.0,
+        -0.7775665399239544,
+        6419206.0
+      ],
+      "pixel_definition": "outer edges preserved; centers col+0.5,row+0.5",
+      "preview_sha256": "cbfe9869d5a99dd83584501be055e3e38b5168de7634153a86f2efcd507ffd17",
+      "rgb_method": "exact overlap area float64; floor(value+0.5) uint8",
+      "rights": {
+        "annotation_license": "CC BY 4.0",
+        "annotation_terms": "https://github.com/Restor-Foundation/tcd/blob/05dab754a3fd15b83d6b7606de7310155f4e2df2/docs/dataset.md",
+        "attribution": "named producer/licensor retained in external STAC; no contacts published",
+        "commercial_final_clearance": "NOT_ASSESSED",
+        "image_license": "CC-BY-4.0",
+        "row_license": "CC-BY 4.0",
+        "stac_sha256": "84c387e6457b887633a69fcd6728a1a3653c5c104b3ac795332143ea3828bb4c",
+        "stac_url": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/60f0a29989ec130007b828a8"
+      },
+      "semantic_policy": "upstream_nonzero_binary_with_review",
+      "separation": {
+        "nearest_opposite_footprint_lower_bound_m": 229224.81132600224,
+        "proximity_hold_m": 1000,
+        "scope": "all cached opposite-role footprints, including holdout metadata; no holdout pixels"
+      },
+      "source_bounds": [
+        3497317.75,
+        6419001.5,
+        3497522.5,
+        6419206.0
+      ],
+      "source_crs": "EPSG:3395",
+      "source_generation": "zenodo-11617167-v1.0.0",
+      "source_ground_gsd": {
+        "east_m": 0.0643465254166708,
+        "latitude": 50.032294286674535,
+        "longitude": 31.41785953274707,
+        "north_m": 0.0642679561026534
+      },
+      "source_hashes": {
+        "60f0a29989ec130007b828a8_661.png": "7cf69800c1f9ed83231b6f74fd0cbcd803d2376521678b546fc24fd90d6e6a33",
+        "60f0a29989ec130007b828a8_661.tif": "6280e908bd234588e8483112d2f161a3e6336009ecae438d1d07a2e5b4e8b560"
+      },
+      "source_positive_pixels": 2200120,
+      "source_transform": [
+        0.0999755859375,
+        0.0,
+        3497317.75,
+        0.0,
+        -0.099853515625,
+        6419206.0
+      ],
+      "split": "train",
+      "status": "accepted_for_M1_7_smoke",
+      "threshold": 0.5,
+      "training_eligible": true,
+      "uniform_background": false,
+      "uniform_canopy": false,
+      "validation_fold": 2,
+      "validity": "raster checks plus source-bound all-valid visual review",
+      "validity_basis": "M1-5C hash-bound source/overlay preview re-viewed 2026-11-06; no artificial fill or gross shift seen; raster validity checked separately, not survey accuracy"
+    },
+    {
+      "acceptance_evidence": {
+        "ledger_pointer": "m1_5d3/result/samples/image_id=1022",
+        "review_basis": "2026-11-06 actual source/RGB-binary-overlay visual inspection. Mixed small fields/gardens and palm/tree groups; mask follows crown groups, no obvious fill or shift.",
+        "review_preview_sha256": "242e901849210b87e4c744857c89e529147733dff6b5882466f89d01e987c401",
+        "review_receipt_sha256": "e784dab59b1888a92436651f1280a19973e8fc753afd015175d9d6ec43c96deb",
+        "run_manifest_sha256": "a95b3a6350d80d7cc03fae768de62576dad482cd0418ffbc5ea421937f5c84b0",
+        "separation": {
+          "nearest_opposite_footprint_lower_bound_m": 3873.521508873309,
+          "proximity_hold_m": 1000,
+          "scope": "all cached opposite-role footprints, including holdout metadata; no holdout pixels"
+        },
+        "source_checks": "original SHA/grid/PNG label, STAC rights, source-bound visual receipt, product SHA/grid/threshold/validity PASS"
+      },
+      "binary_canopy_ratio": 0.3291175920168549,
+      "canopy_fraction_mean": 0.329224556684494,
+      "category_crosswalk_status": "not_available",
+      "category_level_per_id_validation": "NOT_VERIFIED",
+      "coco_categories": [
+        1,
+        2
+      ],
+      "crowd_policy": "canonical binary retained; cross-format disagreement alone WARN",
+      "edge_black_pixels": 0,
+      "exact_black_pixels": 0,
+      "fraction_method": "same area weights; float32",
+      "gsd_error_m": {
+        "east_m": -0.00047088209446083384,
+        "north_m": 0.00029245964201973784
+      },
+      "image_id": 1022,
+      "input_shape": [
+        2048,
+        2048
+      ],
+      "oam_id": "5ae3adc00b093000130affa6",
+      "official_split": "train",
+      "output_bounds": [
+        4369391.5,
+        -688026.625,
+        4369596.0,
+        -687821.8125
+      ],
+      "output_crs": "EPSG:3395",
+      "output_ground_gsd": {
+        "east_m": 0.49952911790553917,
+        "latitude": -6.209025221291106,
+        "longitude": 39.25183019489723,
+        "north_m": 0.5002924596420197
+      },
+      "output_hashes": {
+        "canopy_fraction.tif": "7c9e5d2c7f0e118c108d4b2f33b7a39e55768ab3c0746132281ad0f20520e29a",
+        "canopy_mask.tif": "2d8ebf33ace088684df96beb542fcbdebf7306268098f424ee0e0126bdb24068",
+        "rgb.tif": "942a688c336f7878409b5c0b7bb6aeac5a8c5da50ab66a969dbfbf7968d2c89f",
+        "valid_fraction.tif": "af77c687182596c8a2b4629618dceeb6102e91c433e938e34d3b0b33d5078e58"
+      },
+      "output_shape": [
+        407,
+        407
+      ],
+      "output_transform": [
+        0.5024570024570024,
+        0.0,
+        4369391.5,
+        0.0,
+        -0.5032248157248157,
+        -687821.8125
+      ],
+      "pixel_definition": "outer edges preserved; centers col+0.5,row+0.5",
+      "preview_sha256": "ae034e767d77c427447b686741e1cda9141a3087831df7d91a1bf9249785012c",
+      "rgb_method": "exact overlap area float64; floor(value+0.5) uint8",
+      "rights": {
+        "annotation_license": "CC BY 4.0",
+        "annotation_terms": "https://github.com/Restor-Foundation/tcd/blob/05dab754a3fd15b83d6b7606de7310155f4e2df2/docs/dataset.md",
+        "attribution": "named producer/licensor retained in external STAC; no contacts published",
+        "commercial_final_clearance": "NOT_ASSESSED",
+        "image_license": "CC-BY-4.0",
+        "row_license": "CC-BY 4.0",
+        "stac_sha256": "3c69906fac938af08f4ea933de4db7155cb49275206928f7010d4a385a907f2b",
+        "stac_url": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/5ae3adc00b093000130affa6"
+      },
+      "semantic_policy": "upstream_nonzero_binary_with_review",
+      "separation": {
+        "nearest_opposite_footprint_lower_bound_m": 3873.521508873309,
+        "proximity_hold_m": 1000,
+        "scope": "all cached opposite-role footprints, including holdout metadata; no holdout pixels"
+      },
+      "source_bounds": [
+        4369391.5,
+        -688026.625,
+        4369596.0,
+        -687821.8125
+      ],
+      "source_crs": "EPSG:3395",
+      "source_generation": "zenodo-11617167-v1.0.0",
+      "source_ground_gsd": {
+        "east_m": 0.09927165542735045,
+        "latitude": -6.209025221291106,
+        "longitude": 39.25183019489723,
+        "north_m": 0.09942335465924498
+      },
+      "source_hashes": {
+        "5ae3adc00b093000130affa6_1022.png": "d1ea71e180aa833b777946c8215f5505eac2e2b1ed89e922b9724a8a8186a4a1",
+        "5ae3adc00b093000130affa6_1022.tif": "443d0dc2a8cf0855ba8ed2a19b944a7bc6036f98549a843d30e20a286fbc4b25"
+      },
+      "source_positive_pixels": 1380868,
+      "source_transform": [
+        0.099853515625,
+        0.0,
+        4369391.5,
+        0.0,
+        -0.100006103515625,
+        -687821.8125
+      ],
+      "split": "train",
+      "status": "accepted_for_M1_7_smoke",
+      "threshold": 0.5,
+      "training_eligible": true,
+      "uniform_background": false,
+      "uniform_canopy": false,
+      "validation_fold": 1,
+      "validity": "raster checks plus source-bound all-valid visual review",
+      "validity_basis": "2026-11-06 actual source/RGB-binary-overlay visual inspection. Mixed small fields/gardens and palm/tree groups; mask follows crown groups, no obvious fill or shift."
+    },
+    {
+      "acceptance_evidence": {
+        "ledger_pointer": "m1_5d3/result/samples/image_id=1280",
+        "review_basis": "2026-11-06 actual source/RGB-binary-overlay visual inspection. Urban blocks, roads and scattered crowns; sparse union follows visible trees, no artificial gap.",
+        "review_preview_sha256": "56dc345d1d48d14027dd40a83b607f05fe8794210f475fd321abddf1ee062370",
+        "review_receipt_sha256": "e784dab59b1888a92436651f1280a19973e8fc753afd015175d9d6ec43c96deb",
+        "run_manifest_sha256": "a95b3a6350d80d7cc03fae768de62576dad482cd0418ffbc5ea421937f5c84b0",
+        "separation": {
+          "nearest_opposite_footprint_lower_bound_m": 129681.77878748333,
+          "proximity_hold_m": 1000,
+          "scope": "all cached opposite-role footprints, including holdout metadata; no holdout pixels"
+        },
+        "source_checks": "original SHA/grid/PNG label, STAC rights, source-bound visual receipt, product SHA/grid/threshold/validity PASS"
+      },
+      "binary_canopy_ratio": 0.12156415309615184,
+      "canopy_fraction_mean": 0.12173581123352051,
+      "category_crosswalk_status": "not_available",
+      "category_level_per_id_validation": "NOT_VERIFIED",
+      "coco_categories": [
+        1,
+        2
+      ],
+      "crowd_policy": "canonical binary retained; cross-format disagreement alone WARN",
+      "edge_black_pixels": 0,
+      "exact_black_pixels": 0,
+      "fraction_method": "same area weights; float32",
+      "gsd_error_m": {
+        "east_m": -1.954929399194949e-05,
+        "north_m": 0.00036987733121518485
+      },
+      "image_id": 1280,
+      "input_shape": [
+        2048,
+        2048
+      ],
+      "oam_id": "59e62b9b3d6412ef7220a5b7",
+      "official_split": "train",
+      "output_bounds": [
+        -8229784.0,
+        4949350.0,
+        -8229579.0,
+        4949554.5
+      ],
+      "output_crs": "EPSG:3395",
+      "output_ground_gsd": {
+        "east_m": 0.49998045070600805,
+        "latitude": 40.76238977919034,
+        "longitude": -73.92848674885668,
+        "north_m": 0.5003698773312152
+      },
+      "output_hashes": {
+        "canopy_fraction.tif": "6369fa0237624c37c3fc3c9b5ff40b7426eee4db797f12d5c63100ba1fadec7f",
+        "canopy_mask.tif": "cc2e10ea119343f2201c8b382bea6ea2de02c4a256ac72f5776b650bdc10141d",
+        "rgb.tif": "6dc7eee1c92047d4d611a42cca0f6129771fd59b94d5c14a6124f65f2470fe20",
+        "valid_fraction.tif": "28d8329efdfbadadddafbc222a55c86b09c7cb8b269cccc7e8b5b97b726fbe03"
+      },
+      "output_shape": [
+        310,
+        311
+      ],
+      "output_transform": [
+        0.6591639871382636,
+        0.0,
+        -8229784.0,
+        0.0,
+        -0.6596774193548387,
+        4949554.5
+      ],
+      "pixel_definition": "outer edges preserved; centers col+0.5,row+0.5",
+      "preview_sha256": "18b49a3632c4aa10cf988093a61d99d880ca9e8b36fe3d474d85658526a968ac",
+      "rgb_method": "exact overlap area float64; floor(value+0.5) uint8",
+      "rights": {
+        "annotation_license": "CC BY 4.0",
+        "annotation_terms": "https://github.com/Restor-Foundation/tcd/blob/05dab754a3fd15b83d6b7606de7310155f4e2df2/docs/dataset.md",
+        "attribution": "named producer/licensor retained in external STAC; no contacts published",
+        "commercial_final_clearance": "NOT_ASSESSED",
+        "image_license": "CC-BY-4.0",
+        "row_license": "CC-BY 4.0",
+        "stac_sha256": "4e0cc5608d309906825fa3231778f64153d25dda28aed5c2cd75c5ad88d54f19",
+        "stac_url": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/59e62b9b3d6412ef7220a5b7"
+      },
+      "semantic_policy": "upstream_nonzero_binary_with_review",
+      "separation": {
+        "nearest_opposite_footprint_lower_bound_m": 129681.77878748333,
+        "proximity_hold_m": 1000,
+        "scope": "all cached opposite-role footprints, including holdout metadata; no holdout pixels"
+      },
+      "source_bounds": [
+        -8229784.0,
+        4949350.0,
+        -8229579.0,
+        4949554.5
+      ],
+      "source_crs": "EPSG:3395",
+      "source_generation": "zenodo-11617167-v1.0.0",
+      "source_ground_gsd": {
+        "east_m": 0.07592476431453492,
+        "latitude": 40.76238977919034,
+        "longitude": -73.92848674885668,
+        "north_m": 0.07573958353506866
+      },
+      "source_hashes": {
+        "59e62b9b3d6412ef7220a5b7_1280.png": "990d901fb3fd4e2871a6ec9776dbebfec4b2551dacbf1fd3c7ab99f56fd10931",
+        "59e62b9b3d6412ef7220a5b7_1280.tif": "41d53176b3a68c90e68139c8aac20f0b4b091c8593f296ee744c96ef3187f078"
+      },
+      "source_positive_pixels": 510597,
+      "source_transform": [
+        0.10009765625,
+        0.0,
+        -8229784.0,
+        0.0,
+        -0.099853515625,
+        4949554.5
+      ],
+      "split": "train",
+      "status": "accepted_for_M1_7_smoke",
+      "threshold": 0.5,
+      "training_eligible": true,
+      "uniform_background": false,
+      "uniform_canopy": false,
+      "validation_fold": 1,
+      "validity": "raster checks plus source-bound all-valid visual review",
+      "validity_basis": "2026-11-06 actual source/RGB-binary-overlay visual inspection. Urban blocks, roads and scattered crowns; sparse union follows visible trees, no artificial gap."
+    },
+    {
+      "acceptance_evidence": {
+        "ledger_pointer": "m1_5d3/result/samples/image_id=1358",
+        "review_basis": "2026-11-06 actual source/RGB-binary-overlay visual inspection. Sports courts, parking, buildings and tree groups; union broadly aligns with crowns, no artificial missing coverage.",
+        "review_preview_sha256": "c9f174dfc3d3b4bb32b1c499eb423b6b5097c993302b90c5b1d98766205d7ac5",
+        "review_receipt_sha256": "e784dab59b1888a92436651f1280a19973e8fc753afd015175d9d6ec43c96deb",
+        "run_manifest_sha256": "a95b3a6350d80d7cc03fae768de62576dad482cd0418ffbc5ea421937f5c84b0",
+        "separation": {
+          "nearest_opposite_footprint_lower_bound_m": 87740.63390911893,
+          "proximity_hold_m": 1000,
+          "scope": "all cached opposite-role footprints, including holdout metadata; no holdout pixels"
+        },
+        "source_checks": "original SHA/grid/PNG label, STAC rights, source-bound visual receipt, product SHA/grid/threshold/validity PASS"
+      },
+      "binary_canopy_ratio": 0.2327935769896194,
+      "canopy_fraction_mean": 0.23264743387699127,
+      "category_crosswalk_status": "not_available",
+      "category_level_per_id_validation": "NOT_VERIFIED",
+      "coco_categories": [
+        1,
+        2
+      ],
+      "crowd_policy": "canonical binary retained; cross-format disagreement alone WARN",
+      "edge_black_pixels": 2,
+      "exact_black_pixels": 62,
+      "fraction_method": "same area weights; float32",
+      "gsd_error_m": {
+        "east_m": 0.0002477218494029154,
+        "north_m": 0.0008585023245695211
+      },
+      "image_id": 1358,
+      "input_shape": [
+        2048,
+        2048
+      ],
+      "oam_id": "5b8fc8f88752bd000830170d",
+      "official_split": "train",
+      "output_bounds": [
+        3904818.5,
+        6149522.5,
+        3905023.25,
+        6149727.5
+      ],
+      "output_crs": "EPSG:3395",
+      "output_ground_gsd": {
+        "east_m": 0.5002477218494029,
+        "latitude": 48.44743619389866,
+        "longitude": 35.07850105289875,
+        "north_m": 0.5008585023245695
+      },
+      "output_hashes": {
+        "canopy_fraction.tif": "6cb3bd43ee841d6aeb22f7a75644d49117c354f44cd234968176944e59da1e21",
+        "canopy_mask.tif": "e91ce65931e2f1ee2ed6fa52edb1ffa85040f7410399913c8a75464fd971c599",
+        "rgb.tif": "e2c9d666de3ac7f1d6d8f77074d832c9ded6a36f29ee22550a4b46dc0a5ddbb3",
+        "valid_fraction.tif": "15d5f6df645625998c9c98db5ede4792ec74d6290f8be8e6410f8165139bc828"
+      },
+      "output_shape": [
+        272,
+        272
+      ],
+      "output_transform": [
+        0.7527573529411765,
+        0.0,
+        3904818.5,
+        0.0,
+        -0.7536764705882353,
+        6149727.5
+      ],
+      "pixel_definition": "outer edges preserved; centers col+0.5,row+0.5",
+      "preview_sha256": "1aaefd637faca6fc11e0a0ad4a5dff6aa22e9c40fe3bd7e0aaf11bad5d9fc77d",
+      "rgb_method": "exact overlap area float64; floor(value+0.5) uint8",
+      "rights": {
+        "annotation_license": "CC BY 4.0",
+        "annotation_terms": "https://github.com/Restor-Foundation/tcd/blob/05dab754a3fd15b83d6b7606de7310155f4e2df2/docs/dataset.md",
+        "attribution": "named producer/licensor retained in external STAC; no contacts published",
+        "commercial_final_clearance": "NOT_ASSESSED",
+        "image_license": "CC-BY-4.0",
+        "row_license": "CC-BY 4.0",
+        "stac_sha256": "5c2dbad9b958c2a7e5b158108a34dd1e165517f3ad300af286c1e3e9499719d4",
+        "stac_url": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/5b8fc8f88752bd000830170d"
+      },
+      "semantic_policy": "upstream_nonzero_binary_with_review",
+      "separation": {
+        "nearest_opposite_footprint_lower_bound_m": 87740.63390911893,
+        "proximity_hold_m": 1000,
+        "scope": "all cached opposite-role footprints, including holdout metadata; no holdout pixels"
+      },
+      "source_bounds": [
+        3904818.5,
+        6149522.5,
+        3905023.25,
+        6149727.5
+      ],
+      "source_crs": "EPSG:3395",
+      "source_generation": "zenodo-11617167-v1.0.0",
+      "source_ground_gsd": {
+        "east_m": 0.06643915057044361,
+        "latitude": 48.44743619389866,
+        "longitude": 35.07850105289875,
+        "north_m": 0.06652027278109433
+      },
+      "source_hashes": {
+        "5b8fc8f88752bd000830170d_1358.png": "cf7cce7a3fab43c008988f907e497ec0f9ab71bd87ed65e1ffdab97f323792d9",
+        "5b8fc8f88752bd000830170d_1358.tif": "2dac67971e7337d2737ddf4723f6a766b42c85fb1ca481d17a6aa6e43a73da5e"
+      },
+      "source_positive_pixels": 975794,
+      "source_transform": [
+        0.0999755859375,
+        0.0,
+        3904818.5,
+        0.0,
+        -0.10009765625,
+        6149727.5
+      ],
+      "split": "train",
+      "status": "accepted_for_M1_7_smoke",
+      "threshold": 0.5,
+      "training_eligible": true,
+      "uniform_background": false,
+      "uniform_canopy": false,
+      "validation_fold": 2,
+      "validity": "raster checks plus source-bound all-valid visual review",
+      "validity_basis": "2026-11-06 actual source/RGB-binary-overlay visual inspection. Sports courts, parking, buildings and tree groups; union broadly aligns with crowns, no artificial missing coverage."
+    },
+    {
+      "acceptance_evidence": {
+        "ledger_pointer": "m1_5d2/result/samples/image_id=1972",
+        "review_basis": "M1-5C hash-bound source/overlay preview re-viewed 2026-11-06; no artificial fill or gross shift seen; raster validity checked separately, not survey accuracy",
+        "review_preview_sha256": "d893c93a612930ad327e8ce830ceee13ae3ab110a1b642026ea5cb3bcd314a6b",
+        "review_receipt_sha256": "78fd6f3adcf3b905290b39814a1b052eeec773afd14bb7e1ab117d21002bc6b7",
+        "run_manifest_sha256": "1f79a84b3725595b1c6a9860e70b96aa3682117b66e5684b48c5e8b33a8123ed",
+        "separation": {
+          "nearest_opposite_footprint_lower_bound_m": 53360.17550165861,
+          "proximity_hold_m": 1000,
+          "scope": "all cached opposite-role footprints, including holdout metadata; no holdout pixels"
+        },
+        "source_checks": "original SHA/grid/PNG label, STAC rights, source-bound visual receipt, product SHA/grid/threshold/validity PASS"
+      },
+      "binary_canopy_ratio": 0.6065595463137996,
+      "canopy_fraction_mean": 0.6064772605895996,
+      "category_crosswalk_status": "not_available",
+      "category_level_per_id_validation": "NOT_VERIFIED",
+      "coco_categories": [
+        1,
+        2
+      ],
+      "crowd_policy": "canonical binary retained; cross-format disagreement alone WARN",
+      "edge_black_pixels": 0,
+      "exact_black_pixels": 0,
+      "fraction_method": "same area weights; float32",
+      "gsd_error_m": {
+        "east_m": 0.0006974890143128798,
+        "north_m": 0.0006974593258045614
+      },
+      "image_id": 1972,
+      "input_shape": [
+        2048,
+        2048
+      ],
+      "oam_id": "5bba1c4f9ed15b0006d24f3b",
+      "official_split": "train",
+      "output_bounds": [
+        4341876.0,
+        7486562.0,
+        4342080.5,
+        7486766.5
+      ],
+      "output_crs": "EPSG:3395",
+      "output_ground_gsd": {
+        "east_m": 0.5006974890143129,
+        "latitude": 55.8168402768827,
+        "longitude": 39.00465425289532,
+        "north_m": 0.5006974593258046
+      },
+      "output_hashes": {
+        "canopy_fraction.tif": "13c7bdacaab6d99a7c60dcb45896642c81124222457fd9111d6bde97a5bb8b09",
+        "canopy_mask.tif": "5ca7bf9cee25df0dc4b105cbff8e3435715d1c6d693f8f41806cf585003e750e",
+        "rgb.tif": "0ca063164c9b8ef766c2fbe8d367eff07d48e9eaad06afecfca77a5c0329a437",
+        "valid_fraction.tif": "354d781219ea5e5a0adb3e32376a258fc88ba440fd695e2ebec7c2e6d7cc01cb"
+      },
+      "output_shape": [
+        230,
+        230
+      ],
+      "output_transform": [
+        0.8891304347826087,
+        0.0,
+        4341876.0,
+        0.0,
+        -0.8891304347826087,
+        7486766.5
+      ],
+      "pixel_definition": "outer edges preserved; centers col+0.5,row+0.5",
+      "preview_sha256": "95645c228de093c5ace5e2c80f29d0bd6e0f71b5100dbe625eb2ae8b9455e5af",
+      "rgb_method": "exact overlap area float64; floor(value+0.5) uint8",
+      "rights": {
+        "annotation_license": "CC BY 4.0",
+        "annotation_terms": "https://github.com/Restor-Foundation/tcd/blob/05dab754a3fd15b83d6b7606de7310155f4e2df2/docs/dataset.md",
+        "attribution": "named producer/licensor retained in external STAC; no contacts published",
+        "commercial_final_clearance": "NOT_ASSESSED",
+        "image_license": "CC-BY-4.0",
+        "row_license": "CC-BY 4.0",
+        "stac_sha256": "c4b9caacd229b7908ce711b9c1c4195be71b6ab53d4c902c4c531da5f0b349af",
+        "stac_url": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/5bba1c4f9ed15b0006d24f3b"
+      },
+      "semantic_policy": "upstream_nonzero_binary_with_review",
+      "separation": {
+        "nearest_opposite_footprint_lower_bound_m": 53360.17550165861,
+        "proximity_hold_m": 1000,
+        "scope": "all cached opposite-role footprints, including holdout metadata; no holdout pixels"
+      },
+      "source_bounds": [
+        4341876.0,
+        7486562.0,
+        4342080.5,
+        7486766.5
+      ],
+      "source_crs": "EPSG:3395",
+      "source_generation": "zenodo-11617167-v1.0.0",
+      "source_ground_gsd": {
+        "east_m": 0.05623067521760964,
+        "latitude": 55.8168402768827,
+        "longitude": 39.00465425289532,
+        "north_m": 0.05623067527260764
+      },
+      "source_hashes": {
+        "5bba1c4f9ed15b0006d24f3b_1972.png": "e98c2631dbea8d284f4247cb4652f8c7d467f788b4ae19a33ede9d2551c0343e",
+        "5bba1c4f9ed15b0006d24f3b_1972.tif": "015150430c8576f223a787f241ece6ba9bea20f88635efade4e0dd4b853978db"
+      },
+      "source_positive_pixels": 2543750,
+      "source_transform": [
+        0.099853515625,
+        0.0,
+        4341876.0,
+        0.0,
+        -0.099853515625,
+        7486766.5
+      ],
+      "split": "val",
+      "status": "accepted_for_M1_7_smoke",
+      "threshold": 0.5,
+      "training_eligible": true,
+      "uniform_background": false,
+      "uniform_canopy": false,
+      "validation_fold": 0,
+      "validity": "raster checks plus source-bound all-valid visual review",
+      "validity_basis": "M1-5C hash-bound source/overlay preview re-viewed 2026-11-06; no artificial fill or gross shift seen; raster validity checked separately, not survey accuracy"
+    },
+    {
+      "acceptance_evidence": {
+        "ledger_pointer": "m1_5d3/result/samples/image_id=2243",
+        "review_basis": "2026-11-06 actual source/RGB-binary-overlay visual inspection. Dense vegetation and winding road/rock channel; large canopy fraction plausible, no obvious fill or gross shift.",
+        "review_preview_sha256": "43c8cfae868e6a4ae4750a4a2bacace4fc602b51bf8be29be93904282a85569e",
+        "review_receipt_sha256": "e784dab59b1888a92436651f1280a19973e8fc753afd015175d9d6ec43c96deb",
+        "run_manifest_sha256": "a95b3a6350d80d7cc03fae768de62576dad482cd0418ffbc5ea421937f5c84b0",
+        "separation": {
+          "nearest_opposite_footprint_lower_bound_m": 873421.2981609319,
+          "proximity_hold_m": 1000,
+          "scope": "all cached opposite-role footprints, including holdout metadata; no holdout pixels"
+        },
+        "source_checks": "original SHA/grid/PNG label, STAC rights, source-bound visual receipt, product SHA/grid/threshold/validity PASS"
+      },
+      "binary_canopy_ratio": 0.7619445229751675,
+      "canopy_fraction_mean": 0.761866569519043,
+      "category_crosswalk_status": "not_available",
+      "category_level_per_id_validation": "NOT_VERIFIED",
+      "coco_categories": [
+        1,
+        2
+      ],
+      "crowd_policy": "canonical binary retained; cross-format disagreement alone WARN",
+      "edge_black_pixels": 0,
+      "exact_black_pixels": 0,
+      "fraction_method": "same area weights; float32",
+      "gsd_error_m": {
+        "east_m": -0.00015714144265310814,
+        "north_m": -0.0005809118234444965
+      },
+      "image_id": 2243,
+      "input_shape": [
+        2048,
+        2048
+      ],
+      "oam_id": "59e62be63d6412ef7220c37a",
+      "official_split": "train",
+      "output_bounds": [
+        19762416.0,
+        -1985718.75,
+        19762620.0,
+        -1985513.875
+      ],
+      "output_crs": "EPSG:3395",
+      "output_ground_gsd": {
+        "east_m": 0.4998428585573469,
+        "latitude": -17.666733311581115,
+        "longitude": 177.52971972087155,
+        "north_m": 0.4994190881765555
+      },
+      "output_hashes": {
+        "canopy_fraction.tif": "be04799f33db01dca6cfa23356669be5c590e61c885bfbb7cf1aabaaf57ba08a",
+        "canopy_mask.tif": "d7a02ab659eb9e89e7d84f9ad7ec3d65c4d55bc91b45754666c92ab071c179d7",
+        "rgb.tif": "e1cc0a4eb242e19414bf0fb3dc91c210b21359168addfc04c6e8b5a10457a04b",
+        "valid_fraction.tif": "e64d7441056f8c049b6beefb2fadedee43b0a8e24231e4bbfea5798544968e00"
+      },
+      "output_shape": [
+        391,
+        389
+      ],
+      "output_transform": [
+        0.5244215938303342,
+        0.0,
+        19762416.0,
+        0.0,
+        -0.5239769820971867,
+        -1985513.875
+      ],
+      "pixel_definition": "outer edges preserved; centers col+0.5,row+0.5",
+      "preview_sha256": "9474bc002857d66250f555ac116ed2335f70e2b0dee2d2cb79dbff37f86b050b",
+      "rgb_method": "exact overlap area float64; floor(value+0.5) uint8",
+      "rights": {
+        "annotation_license": "CC BY 4.0",
+        "annotation_terms": "https://github.com/Restor-Foundation/tcd/blob/05dab754a3fd15b83d6b7606de7310155f4e2df2/docs/dataset.md",
+        "attribution": "named producer/licensor retained in external STAC; no contacts published",
+        "commercial_final_clearance": "NOT_ASSESSED",
+        "image_license": "CC-BY-4.0",
+        "row_license": "CC-BY 4.0",
+        "stac_sha256": "274c58122df8d29e11b2b0976e591fe6fa883d92905b0f74961737c0d0833648",
+        "stac_url": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/59e62be63d6412ef7220c37a"
+      },
+      "semantic_policy": "upstream_nonzero_binary_with_review",
+      "separation": {
+        "nearest_opposite_footprint_lower_bound_m": 873421.2981609319,
+        "proximity_hold_m": 1000,
+        "scope": "all cached opposite-role footprints, including holdout metadata; no holdout pixels"
+      },
+      "source_bounds": [
+        19762416.0,
+        -1985718.75,
+        19762620.0,
+        -1985513.875
+      ],
+      "source_crs": "EPSG:3395",
+      "source_generation": "zenodo-11617167-v1.0.0",
+      "source_ground_gsd": {
+        "east_m": 0.09494085578970644,
+        "latitude": -17.666733311581115,
+        "longitude": 177.52971972087155,
+        "north_m": 0.09534807732582928
+      },
+      "source_hashes": {
+        "59e62be63d6412ef7220c37a_2243.png": "b258bcef22fe11ff01cfa7bc358cbb3dcad80d5104ed48e8316edc106e07aeab",
+        "59e62be63d6412ef7220c37a_2243.tif": "14e6a2e0816d719eef1d8124ecc3882db33f33c07d873cbf7c680b5d3ab6829f"
+      },
+      "source_positive_pixels": 3195500,
+      "source_transform": [
+        0.099609375,
+        0.0,
+        19762416.0,
+        0.0,
+        -0.10003662109375,
+        -1985513.875
+      ],
+      "split": "train",
+      "status": "accepted_for_M1_7_smoke",
+      "threshold": 0.5,
+      "training_eligible": true,
+      "uniform_background": false,
+      "uniform_canopy": false,
+      "validation_fold": 1,
+      "validity": "raster checks plus source-bound all-valid visual review",
+      "validity_basis": "2026-11-06 actual source/RGB-binary-overlay visual inspection. Dense vegetation and winding road/rock channel; large canopy fraction plausible, no obvious fill or gross shift."
+    },
+    {
+      "acceptance_evidence": {
+        "ledger_pointer": "m1_5d3/result/samples/image_id=3785",
+        "review_basis": "2026-11-06 actual source/RGB-binary-overlay visual inspection. Parking/buildings/grass and trees. 204 interior black pixels in 46 components, no border connection; enlarged largest component near building/tree shadow, not an artificial wedge. Full scene/overlay also viewed.",
+        "review_preview_sha256": "be627d41385abca724b8eeeef81933c8224795f60859af961ad9d01664a0e8b5",
+        "review_receipt_sha256": "e784dab59b1888a92436651f1280a19973e8fc753afd015175d9d6ec43c96deb",
+        "run_manifest_sha256": "a95b3a6350d80d7cc03fae768de62576dad482cd0418ffbc5ea421937f5c84b0",
+        "separation": {
+          "nearest_opposite_footprint_lower_bound_m": 177025.60217632522,
+          "proximity_hold_m": 1000,
+          "scope": "all cached opposite-role footprints, including holdout metadata; no holdout pixels"
+        },
+        "source_checks": "original SHA/grid/PNG label, STAC rights, source-bound visual receipt, product SHA/grid/threshold/validity PASS"
+      },
+      "binary_canopy_ratio": 0.12684971743010112,
+      "canopy_fraction_mean": 0.12657833099365234,
+      "category_crosswalk_status": "not_available",
+      "category_level_per_id_validation": "NOT_VERIFIED",
+      "coco_categories": [
+        1,
+        2
+      ],
+      "crowd_policy": "canonical binary retained; cross-format disagreement alone WARN",
+      "edge_black_pixels": 0,
+      "exact_black_pixels": 204,
+      "fraction_method": "same area weights; float32",
+      "gsd_error_m": {
+        "east_m": -0.00033643393423127277,
+        "north_m": -0.00033645051996700204
+      },
+      "image_id": 3785,
+      "input_shape": [
+        2048,
+        2048
+      ],
+      "oam_id": "5d87983a0e02d300050aa10f",
+      "official_split": "train",
+      "output_bounds": [
+        -9563007.0,
+        4415192.5,
+        -9562802.0,
+        4415397.5
+      ],
+      "output_crs": "EPSG:3395",
+      "output_ground_gsd": {
+        "east_m": 0.4996635660657687,
+        "latitude": 37.013725275418665,
+        "longitude": -85.90503272925349,
+        "north_m": 0.499663549480033
+      },
+      "output_hashes": {
+        "canopy_fraction.tif": "1502fc477ae246b8b1a596b22cff0bfabc1681bbf5a45e43b236c49f5cccecae",
+        "canopy_mask.tif": "99d1478735d4633caeeb4d63a5b0aa22abb6dac7c57f51323ed4cb78ed843e12",
+        "rgb.tif": "5b2069b95675e665be861fafd16dd11c72ef2b3c9d3c7e5792e63de3dbc34c1b",
+        "valid_fraction.tif": "cc2e4bec93741a6141c94708033071b3303581e0f6d8081a74c837e28525b439"
+      },
+      "output_shape": [
+        328,
+        328
+      ],
+      "output_transform": [
+        0.625,
+        0.0,
+        -9563007.0,
+        0.0,
+        -0.625,
+        4415397.5
+      ],
+      "pixel_definition": "outer edges preserved; centers col+0.5,row+0.5",
+      "preview_sha256": "21944f1316be1fe204b1761ac0b0f7b34e3ad408ffc23b168c27d0a1a1e4121d",
+      "rgb_method": "exact overlap area float64; floor(value+0.5) uint8",
+      "rights": {
+        "annotation_license": "CC BY 4.0",
+        "annotation_terms": "https://github.com/Restor-Foundation/tcd/blob/05dab754a3fd15b83d6b7606de7310155f4e2df2/docs/dataset.md",
+        "attribution": "named producer/licensor retained in external STAC; no contacts published",
+        "commercial_final_clearance": "NOT_ASSESSED",
+        "image_license": "CC-BY-4.0",
+        "row_license": "CC-BY 4.0",
+        "stac_sha256": "70fdb5edf7678b1b9b71bff0887bbd7eb05d5faf1697bf29908ff59362594871",
+        "stac_url": "https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/5d87983a0e02d300050aa10f"
+      },
+      "semantic_policy": "upstream_nonzero_binary_with_review",
+      "separation": {
+        "nearest_opposite_footprint_lower_bound_m": 177025.60217632522,
+        "proximity_hold_m": 1000,
+        "scope": "all cached opposite-role footprints, including holdout metadata; no holdout pixels"
+      },
+      "source_bounds": [
+        -9563007.0,
+        4415192.5,
+        -9562802.0,
+        4415397.5
+      ],
+      "source_crs": "EPSG:3395",
+      "source_generation": "zenodo-11617167-v1.0.0",
+      "source_ground_gsd": {
+        "east_m": 0.08002424280511072,
+        "latitude": 37.013725275418665,
+        "longitude": -85.90503272925349,
+        "north_m": 0.08002424126886754
+      },
+      "source_hashes": {
+        "5d87983a0e02d300050aa10f_3785.png": "e3be0b0c257d54efec538b34d4c9ee23f0d958e0dd914fd74f91e9af4882b7a4",
+        "5d87983a0e02d300050aa10f_3785.tif": "d10dff0537f0f4004fef2d38ca09a03daee51705baaa486ab95f82b2e30ed076"
+      },
+      "source_positive_pixels": 530908,
+      "source_transform": [
+        0.10009765625,
+        0.0,
+        -9563007.0,
+        0.0,
+        -0.10009765625,
+        4415397.5
+      ],
+      "split": "val",
+      "status": "accepted_for_M1_7_smoke",
+      "threshold": 0.5,
+      "training_eligible": true,
+      "uniform_background": false,
+      "uniform_canopy": false,
+      "validation_fold": 0,
+      "validity": "raster checks plus source-bound all-valid visual review",
+      "validity_basis": "2026-11-06 actual source/RGB-binary-overlay visual inspection. Parking/buildings/grass and trees. 204 interior black pixels in 46 components, no border connection; enlarged largest component near building/tree shadow, not an artificial wedge. Full scene/overlay also viewed."
+    }
+  ],
+  "schema": "ouem-m1-7-g0-v1",
+  "scope": "tiny functional dataset only; no accuracy/commercial clearance claim",
+  "source_generation": "zenodo-11617167-v1.0.0"
+}
