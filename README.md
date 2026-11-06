@@ -4,23 +4,27 @@ Engineering repository for a practical **RGB tree-canopy semantic-segmentation c
 
 **Goal:** Use Japanese GSI aerial RGB imagery at approximately 0.5–0.6 m/ground pixel to produce usable 2D tree-canopy masks for OUEM's simplified 3D canopy, shade/heat and landscape workflows. The priority is a maintainable, reproducible implementation with documented rights and limitations—not a state-of-the-art benchmark or individual-tree delineation.
 
-## Active route and current status
+## Active route and current status (review snapshot: 2026-11-07)
 
-**Active engineering route (2026-11-05):** initialize the official Ai2 SatlasPretrain `Aerial_SwinB_SI` backbone and FPN, attach a newly initialized two-class semantic segmentation head (background versus Tree/Canopy), and fine-tune on **verified CC BY 4.0 OAM-TCD** RGB imagery and labels. The current preprocessing target is approximately **0.50 m/local ground pixel**, using ground-scale-aware resampling with a shared image/label grid. Training with other datasets and target-domain adaptation are deferred; no new Japanese annotation is required for the first milestone.
+**Active engineering route:** Ai2 SatlasPretrain `Aerial_SwinB_SI` official backbone/FPN + newly initialized 2-class SEGMENT head; fine-tune using verified CC BY 4.0 OAM-TCD RGB/Tree–Canopy labels at approximately **0.50 m/local ground pixel**, then visually assess actual Japanese GSI aerial imagery.
 
-The route has progressed beyond the original design proposal, but **M1 fine-tuning on a useful dataset and an independently validated GSI model are not yet complete**.
+**Milestone status:** The bounded GPU training, checkpoint/restore and Val3 inference/evaluation **pipeline has been demonstrated** on Tesla T4. **M1 remains incomplete and useful model quality is NOT established**: the G2 Step20 model predicted zero canopy on all three fixed Val 224×224 crops (micro Tree IoU/F1 0). This is not GSI performance evidence or a final model judgment.
 
-| Stage | Observed status | Evidence |
+The 2026-11-07 review keeps the Satlas-first direction, preserves prior G0–G3 artifacts as an immutable small-run reference, and proposes **~100 total QA-accepted images (provisionally Train 80 / Val 20, with existing Zenodo10 eligible after new R1 QA)** for the first expansion. Exact folds/source separation and evidence-based QA take precedence over a numeric target. Build a generalized dataset/Trainer independently of frozen smoke tooling; perform early qualitative GSI review once a trained candidate yields nontrivial source-domain masks.
+
+**Review and handoff documents:** [Project Review](docs/PROJECT_REVIEW_20261107.md) · [Current State](docs/CURRENT_STATE.md) · [Next Roadmap](docs/ROADMAP_NEXT.md). These documents are proposed until the documentation PR is accepted; the [Project Charter](docs/PROJECT_CHARTER.md), [Design Principles](docs/DESIGN_PRINCIPLES.md), and [ADR](docs/decisions/ADR_20261101_SATLAS_FIRST.md) remain higher-priority design sources.
+
+| Stage | Actual status as of this snapshot | Evidence |
 | --- | --- | --- |
-| M1-1 official Satlas model/weights on Windows CPU | Official checkpoint loading and CPU structural smoke verified | [M1-1 specification and records](docs/implementation/M1_1_SATLAS_OFFICIAL_CPU_SMOKE_SPEC.md) |
-| M1-2 OAM-TCD source QA and local-ground-scale preparation | Two approved pairs prepared at ~0.50 m ground GSD; per-source rights and geometry checked | [M1-2D pair result](docs/implementation/M1_2D_PAIR_RESULT.json), [geometry/preprocessing note](docs/implementation/M1_2D_GROUND_SCALE_PAIRS.md) |
-| M1-3 real-data CPU forward/backward and resource audit | Completed for the two selected samples | [M1-3A](docs/implementation/M1_3A_REAL_CPU_SMOKE.md), [M1-3B](docs/implementation/M1_3B_TRAINING_RESOURCE_AUDIT.md) |
-| M1-4 bounded CPU learning | 20 actual FP32/AdamW optimizer steps completed on one Train crop; separate-process checkpoint reload verified | [M1-4 record](docs/implementation/M1_4_BOUNDED_OVERFIT.md) |
-| M1-4B deterministic CPU continuation | Reference versus resumed step 21 matched under the recorded CPU/software conditions | [M1-4B record](docs/implementation/M1_4B_CONTINUATION.md) |
-| M1-5A dataset inventory | 4,608 rows inventoried at fixed OAM-TCD revision; expansion candidates remain provisional, not training-approved | [M1-5A inventory](docs/implementation/M1_5A_DATASET_INVENTORY.md) |
-| M1-6 Colab GPU smoke | CLI and offline tests prepared; real T4 execution pending user verification | [Colab procedure and acceptance](#m1-6-bounded-colab-fp32-gpu-smoke-user-execution-pending) |
+| M1-1 through M1-4B | Windows CPU model/preprocessing and bounded continuation demonstrated | [M1-4B](docs/implementation/M1_4B_CONTINUATION.md) |
+| M1-5A through M1-5D | Source inventory, Zenodo lineage and data QA pilots; unresolved HOLD sources excluded | [M1-5A / pilot records](docs/implementation/M1_5A_DATASET_INVENTORY.md) |
+| M1-7 G0 / G1-A | Zenodo10 fixed Train7/Val3, products and Drive transfer hash verified | [G0 manifest](docs/implementation/M1_7_G0_MANIFEST.json) |
+| M1-7 G1-B | One T4 GPU step, checkpoint/restore demonstrated | [G1-B code](scripts/m1_7_g1b_gpu_smoke.py) |
+| M1-7 G2 | Train7 bounded 20-step learning, Step10 continuation, Step20 stored | [G2 code](scripts/m1_7_g2_train.py) |
+| M1-7 G3-A | T4 Val3 inference, metrics, PNG visualization and Drive copy PASS; canopy-quality NOT MET | [G3-A evaluation specification](docs/implementation/M1_7_G3A_EVALUATION.md) |
+| Next | Approx. 100-image data QA, general Trainer, meaningful source-domain learning, GSI qualitative suitability | [Roadmap](docs/ROADMAP_NEXT.md) |
 
-**Evidence boundary:** The 20-step CPU experiment uses **Train image 661** (top-left 256 × 256 crop) and evaluates **Val image 1972** (top-left 224 × 224 crop). Improvement on these two crops demonstrates trainability, **not generalization or Japanese/GSI accuracy**. GPU VRAM/real-model training and production/commercial deployment are not established by these CPU results.
+**Reading caution:** Detailed historical operation recipes later in this README and older stage documents retain the status and environment assumptions present **when those recipes were written** (including some `GPU pending` language). For current status use [Current State](docs/CURRENT_STATE.md), then the actual run receipts/provenance. Do not treat this README update as a replacement for source SHA verification or formal rights clearance.
 
 ## Where to find the authoritative information
 
@@ -61,9 +65,9 @@ The core work is **already scripted**, but there is **not yet one general end-to
 
 The two existing processed pairs are documented in [M1-2D result](docs/implementation/M1_2D_PAIR_RESULT.json): `train/661` is 264 × 264 and `val/1972` is 231 × 231 before patch cropping. The fixed OAM-TCD revision is `d97d4da0ebbb6e249ae95ac5e19656babd972eb2`. Existing files are external to the repository; a new PC must receive or regenerate them and verify the hashes.
 
-**Next engineering rule:** For M1-5B, extend the existing acquisition/QA/preprocessing logic to small additional source groups with configurable paths, network limits, stable manifests and separate offline processing. Prefer reusing existing scripts/tests and updating existing documents over creating a parallel pipeline or numerous new files. Windows/CPU portability and non-interactive operation matter for eventual company-PC use; Google Colab GPU execution is a distinct environment-specific gate.
+**Historical M1-5B planning note (not the current next task):** At that stage, extend the existing acquisition/QA/preprocessing logic to small additional source groups with configurable paths, network limits, stable manifests and separate offline processing. Prefer reusing existing scripts/tests and updating existing documents over creating a parallel pipeline or numerous new files. Windows/CPU portability and non-interactive operation matter for eventual company-PC use; Google Colab GPU execution is a distinct environment-specific gate.
 
-## M1-6: bounded Colab FP32 GPU smoke (user execution pending)
+## Historical M1-6 procedure: bounded Colab FP32 GPU smoke (this specific CLI was not GPU-verified)
 
 One CLI, [`scripts/m1_6_colab_gpu_smoke.py`](scripts/m1_6_colab_gpu_smoke.py), connects the existing verified loader and official Satlas model to CUDA. **Real-model T4 execution, Python 3.13/PyTorch 2.11 compatibility, FP32 VRAM fit, GPU updates and GPU checkpoint restoration are NOT_VERIFIED by Codex.** On 2026-11-05 the user separately observed Colab Python 3.13.16, torch 2.11.0+cu130, Tesla T4 (14.56 GiB), CUDA tensor operations, Drive I/O and transferred-input hashes. Those checks do not establish Satlas CUDA compatibility or training success. Free-tier GPU availability and capacity are not guaranteed.
 
