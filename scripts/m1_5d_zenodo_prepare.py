@@ -1,5 +1,7 @@
 """Offline Zenodo v1 adapter; source-bound external reviews required, no network."""
 import argparse
+from collections import Counter
+import hashlib
 from datetime import datetime, timezone
 from importlib.metadata import version
 import json
@@ -18,6 +20,104 @@ from m1_2d_geometry_audit import sha, require_hash, intervals
 from m1_2d_prepare_pairs import output_grid, reduce_area, binary
 
 GENERATION = 'zenodo-11617167-v1.0.0'
+EXCLUDED = {3,661,1972,2,9,576,1401,4235}
+
+
+def select_pilot(rows, seed=0, train_count=8, val_count=4):
+    """Metadata-only, bounded, source-unique and spatially isolated selection."""
+    if not 1 <= train_count <= 12 or not 1 <= val_count <= 6: raise ValueError('Pilot count outside fixed limits')
+    protected_groups = {r['oam_id'] for r in rows if r['image_id'] in EXCLUDED}
+    excluded = Counter(); pool = []
+    for row in sorted(rows,key=lambda r:r['image_id']):
+        if row['image_id'] in EXCLUDED or row['oam_id'] in protected_groups:
+            excluded['protected_or_known_hold_source'] += 1; continue
+        if row['official_split'] != 'train': excluded['holdout'] += 1; continue
+        if row.get('license') != 'CC-BY 4.0': excluded['license'] += 1; continue
+        pool.append(row)
+    chosen = []; used = set(); diversity = Counter(); attempted = []
+    for split,count in [('train',train_count),('val',val_count)]:
+        def key(row):
+            lon,lat = row['center']; cell = (row.get('biome'),int(np.floor(lon/30)),int(np.floor(lat/20)))
+            digest = hashlib.sha256(f"{seed}:{row['oam_id']}:{row['image_id']}".encode()).hexdigest()
+            return diversity[cell],digest,row['image_id']
+        candidates = [r for r in pool if partition(r,'train') == split]
+        while candidates and sum(s['split']==split for s in chosen) < count:
+            row = min(candidates,key=key); candidates.remove(row)
+            if row['oam_id'] in used: continue
+            used.add(row['oam_id'])
+            try: leak = separation(row,rows)
+            except ValueError as exc:
+                attempted.append(dict(image_id=row['image_id'],split=split,reason=str(exc))); continue
+            lon,lat = row['center']; cell = (row.get('biome'),int(np.floor(lon/30)),int(np.floor(lat/20)))
+            diversity[cell] += 1
+            chosen.append(dict(image_id=row['image_id'],oam_id=row['oam_id'],split=split,validation_fold=row['validation_fold'],
+                diversity_cell=list(cell),reason='explicit CC BY; unique source; minimum used biome/geographic cell then seeded SHA256 rank',separation=leak))
+    return dict(seed=seed,selection='metadata only; no imagery/quality ranking',requested=dict(train=train_count,val=val_count),
+                candidates=chosen,excluded_counts=dict(excluded),spatial_rejections=attempted,
+                known_excluded_ids=sorted(EXCLUDED),reserve_policy='At most one additional preselected batch of Train4/Val2; cumulative 18 image screens')
+
+
+def screen(root, output, seed=0, ids=None):
+    """Create review-only diagnostics; never infer ALL_VALID or write training pairs."""
+    from m1_5b2_border_audit import component_report
+    rows = local_index(root); indexed = {r['image_id']:r for r in rows}
+    plan = select_pilot(rows,seed)
+    extended = select_pilot(rows,seed,12,6)
+    initial = {c['oam_id'] for c in plan['candidates']}
+    plan['reserve_candidates'] = []
+    for split,limit in [('train',4),('val',2)]:
+        plan['reserve_candidates'].extend([c for c in extended['candidates'] if c['split']==split and c['oam_id'] not in initial][:limit])
+    if ids is None: ids = [c['image_id'] for c in plan['candidates']]
+    allowed = {c['image_id'] for c in plan['candidates']+plan['reserve_candidates']}
+    if not set(ids) <= allowed: raise ValueError('Target outside deterministic pilot/reserve plan')
+    if not ids or len(ids)!=len(set(ids)) or len(ids)>18: raise ValueError('Explicit screening bound exceeded')
+    if any(i not in indexed or i in EXCLUDED or indexed[i]['official_split']!='train' for i in ids): raise ValueError('Forbidden screening target')
+    coco_path = root/'archives/dataset/holdout/train.json'
+    coco = coco_annotation_summary(coco_path,ids)
+    fresh(output,[root])
+    report = dict(source_generation=GENERATION,selection=plan,
+        metadata_hashes={n:sha(root/'archives'/n) for n in ['train_meta.json','test_meta.json']},
+        coco_sha256=sha(coco_path),samples=[],status='REVIEW_REQUIRED',
+        category_crosswalk_status='not_available',archive_member_authentication='PENDING separate archive/receipt check')
+    for rid in ids:
+        row = indexed[rid]; entry = dict(image_id=rid,oam_id=row['oam_id'],split=partition(row,'train'),status='REVIEW_REQUIRED')
+        report['samples'].append(entry)
+        try:
+            entry['separation'] = separation(row,rows)
+            stem = row['oam_id']+'_'+str(rid); base = root/'extracted/dataset/holdout'
+            paths = [base/'images'/(stem+'.tif'),base/'masks'/(stem+'.png')]
+            entry['source_hashes'] = {p.name:sha(p) for p in paths}
+            with Image.open(paths[0]) as im,Image.open(paths[1]) as ann:
+                if im.format!='TIFF' or ann.format!='PNG' or im.mode!='RGB' or ann.mode!='RGB': raise ValueError('Unsupported RGB/PNG format')
+                if any(x.getexif().get(274,1)!=1 for x in [im,ann]): raise ValueError('Unsupported orientation')
+                rgb,annotation=np.array(im),np.array(ann)
+            mask=semantic_binary(rgb,annotation,coco[rid]['categories'])
+            with rasterio.open(paths[0]) as src:
+                t=src.transform
+                if str(src.crs)!='EPSG:3395' or src.shape!=(row['height'],row['width']) or src.count!=3 or t.b or t.d or t.a<=0 or t.e>=0:
+                    raise ValueError('Unexpected grid')
+                if not np.allclose(src.bounds,row['bounds'],rtol=0,atol=1e-8): raise ValueError('Metadata bounds mismatch')
+                if src.nodata is not None or not np.all(src.dataset_mask()==255) or any(c.name=='alpha' for c in src.colorinterp): raise ValueError('HOLD_NODATA_OR_MASK')
+                if not np.array_equal(src.read().transpose(1,2,0),rgb): raise ValueError('Reader mismatch')
+                shape,grid,gsd=output_grid(src.crs,t,src.width,src.height)
+                entry.update(source_crs=str(src.crs),source_transform=list(t)[:6],source_bounds=list(src.bounds),
+                    input_shape=list(src.shape),proposed_output_shape=list(shape),proposed_output_ground_gsd=gsd,
+                    nodata=None,gdal_all_valid=True)
+            stats,_,_=component_report(np.all(rgb==0,axis=2),mask,4)
+            entry.update(black_components=stats,source_canopy_fraction=float(mask.mean()),coco_categories=coco[rid]['categories'],
+                         uniform_background=bool(np.all(mask==0)),uniform_canopy=bool(np.all(mask==1)))
+            # A large connected border region is a review/hold heuristic, not a NoData classifier.
+            if stats['border_connected_pixels']/mask.size >= .01:
+                entry.update(status='HOLD',reason='HOLD_LARGE_BORDER_BLACK_COMPONENT_REVIEW')
+            folder=output/str(rid);folder.mkdir()
+            canvas=Image.new('RGB',(rgb.shape[1]*3,rgb.shape[0]))
+            for x,array in enumerate([rgb,np.repeat((mask*255)[:,:,None],3,axis=2),overlay(rgb,mask)]):
+                canvas.paste(Image.fromarray(array),(x*rgb.shape[1],0))
+            canvas.thumbnail((2100,700));canvas.save(folder/'preview.jpg',quality=92)
+            entry['preview_sha256']=sha(folder/'preview.jpg')
+        except (ValueError,KeyError,OSError) as exc: entry.update(status='HOLD',reason=str(exc))
+        (output/'screen.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
+    return report
 
 
 def local_index(root):
@@ -154,9 +254,14 @@ def prepare(root, evidence_path, ids, output):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--zenodo',type=Path,required=True); parser.add_argument('--evidence',type=Path,required=True)
-    parser.add_argument('--output',type=Path,required=True); parser.add_argument('--ids',type=int,nargs='+',default=[3,661,1972])
+    parser.add_argument('--zenodo',type=Path,required=True); parser.add_argument('--evidence',type=Path)
+    parser.add_argument('--output',type=Path,required=True); parser.add_argument('--ids',type=int,nargs='+')
+    parser.add_argument('--screen',action='store_true'); parser.add_argument('--seed',type=int,default=0)
     args = parser.parse_args()
-    result = prepare(args.zenodo,args.evidence,args.ids,args.output)
+    if args.screen:
+        result=screen(args.zenodo,args.output,args.seed,args.ids)
+    else:
+        if not args.evidence: parser.error('--evidence required for preparation')
+        result = prepare(args.zenodo,args.evidence,args.ids or [3,661,1972],args.output)
     print(json.dumps({s['image_id']:s['status'] for s in result['samples']}))
     raise SystemExit(0 if result['status'] == 'PASS_CANDIDATE' else 1)

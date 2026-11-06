@@ -147,6 +147,52 @@ def test_zenodo_prepare_holdout_pixels_never_read(zenodo_local,tmp_path):
     with pytest.raises(ValueError,match='Holdout/unknown'): zen.prepare(root,path,[999],tmp_path/'unknown')
 
 
+def test_zenodo_pilot_selection_is_metadata_only_and_bounded(monkeypatch):
+    monkeypatch.setattr(zen,'separation',lambda row,rows:{'verified':row['image_id']})
+    rows=[]
+    for i in range(24):
+        rows.append(dict(image_id=100+i,oam_id=f'source{i}',official_split='train',validation_fold=0 if i>=16 else 1,
+                         license='CC-BY 4.0',center=[i*10-120,i-12],biome=i%4))
+    rows += [dict(rows[0],image_id=999,license=None),dict(rows[0],image_id=998,official_split='test',validation_fold=-1)]
+    first=zen.select_pilot(rows);again=zen.select_pilot(list(reversed(rows)))
+    assert first==again
+    assert len(first['candidates'])==12
+    assert len({c['oam_id'] for c in first['candidates']})==12
+    assert sum(c['split']=='train' for c in first['candidates'])==8
+    assert not {998,999}&{c['image_id'] for c in first['candidates']}
+    assert first != zen.select_pilot(rows,seed=1)
+    with pytest.raises(ValueError):zen.select_pilot(rows,train_count=13)
+
+
+def test_zenodo_pilot_spatial_rejection_is_recorded(monkeypatch):
+    def reject(row,rows):raise ValueError('HOLD_CROSS_SPLIT_FOOTPRINT')
+    monkeypatch.setattr(zen,'separation',reject)
+    row=dict(image_id=100,oam_id='a',official_split='train',validation_fold=1,license='CC-BY 4.0',center=[0,0],biome=1)
+    result=zen.select_pilot([row])
+    assert not result['candidates']
+    assert result['spatial_rejections'][0]['reason']=='HOLD_CROSS_SPLIT_FOOTPRINT'
+
+
+def test_zenodo_screen_cannot_approve_without_review(zenodo_local,tmp_path):
+    root,_,_,_=zenodo_local
+    path=root/'archives/train_meta.json'
+    rows=[json.loads(line) for line in path.read_text().splitlines()]
+    rows[0]['image_id']=10
+    path.write_text('\n'.join(json.dumps(r) for r in rows)+'\n')
+    for directory,suffix in [('images','.tif'),('masks','.png')]:
+        folder=root/'extracted/dataset/holdout'/directory
+        (folder/('source3_3'+suffix)).rename(folder/('source3_10'+suffix))
+    (root/'archives/dataset/holdout/train.json').write_text(json.dumps({'annotations':[{'image_id':10,'id':77,'category_id':1}]}))
+    report=zen.screen(root,tmp_path/'screen')
+    assert report['status']=='REVIEW_REQUIRED'
+    entry=next(s for s in report['samples'] if s['image_id']==10)
+    assert entry['status']=='REVIEW_REQUIRED'
+    assert entry['black_components']['border_connected_pixels']==0
+    assert not list((tmp_path/'screen').rglob('*.tif'))
+    assert (tmp_path/'screen/10/preview.jpg').exists()
+    with pytest.raises(ValueError,match='plan'):zen.screen(root,tmp_path/'bad',ids=[999])
+
+
 @pytest.fixture(autouse=True)
 def offline(monkeypatch):
     monkeypatch.setattr(socket.socket,'connect',lambda *a,**k:pytest.fail('Network forbidden'))
