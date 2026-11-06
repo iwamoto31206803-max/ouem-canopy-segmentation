@@ -25,13 +25,17 @@ CONFIG=dict(seed=0,patch=224,batch_size=1,steps=1,precision='FP32',lr=1e-4,weigh
             crop_origin=[0,0],scheduler=False,augmentation=False,padding=False)
 
 
-def load_patch(root, manifest, image_id=3, role='train'):
+def load_patch(root, manifest, image_id=3, role='train', crop_xywh=None):
     """Verification is deliberately full-dataset, even for a single selected crop."""
     import torch
     data.verify(root,manifest,data.MANIFEST_SHA256)
     m=json.loads(manifest.read_text());sample=next((s for s in m['samples'] if s['image_id']==image_id),None)
     if role not in ('train','val') or sample is None or sample['split']!=role: raise ValueError('Image/role mismatch')
     crops={};size=CONFIG['patch'];top,left=CONFIG['crop_origin']
+    if crop_xywh is not None:
+        if len(crop_xywh)!=4 or any(type(v) is not int for v in crop_xywh):raise ValueError('Integer crop required')
+        left,top,width,height=crop_xywh
+        if left<0 or top<0 or width!=size or height!=size:raise ValueError('Unsupported crop bounds/size')
     for name in sorted(data.PRODUCTS):
         with rasterio.open(root/role/str(image_id)/name) as src:
             if src.height<top+size or src.width<left+size: raise ValueError('Patch outside valid extent')
@@ -109,16 +113,17 @@ def finite_optimizer(optimizer,torch):
             raise ValueError('Nonfinite optimizer state')
 
 
-def one_step(model,optimizer,images,target,torch,record):
+def one_step(model,optimizer,images,target,torch,record,evaluate_before=True):
     from m1_1_satlas_smoke import gradient_evidence,validate_output
     from m1_4_bounded_overfit import finite_parameters
-    model.eval();record['stage']='initial_eval'
-    with torch.no_grad():
-        (probability,loss),seconds=timed_cuda(torch,lambda:model(images,target))
-        record['nan_inf_detected']=not bool(torch.isfinite(probability).all() and torch.isfinite(loss))
-        validate_output(torch,probability,loss,CONFIG['patch'])
-        record['before_loss']=dict(value=loss.item(),mode='eval/no_grad',seconds=seconds)
-    del probability,loss
+    if evaluate_before:
+        model.eval();record['stage']='initial_eval'
+        with torch.no_grad():
+            (probability,loss),seconds=timed_cuda(torch,lambda:model(images,target))
+            record['nan_inf_detected']=not bool(torch.isfinite(probability).all() and torch.isfinite(loss))
+            validate_output(torch,probability,loss,CONFIG['patch'])
+            record['before_loss']=dict(value=loss.item(),mode='eval/no_grad',seconds=seconds)
+        del probability,loss
     model.train();optimizer.zero_grad(set_to_none=True)
     record['stage']='forward_loss'
     (probability,loss),record['forward_seconds']=timed_cuda(torch,lambda:model(images,target))
