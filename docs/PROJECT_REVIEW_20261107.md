@@ -25,7 +25,7 @@ The output mask is an intermediate layer. Do not mistake model-only IoU for OUEM
 
 **Engineering pipeline: achieved for a bounded small-data experiment (not M1 model-quality completion).**
 
-- Existing Zenodo10: 7 Train + 3 Val, exact manifest `c2f4ccd56da8770cd73ef1db299d67d5528dcab8ea0051da1c2d5f8174a850ca`; 40 derived GeoTIFF products. Its acceptance scope is **`accepted_for_M1_7_smoke`**, not general training-quality certification.
+- Existing Zenodo10: 7 Train + 3 Val, exact manifest `c2f4ccd56da8770cd73ef1db299d67d5528dcab8ea0051da1c2d5f8174a850ca`; 40 derived GeoTIFF products. Its acceptance scope is **`accepted_for_M1_7_smoke`**, not general training-quality certification. All ten sample records retain `category_level_per_id_validation=NOT_VERIFIED`; R1 must separately assess training-dataset eligibility before counting any of these ten as accepted for expanded training. Do not modify the frozen G0 manifest or prior results.
 - G1-B: real Tesla T4 CUDA optimizer step and checkpoint-state restoration.
 - G2: fixed 20 optimizer steps, Step10 checkpoint continuation and Step20 checkpoint. Step20 SHA-256: `47044e414c27718d37ea2d67a89f88cc24e2777757db07cfad2286ead2b9e767`.
 - G3-A: real GPU evaluation and Drive copy PASS with paired JSON metrics/provenance and three PNG visualizations. Reconstructed Step0 **is not proven identical** to original G2 initial head/upsample; only the official backbone/FPN identity is anchored.
@@ -47,6 +47,6 @@ Runtime receipts are caller-run GPU observations and Google Drive artifacts; rep
 
 **Review disposition: CONDITIONAL PASS.** No fundamental mission or architecture rebase is currently justified. Shift effort from repeated bounded smoke tests toward a clean ~100-image training dataset, general training/restore, then early qualitative GSI inspection. Do **not** interpret a dataset-size target as permission to lower data QA.
 
-This review records the user's revised first expansion target: **approximately 100 total accepted images**, provisionally **Train 80 / Val 20**, with the official validation folds and source-group separation taking precedence over the ratio. The target includes the existing ten; actual acceptance counts are evidence-driven. The second expansion scale is **not committed**.
+This review records the user's revised first expansion target: **approximately 100 total accepted images**, provisionally **Train 80 / Val 20**, with the official validation folds and source-group separation taking precedence over the ratio. The target aims to include the existing ten **only where they pass the R1 acceptance rules**; smoke acceptance alone does not promote them. Actual accepted counts are evidence-driven. The second expansion scale is **not committed**.
 
 See [Current State](CURRENT_STATE.md) and [Next Roadmap](ROADMAP_NEXT.md). No code/checkpoint/data artifact is changed by this review PR.
