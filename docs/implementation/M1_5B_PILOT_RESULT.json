@@ -1250,5 +1250,1451 @@
       "manifest.json": "df1f4caa57aff2b164086024f819028a3b004bc9781decb67f285082df7caf14",
       "1401-supplement.json": "b2c07fb9e9e8ea05b183d1005a8b1a4ef11fbedd1ee508752650dad8d9fe2562"
     }
+  },
+  "m1_5c": {
+    "stage": "M1-5C",
+    "compatibility_goal": "EXACT_DROP_IN_RAW_PIXEL_LABEL_METADATA_GRID_COMPATIBILITY",
+    "source_report_sha256": "ab5c5ef22e440c72d40ac5d33cd4f1bb4af9300c8d8bac6f776b3485add60b13",
+    "base_commit": "14cc4595f842d3ce0728ad5ba62f4be89eb6fda0",
+    "result": {
+      "scope": "Read-only compatibility audit, no source/grid repair or training-pair generation",
+      "versions": {
+        "numpy": "1.26.4",
+        "Pillow": "13.0.0",
+        "rasterio": "1.4.3",
+        "pyproj": "3.7.1"
+      },
+      "hf_revision": "d97d4da0ebbb6e249ae95ac5e19656babd972eb2",
+      "zenodo_record": "https://zenodo.org/records/11617167",
+      "archive_md5_status": "CLI measurement initially used USER_REPORTED_PASS; independent agent archive verification is recorded separately under m1_5c.archives",
+      "input_metadata_hashes": {
+        "train_meta.json": "589ede089a85f8cdd126a0cc6c1c97fa788abf5d8957ba4b59d570375e6dbf24",
+        "test_meta.json": "c03eabff7f105944f1e4a412a351790384fb52821f5407ef88b5a08d8b780ec9"
+      },
+      "corpus_metadata": {
+        "counts": {
+          "train_metadata": 4169,
+          "test_metadata": 439,
+          "roles": {
+            "train": 3341,
+            "val": 828,
+            "holdout": 439
+          },
+          "oam_ids": 541
+        },
+        "licenses": {
+          "train": {
+            "CC-BY 4.0": 3979,
+            "None": 177,
+            "unknown": 13
+          },
+          "test": {
+            "CC-BY 4.0": 423,
+            "None": 16
+          }
+        },
+        "train_explicit_cc_by": 3979,
+        "license_unknown_policy": "not eligible; never inherit the HF/archive declaration to fill missing row rights",
+        "source_group_fold_conflicts": 0,
+        "protected_roles_preserved": true,
+        "metadata_mismatch_summary": {
+          "oam_id": {
+            "count": 0,
+            "ids": [],
+            "full_ids_retained_in_external_report": false
+          },
+          "validation_fold": {
+            "count": 0,
+            "ids": [],
+            "full_ids_retained_in_external_report": false
+          },
+          "license": {
+            "count": 206,
+            "ids": [
+              2336,
+              4600,
+              782,
+              2487,
+              882,
+              976,
+              4647,
+              3569,
+              2617,
+              2266,
+              1807,
+              1919
+            ],
+            "full_ids_retained_in_external_report": true
+          },
+          "height": {
+            "count": 0,
+            "ids": [],
+            "full_ids_retained_in_external_report": false
+          },
+          "width": {
+            "count": 0,
+            "ids": [],
+            "full_ids_retained_in_external_report": false
+          },
+          "crs": {
+            "count": 0,
+            "ids": [],
+            "full_ids_retained_in_external_report": false
+          },
+          "bounds": {
+            "count": 11,
+            "ids": [
+              4723,
+              4545,
+              4272,
+              752,
+              842,
+              359,
+              1001,
+              908,
+              4234,
+              4776,
+              4668
+            ],
+            "full_ids_retained_in_external_report": false
+          }
+        }
+      },
+      "file_counts": {
+        "rgb": 4608,
+        "mask": 4608
+      },
+      "missing_train_pairs": [],
+      "prior_receipt_checks": {
+        "m1-5b3-pilot-01/raw_manifest.json": "PASS",
+        "m1-5b3-pairs-01/manifest.json": "PASS"
+      },
+      "samples": [
+        {
+          "image_id": 3,
+          "oam_id": "5fb52130d89ab70006abca33",
+          "role": "train",
+          "zenodo_source_sha256": {
+            "rgb": "425c59ac00dea930dd1664a8bc3cfa5b044c3434305fd56e257aa8a7700254a1",
+            "mask": "73c12f6d9f6d8d67e3dbbe1300846728df7983288f246384de01b431ad8d2dff"
+          },
+          "zenodo_geometry": {
+            "crs": "EPSG:3395",
+            "shape": [
+              2048,
+              2048
+            ],
+            "affine": [
+              0.0999755859375,
+              0.0,
+              3211017.5,
+              0.0,
+              -0.10003662109375,
+              -1787205.0
+            ],
+            "bounds": [
+              3211017.5,
+              -1787409.875,
+              3211222.25,
+              -1787205.0
+            ],
+            "local_ground_gsd": {
+              "latitude": -15.950951306119327,
+              "longitude": 28.84598062852467,
+              "east_m": 0.0961505651432739,
+              "north_m": 0.0962092654991526
+            },
+            "nodata": null,
+            "bands": 3,
+            "dtypes": [
+              "uint8",
+              "uint8",
+              "uint8"
+            ],
+            "compression": "YCbCr JPEG",
+            "alpha": false,
+            "mask_values": [
+              255
+            ],
+            "mask_flags": [
+              [
+                "all_valid"
+              ],
+              [
+                "all_valid"
+              ],
+              [
+                "all_valid"
+              ]
+            ],
+            "proposed_050_shape": [
+              394,
+              394
+            ],
+            "proposed_050_affine": [
+              0.5196700507614214,
+              0.0,
+              3211017.5,
+              0.0,
+              -0.5199873096446701,
+              -1787205.0
+            ],
+            "proposed_050_gsd": {
+              "latitude": -15.950951306119327,
+              "longitude": 28.84598062852467,
+              "east_m": 0.49978771035660163,
+              "north_m": 0.5000928364792133
+            }
+          },
+          "metadata": {
+            "image_id": 3,
+            "oam_id": "5fb52130d89ab70006abca33",
+            "validation_fold": 3,
+            "license": "CC-BY 4.0",
+            "crs": "EPSG:3395",
+            "bounds": [
+              3211017.5,
+              -1787409.875,
+              3211222.25,
+              -1787205.0
+            ]
+          },
+          "target_metadata_identity": {
+            "image_id": true,
+            "oam_id": true,
+            "validation_fold": true,
+            "license": true,
+            "crs": true,
+            "bounds": true
+          },
+          "png_mode": "RGB",
+          "panoptic_nonzero_id_count": 41,
+          "image_mask_shape_equal": true,
+          "raw_black_pixels": 0,
+          "edge_black_pixels": 0,
+          "metadata_dimensions_match": true,
+          "orientations": [
+            1,
+            1
+          ],
+          "license_gate": "PASS",
+          "coverage_review": "NO_EDGE_BLACK_TRIGGER",
+          "coco_annotation_summary": {
+            "count": 41,
+            "categories": [
+              1,
+              2
+            ],
+            "object_keys": [
+              "area",
+              "bbox",
+              "category_id",
+              "extra",
+              "id",
+              "image_id",
+              "iscrowd",
+              "segmentation"
+            ],
+            "crowd": 1,
+            "extra_keys": [],
+            "nonempty_extra_count": 0,
+            "annotation_id_count": 41,
+            "annotation_id_examples": [
+              129,
+              130,
+              131,
+              132,
+              133
+            ]
+          },
+          "canonical_category_mapping": "PASS_WITH_HASH_VERIFIED_PRIOR_SEGMENTS",
+          "source_compatibility": "FAIL",
+          "training_eligible": false,
+          "aux_lat_lon": {
+            "lat": 28.8450603485,
+            "lon": -15.9518413544,
+            "matches_swapped_lower_left_xy": true,
+            "used_for_geometry": false
+          },
+          "zenodo_grid_equals_float32_row_bounds": true,
+          "hf_source_sha256": {
+            "rgb.bin": "ffd58b59c9eb163e962b530374505c9786426252b65a41bcaec3d22fe914bbfe",
+            "annotation.bin": "01f43d457c1315b53ecc3aa233c3c0486f11c0dbacd84f359de59e69fba4eed7",
+            "segments.json": "a306d116c5fb1c3fa264cc4210a32c01697bd34c70b73ea342226d7f477437f2"
+          },
+          "rgb_pixel_comparison": {
+            "status": "FAIL",
+            "shape": [
+              2048,
+              2048,
+              3
+            ],
+            "dtype": "uint8",
+            "changed_values": 14000,
+            "changed_pixels": 9194,
+            "delta_min": -6,
+            "delta_max": 8,
+            "mean_absolute_error": 0.0018135706583658855,
+            "decoded_sha256": [
+              "00d482ffc4e46ca5669dfa6ea88f4b6abb0df9dab7efbf331e362979fb0f19b4",
+              "67989cb73bc56837070f14f3ad7c1541d8cd403af4ba2de530f126f344342d5f"
+            ]
+          },
+          "panoptic_rgb_comparison": {
+            "status": "PASS",
+            "shape": [
+              2048,
+              2048,
+              3
+            ],
+            "dtype": "uint8",
+            "changed_values": 0,
+            "changed_pixels": 0,
+            "delta_min": 0,
+            "delta_max": 0,
+            "mean_absolute_error": 0.0,
+            "decoded_sha256": [
+              "7d35d7f0b912c103401cbf1d54ada4feb5814ef8b464718cb8b8cb9024f40e67",
+              "7d35d7f0b912c103401cbf1d54ada4feb5814ef8b464718cb8b8cb9024f40e67"
+            ]
+          },
+          "panoptic_id_comparison": {
+            "status": "PASS",
+            "shape": [
+              2048,
+              2048
+            ],
+            "dtype": "uint32",
+            "changed_values": 0,
+            "changed_pixels": 0,
+            "delta_min": 0,
+            "delta_max": 0,
+            "mean_absolute_error": 0.0,
+            "decoded_sha256": [
+              "36dcd6351d1ed7e02ae312e50711b7df2bb77e0ed68db32f0171a4974dcf91c8",
+              "36dcd6351d1ed7e02ae312e50711b7df2bb77e0ed68db32f0171a4974dcf91c8"
+            ]
+          },
+          "hf_geometry": {
+            "crs": "EPSG:3395",
+            "shape": [
+              2048,
+              2048
+            ],
+            "affine": [
+              0.1,
+              0.0,
+              3211017.441218063,
+              0.0,
+              -0.1,
+              -1787205.0359841876
+            ],
+            "bounds": [
+              3211017.441218063,
+              -1787409.8359841877,
+              3211222.2412180626,
+              -1787205.0359841876
+            ],
+            "local_ground_gsd": {
+              "latitude": -15.950951292945264,
+              "longitude": 28.845980325056367,
+              "east_m": 0.09617404561418824,
+              "north_m": 0.09617404610496577
+            },
+            "nodata": null,
+            "bands": 3,
+            "dtypes": [
+              "uint8",
+              "uint8",
+              "uint8"
+            ],
+            "compression": "YCbCr JPEG",
+            "alpha": false,
+            "mask_values": [
+              255
+            ],
+            "mask_flags": [
+              [
+                "all_valid"
+              ],
+              [
+                "all_valid"
+              ],
+              [
+                "all_valid"
+              ]
+            ],
+            "proposed_050_shape": [
+              394,
+              394
+            ],
+            "proposed_050_affine": [
+              0.5197969543142481,
+              0.0,
+              3211017.441218063,
+              0.0,
+              -0.519796954314839,
+              -1787205.0359841876
+            ],
+            "proposed_050_gsd": {
+              "latitude": -15.950951292945264,
+              "longitude": 28.845980325056367,
+              "east_m": 0.4999097591309606,
+              "north_m": 0.4999097646643592
+            }
+          },
+          "geometry_equality": {
+            "crs": true,
+            "shape": true,
+            "affine": false,
+            "bounds": false
+          },
+          "bounds_delta_projected_m": [
+            0.05878193723037839,
+            -0.03901581233367324,
+            0.008781937416642904,
+            0.03598418761976063
+          ],
+          "panoptic_qa": {
+            "categories": [
+              1,
+              2
+            ],
+            "zero_pixels": 3133687,
+            "crowd_ids": [
+              137
+            ],
+            "segments_without_pixels": [],
+            "positive_pixels": 1060617
+          },
+          "binary_comparison": {
+            "status": "PASS",
+            "shape": [
+              2048,
+              2048
+            ],
+            "dtype": "uint8",
+            "changed_values": 0,
+            "changed_pixels": 0,
+            "delta_min": 0,
+            "delta_max": 0,
+            "mean_absolute_error": 0.0,
+            "decoded_sha256": [
+              "f63fca5cea1a9ae72a4f5408d9dc83a609fe19f5671be7b25c1482c907c30c02",
+              "f63fca5cea1a9ae72a4f5408d9dc83a609fe19f5671be7b25c1482c907c30c02"
+            ]
+          },
+          "in_memory_zenodo_binary_vs_accepted": {
+            "status": "PASS",
+            "shape": [
+              394,
+              394
+            ],
+            "dtype": "uint8",
+            "changed_values": 0,
+            "changed_pixels": 0,
+            "delta_min": 0,
+            "delta_max": 0,
+            "mean_absolute_error": 0.0,
+            "decoded_sha256": [
+              "55d1a9333f7a5c1065e7527883f25d5f582c3a56c1f2feb381b5f42d8cbb4bcd",
+              "55d1a9333f7a5c1065e7527883f25d5f582c3a56c1f2feb381b5f42d8cbb4bcd"
+            ]
+          },
+          "accepted_050_shape": [
+            394,
+            394
+          ],
+          "zenodo_pil_rasterio_equal": true,
+          "preview_sha256": "232d55b0701facf536b842c2a4ff75c65c661157c0862f0f48354b806a11df09",
+          "panoptic_ids_not_direct_coco_foreign_keys": {
+            "count": 7,
+            "examples": [
+              122,
+              123,
+              124,
+              125,
+              126
+            ]
+          }
+        },
+        {
+          "image_id": 661,
+          "oam_id": "60f0a29989ec130007b828a8",
+          "role": "train",
+          "zenodo_source_sha256": {
+            "rgb": "6280e908bd234588e8483112d2f161a3e6336009ecae438d1d07a2e5b4e8b560",
+            "mask": "7cf69800c1f9ed83231b6f74fd0cbcd803d2376521678b546fc24fd90d6e6a33"
+          },
+          "zenodo_geometry": {
+            "crs": "EPSG:3395",
+            "shape": [
+              2048,
+              2048
+            ],
+            "affine": [
+              0.0999755859375,
+              0.0,
+              3497317.75,
+              0.0,
+              -0.099853515625,
+              6419206.0
+            ],
+            "bounds": [
+              3497317.75,
+              6419001.5,
+              3497522.5,
+              6419206.0
+            ],
+            "local_ground_gsd": {
+              "latitude": 50.032294286674535,
+              "longitude": 31.41785953274707,
+              "east_m": 0.0643465254166708,
+              "north_m": 0.0642679561026534
+            },
+            "nodata": null,
+            "bands": 3,
+            "dtypes": [
+              "uint8",
+              "uint8",
+              "uint8"
+            ],
+            "compression": "YCbCr JPEG",
+            "alpha": false,
+            "mask_values": [
+              255
+            ],
+            "mask_flags": [
+              [
+                "all_valid"
+              ],
+              [
+                "all_valid"
+              ],
+              [
+                "all_valid"
+              ]
+            ],
+            "proposed_050_shape": [
+              263,
+              264
+            ],
+            "proposed_050_affine": [
+              0.7755681818181818,
+              0.0,
+              3497317.75,
+              0.0,
+              -0.7775665399239544,
+              6419206.0
+            ],
+            "proposed_050_gsd": {
+              "latitude": 50.032294286674535,
+              "longitude": 31.41785953274707,
+              "east_m": 0.4991730434428377,
+              "north_m": 0.5004592090786241
+            }
+          },
+          "metadata": {
+            "image_id": 661,
+            "oam_id": "60f0a29989ec130007b828a8",
+            "validation_fold": 2,
+            "license": "CC-BY 4.0",
+            "crs": "EPSG:3395",
+            "bounds": [
+              3497317.75,
+              6419001.5,
+              3497522.5,
+              6419206.0
+            ]
+          },
+          "target_metadata_identity": {
+            "image_id": true,
+            "oam_id": true,
+            "validation_fold": true,
+            "license": true,
+            "crs": true,
+            "bounds": true
+          },
+          "png_mode": "RGB",
+          "panoptic_nonzero_id_count": 52,
+          "image_mask_shape_equal": true,
+          "raw_black_pixels": 0,
+          "edge_black_pixels": 0,
+          "metadata_dimensions_match": true,
+          "orientations": [
+            1,
+            1
+          ],
+          "license_gate": "PASS",
+          "coverage_review": "NO_EDGE_BLACK_TRIGGER",
+          "coco_annotation_summary": {
+            "count": 52,
+            "categories": [
+              1,
+              2
+            ],
+            "object_keys": [
+              "area",
+              "bbox",
+              "category_id",
+              "extra",
+              "id",
+              "image_id",
+              "iscrowd",
+              "segmentation"
+            ],
+            "crowd": 0,
+            "extra_keys": [],
+            "nonempty_extra_count": 0,
+            "annotation_id_count": 52,
+            "annotation_id_examples": [
+              50607,
+              50608,
+              50609,
+              50610,
+              50611
+            ]
+          },
+          "canonical_category_mapping": "PASS_WITH_HASH_VERIFIED_PRIOR_SEGMENTS",
+          "source_compatibility": "FAIL",
+          "training_eligible": false,
+          "aux_lat_lon": {
+            "lat": 31.4169387817,
+            "lon": 50.0317001343,
+            "matches_swapped_lower_left_xy": true,
+            "used_for_geometry": false
+          },
+          "zenodo_grid_equals_float32_row_bounds": true,
+          "hf_source_sha256": {
+            "rgb.bin": "ea69df9a2d636655c04e4c9002ee5ba3f5774ebf54b076c083958a4b0b28cf10",
+            "annotation.bin": "6975c1455eee9a68ebffe54b6e53971f63a7a81ae861e7733e13ff6c968ab105",
+            "segments.json": "38e75db943428e7086f76db4df286887d9649edf4a398260ca193bd275ba46f5"
+          },
+          "rgb_pixel_comparison": {
+            "status": "FAIL",
+            "shape": [
+              2048,
+              2048,
+              3
+            ],
+            "dtype": "uint8",
+            "changed_values": 804009,
+            "changed_pixels": 394434,
+            "delta_min": -15,
+            "delta_max": 16,
+            "mean_absolute_error": 0.11724265416463216,
+            "decoded_sha256": [
+              "4063580d50e099ee5a30e577b46a427af0a93192936fa46c714ac57e38240b7e",
+              "30436d3a83f9a2cbf12805a0d80933c829de1147832c80d73effca63fe84708b"
+            ]
+          },
+          "panoptic_rgb_comparison": {
+            "status": "PASS",
+            "shape": [
+              2048,
+              2048,
+              3
+            ],
+            "dtype": "uint8",
+            "changed_values": 0,
+            "changed_pixels": 0,
+            "delta_min": 0,
+            "delta_max": 0,
+            "mean_absolute_error": 0.0,
+            "decoded_sha256": [
+              "3d006599410f3ff8012ae826f27fddc5c2bae74540b9ea726e15f920b5dc05e6",
+              "3d006599410f3ff8012ae826f27fddc5c2bae74540b9ea726e15f920b5dc05e6"
+            ]
+          },
+          "panoptic_id_comparison": {
+            "status": "PASS",
+            "shape": [
+              2048,
+              2048
+            ],
+            "dtype": "uint32",
+            "changed_values": 0,
+            "changed_pixels": 0,
+            "delta_min": 0,
+            "delta_max": 0,
+            "mean_absolute_error": 0.0,
+            "decoded_sha256": [
+              "858d0ab918670e1971e4d9e111f5817e039ad331596bee642fc581527c446575",
+              "858d0ab918670e1971e4d9e111f5817e039ad331596bee642fc581527c446575"
+            ]
+          },
+          "hf_geometry": {
+            "crs": "EPSG:3395",
+            "shape": [
+              2048,
+              2048
+            ],
+            "affine": [
+              0.09999999999990905,
+              0.0,
+              3497317.652389994,
+              0.0,
+              -0.09999999999990905,
+              6419206.173651781
+            ],
+            "bounds": [
+              3497317.652389994,
+              6419001.373651781,
+              3497522.4523899937,
+              6419206.173651781
+            ],
+            "local_ground_gsd": {
+              "latitude": 50.03229442353382,
+              "longitude": 31.41785888048029,
+              "east_m": 0.06436223847840071,
+              "north_m": 0.06436223884224661
+            },
+            "nodata": null,
+            "bands": 3,
+            "dtypes": [
+              "uint8",
+              "uint8",
+              "uint8"
+            ],
+            "compression": "YCbCr JPEG",
+            "alpha": false,
+            "mask_values": [
+              255
+            ],
+            "mask_flags": [
+              [
+                "all_valid"
+              ],
+              [
+                "all_valid"
+              ],
+              [
+                "all_valid"
+              ]
+            ],
+            "proposed_050_shape": [
+              264,
+              264
+            ],
+            "proposed_050_affine": [
+              0.7757575757568702,
+              0.0,
+              3497317.652389994,
+              0.0,
+              -0.7757575757568702,
+              6419206.173651781
+            ],
+            "proposed_050_gsd": {
+              "latitude": 50.03229442353382,
+              "longitude": 31.41785888048029,
+              "east_m": 0.49929494025999394,
+              "north_m": 0.49929491685044175
+            }
+          },
+          "geometry_equality": {
+            "crs": true,
+            "shape": true,
+            "affine": false,
+            "bounds": false
+          },
+          "bounds_delta_projected_m": [
+            0.09761000610888004,
+            0.12634821888059378,
+            0.04761000629514456,
+            -0.1736517809331417
+          ],
+          "panoptic_qa": {
+            "categories": [
+              1,
+              2
+            ],
+            "zero_pixels": 1994184,
+            "crowd_ids": [],
+            "segments_without_pixels": [],
+            "positive_pixels": 2200120
+          },
+          "binary_comparison": {
+            "status": "PASS",
+            "shape": [
+              2048,
+              2048
+            ],
+            "dtype": "uint8",
+            "changed_values": 0,
+            "changed_pixels": 0,
+            "delta_min": 0,
+            "delta_max": 0,
+            "mean_absolute_error": 0.0,
+            "decoded_sha256": [
+              "e234c5674317881ecdd89a3d49320691227a425fe05b3961c39f889de64471bf",
+              "e234c5674317881ecdd89a3d49320691227a425fe05b3961c39f889de64471bf"
+            ]
+          },
+          "in_memory_zenodo_binary_vs_accepted": {
+            "status": "FAIL",
+            "shape_equal": false,
+            "dtype_equal": true
+          },
+          "accepted_050_shape": [
+            264,
+            264
+          ],
+          "zenodo_pil_rasterio_equal": true,
+          "preview_sha256": "f2d7a055982a998ac2e592c9800e5b6e8328b0121fe5a8e90528e3e299682f13",
+          "panoptic_ids_not_direct_coco_foreign_keys": {
+            "count": 52,
+            "examples": [
+              40124,
+              40125,
+              40126,
+              40127,
+              40128
+            ]
+          }
+        },
+        {
+          "image_id": 1972,
+          "oam_id": "5bba1c4f9ed15b0006d24f3b",
+          "role": "val",
+          "zenodo_source_sha256": {
+            "rgb": "015150430c8576f223a787f241ece6ba9bea20f88635efade4e0dd4b853978db",
+            "mask": "e98c2631dbea8d284f4247cb4652f8c7d467f788b4ae19a33ede9d2551c0343e"
+          },
+          "zenodo_geometry": {
+            "crs": "EPSG:3395",
+            "shape": [
+              2048,
+              2048
+            ],
+            "affine": [
+              0.099853515625,
+              0.0,
+              4341876.0,
+              0.0,
+              -0.099853515625,
+              7486766.5
+            ],
+            "bounds": [
+              4341876.0,
+              7486562.0,
+              4342080.5,
+              7486766.5
+            ],
+            "local_ground_gsd": {
+              "latitude": 55.8168402768827,
+              "longitude": 39.00465425289532,
+              "east_m": 0.05623067521760964,
+              "north_m": 0.05623067527260764
+            },
+            "nodata": null,
+            "bands": 3,
+            "dtypes": [
+              "uint8",
+              "uint8",
+              "uint8"
+            ],
+            "compression": "YCbCr JPEG",
+            "alpha": false,
+            "mask_values": [
+              255
+            ],
+            "mask_flags": [
+              [
+                "all_valid"
+              ],
+              [
+                "all_valid"
+              ],
+              [
+                "all_valid"
+              ]
+            ],
+            "proposed_050_shape": [
+              230,
+              230
+            ],
+            "proposed_050_affine": [
+              0.8891304347826087,
+              0.0,
+              4341876.0,
+              0.0,
+              -0.8891304347826087,
+              7486766.5
+            ],
+            "proposed_050_gsd": {
+              "latitude": 55.8168402768827,
+              "longitude": 39.00465425289532,
+              "east_m": 0.5006974890143129,
+              "north_m": 0.5006974593258046
+            }
+          },
+          "metadata": {
+            "image_id": 1972,
+            "oam_id": "5bba1c4f9ed15b0006d24f3b",
+            "validation_fold": 0,
+            "license": "CC-BY 4.0",
+            "crs": "EPSG:3395",
+            "bounds": [
+              4341876.0,
+              7486562.0,
+              4342080.5,
+              7486766.5
+            ]
+          },
+          "target_metadata_identity": {
+            "image_id": true,
+            "oam_id": true,
+            "validation_fold": true,
+            "license": true,
+            "crs": true,
+            "bounds": true
+          },
+          "png_mode": "RGB",
+          "panoptic_nonzero_id_count": 13,
+          "image_mask_shape_equal": true,
+          "raw_black_pixels": 0,
+          "edge_black_pixels": 0,
+          "metadata_dimensions_match": true,
+          "orientations": [
+            1,
+            1
+          ],
+          "license_gate": "PASS",
+          "coverage_review": "NO_EDGE_BLACK_TRIGGER",
+          "coco_annotation_summary": {
+            "count": 13,
+            "categories": [
+              1,
+              2
+            ],
+            "object_keys": [
+              "area",
+              "bbox",
+              "category_id",
+              "extra",
+              "id",
+              "image_id",
+              "iscrowd",
+              "segmentation"
+            ],
+            "crowd": 1,
+            "extra_keys": [],
+            "nonempty_extra_count": 0,
+            "annotation_id_count": 13,
+            "annotation_id_examples": [
+              144986,
+              144987,
+              144988,
+              144989,
+              144990
+            ]
+          },
+          "canonical_category_mapping": "PASS_WITH_HASH_VERIFIED_PRIOR_SEGMENTS",
+          "source_compatibility": "FAIL",
+          "training_eligible": false,
+          "aux_lat_lon": {
+            "lat": 39.0037345886,
+            "lon": 55.8163223267,
+            "matches_swapped_lower_left_xy": true,
+            "used_for_geometry": false
+          },
+          "zenodo_grid_equals_float32_row_bounds": true,
+          "hf_source_sha256": {
+            "rgb.bin": "eba6c1dee12d6cd9b75c6928acd0ab2b08428ab02d0eb63c5f0c165652d21726",
+            "annotation.bin": "d932e8b89682823951ddd69f9f4755d0188d75d99b9489a8bfb7d4555ef5f576",
+            "segments.json": "4f4ae5fd9abad93f4fabb57d85f8b35c19a1d99655aa96f19937281a8df077cf"
+          },
+          "rgb_pixel_comparison": {
+            "status": "FAIL",
+            "shape": [
+              2048,
+              2048,
+              3
+            ],
+            "dtype": "uint8",
+            "changed_values": 3882,
+            "changed_pixels": 2307,
+            "delta_min": -1,
+            "delta_max": 2,
+            "mean_absolute_error": 0.0003535747528076172,
+            "decoded_sha256": [
+              "b693665e5788280baf15f095ddecf4e0271c5ac0da4ac23a7b814fd67925edb5",
+              "a85d0b1de280fd605cc57fedf1f4e8231a75d6cce3a000b265a6096af8c2ca06"
+            ]
+          },
+          "panoptic_rgb_comparison": {
+            "status": "PASS",
+            "shape": [
+              2048,
+              2048,
+              3
+            ],
+            "dtype": "uint8",
+            "changed_values": 0,
+            "changed_pixels": 0,
+            "delta_min": 0,
+            "delta_max": 0,
+            "mean_absolute_error": 0.0,
+            "decoded_sha256": [
+              "0bc641ad705d318be123bb183863eeb4418f49ccd7ad5bc28af8acd4bc702103",
+              "0bc641ad705d318be123bb183863eeb4418f49ccd7ad5bc28af8acd4bc702103"
+            ]
+          },
+          "panoptic_id_comparison": {
+            "status": "PASS",
+            "shape": [
+              2048,
+              2048
+            ],
+            "dtype": "uint32",
+            "changed_values": 0,
+            "changed_pixels": 0,
+            "delta_min": 0,
+            "delta_max": 0,
+            "mean_absolute_error": 0.0,
+            "decoded_sha256": [
+              "219f172b5176c44847334aa2b78bd5f1c009850b7aea5ee65e846b9d54ea0d01",
+              "219f172b5176c44847334aa2b78bd5f1c009850b7aea5ee65e846b9d54ea0d01"
+            ]
+          },
+          "hf_geometry": {
+            "crs": "EPSG:3395",
+            "shape": [
+              2048,
+              2048
+            ],
+            "affine": [
+              0.1,
+              0.0,
+              4341875.762843216,
+              0.0,
+              -0.1,
+              7486766.704808961
+            ],
+            "bounds": [
+              4341875.762843216,
+              7486561.904808961,
+              4342080.562843216,
+              7486766.704808961
+            ],
+            "local_ground_gsd": {
+              "latitude": 55.81684055409733,
+              "longitude": 39.004653469952615,
+              "east_m": 0.05631316423995356,
+              "north_m": 0.05631316375185097
+            },
+            "nodata": null,
+            "bands": 3,
+            "dtypes": [
+              "uint8",
+              "uint8",
+              "uint8"
+            ],
+            "compression": "YCbCr JPEG",
+            "alpha": false,
+            "mask_values": [
+              255
+            ],
+            "mask_flags": [
+              [
+                "all_valid"
+              ],
+              [
+                "all_valid"
+              ],
+              [
+                "all_valid"
+              ]
+            ],
+            "proposed_050_shape": [
+              231,
+              231
+            ],
+            "proposed_050_affine": [
+              0.8865800865792802,
+              0.0,
+              4341875.762843216,
+              0.0,
+              -0.8865800865792802,
+              7486766.704808961
+            ],
+            "proposed_050_gsd": {
+              "latitude": 55.81684055409733,
+              "longitude": 39.004653469952615,
+              "east_m": 0.4992613034330109,
+              "north_m": 0.4992612746117913
+            }
+          },
+          "geometry_equality": {
+            "crs": true,
+            "shape": true,
+            "affine": false,
+            "bounds": false
+          },
+          "bounds_delta_projected_m": [
+            0.23715678416192532,
+            0.09519103914499283,
+            -0.06284321565181017,
+            -0.20480896066874266
+          ],
+          "panoptic_qa": {
+            "categories": [
+              1,
+              2
+            ],
+            "zero_pixels": 1650554,
+            "crowd_ids": [
+              106343
+            ],
+            "segments_without_pixels": [],
+            "positive_pixels": 2543750
+          },
+          "binary_comparison": {
+            "status": "PASS",
+            "shape": [
+              2048,
+              2048
+            ],
+            "dtype": "uint8",
+            "changed_values": 0,
+            "changed_pixels": 0,
+            "delta_min": 0,
+            "delta_max": 0,
+            "mean_absolute_error": 0.0,
+            "decoded_sha256": [
+              "13f6555ed9e94678c4d81f276a0792cbe12a1cd1ef8bd3380bed7a147e2dcaa6",
+              "13f6555ed9e94678c4d81f276a0792cbe12a1cd1ef8bd3380bed7a147e2dcaa6"
+            ]
+          },
+          "in_memory_zenodo_binary_vs_accepted": {
+            "status": "FAIL",
+            "shape_equal": false,
+            "dtype_equal": true
+          },
+          "accepted_050_shape": [
+            231,
+            231
+          ],
+          "zenodo_pil_rasterio_equal": true,
+          "preview_sha256": "d893c93a612930ad327e8ce830ceee13ae3ab110a1b642026ea5cb3bcd314a6b",
+          "panoptic_ids_not_direct_coco_foreign_keys": {
+            "count": 13,
+            "examples": [
+              106342,
+              106343,
+              106344,
+              106345,
+              106346
+            ]
+          }
+        },
+        {
+          "image_id": 4235,
+          "oam_id": "5ddb95a2aff195000554e7e4",
+          "role": "val",
+          "zenodo_source_sha256": {
+            "rgb": "dacf8a5abc05616d6f83903ecc000d28919de77d27efdea187f8ca6561bfed6f",
+            "mask": "3cd150b3e589a7688cfceedb96ab80ca16f7b5620dd1dcc1c3a0ea4028ee2f45"
+          },
+          "zenodo_geometry": {
+            "crs": "EPSG:3395",
+            "shape": [
+              2048,
+              2048
+            ],
+            "affine": [
+              0.10009765625,
+              0.0,
+              9340705.0,
+              0.0,
+              -0.0999755859375,
+              3245670.0
+            ],
+            "bounds": [
+              9340705.0,
+              3245465.25,
+              9340910.0,
+              3245670.0
+            ],
+            "local_ground_gsd": {
+              "latitude": 28.132665577440775,
+              "longitude": 83.90990143268257,
+              "east_m": 0.08833769872375623,
+              "north_m": 0.08822997043435289
+            },
+            "nodata": null,
+            "bands": 3,
+            "dtypes": [
+              "uint8",
+              "uint8",
+              "uint8"
+            ],
+            "compression": "YCbCr JPEG",
+            "alpha": false,
+            "mask_values": [
+              255
+            ],
+            "mask_flags": [
+              [
+                "all_valid"
+              ],
+              [
+                "all_valid"
+              ],
+              [
+                "all_valid"
+              ]
+            ],
+            "proposed_050_shape": [
+              361,
+              362
+            ],
+            "proposed_050_affine": [
+              0.5662983425414365,
+              0.0,
+              9340705.0,
+              0.0,
+              -0.567174515235457,
+              3245670.0
+            ],
+            "proposed_050_gsd": {
+              "latitude": 28.132665577440775,
+              "longitude": 83.90990143268257,
+              "east_m": 0.4997668801472268,
+              "north_m": 0.5005401041906021
+            }
+          },
+          "metadata": {
+            "image_id": 4235,
+            "oam_id": "5ddb95a2aff195000554e7e4",
+            "validation_fold": 0,
+            "license": "CC-BY 4.0",
+            "crs": "EPSG:3395",
+            "bounds": [
+              9340705.0,
+              3245465.25,
+              9340910.0,
+              3245670.0
+            ]
+          },
+          "target_metadata_identity": {
+            "image_id": true,
+            "oam_id": true,
+            "validation_fold": true,
+            "license": true,
+            "crs": true,
+            "bounds": true
+          },
+          "png_mode": "RGB",
+          "panoptic_nonzero_id_count": 133,
+          "image_mask_shape_equal": true,
+          "raw_black_pixels": 1660758,
+          "edge_black_pixels": 4493,
+          "metadata_dimensions_match": true,
+          "orientations": [
+            1,
+            1
+          ],
+          "license_gate": "PASS",
+          "coverage_review": "REVIEW_REQUIRED",
+          "coco_annotation_summary": {
+            "count": 135,
+            "categories": [
+              1,
+              2
+            ],
+            "object_keys": [
+              "area",
+              "bbox",
+              "category_id",
+              "extra",
+              "id",
+              "image_id",
+              "iscrowd",
+              "segmentation"
+            ],
+            "crowd": 1,
+            "extra_keys": [],
+            "nonempty_extra_count": 0,
+            "annotation_id_count": 135,
+            "annotation_id_examples": [
+              292546,
+              292547,
+              292548,
+              292549,
+              292550
+            ]
+          },
+          "canonical_category_mapping": "NOT_VERIFIED_NO_PANOPTIC_ID_CROSSWALK",
+          "source_compatibility": "NOT COMPARABLE",
+          "training_eligible": false,
+          "aux_lat_lon": {
+            "lat": 83.9089813232,
+            "lon": 28.1318492889,
+            "matches_swapped_lower_left_xy": true,
+            "used_for_geometry": false
+          },
+          "zenodo_grid_equals_float32_row_bounds": true,
+          "comparison_reason": "No HF raw RGB/PNG/segments found in prioritized caches; COCO instance IDs are not a proven Panoptic ID-category crosswalk",
+          "zenodo_pil_rasterio_equal": true,
+          "preview_sha256": "3ea116a7b724c909b3e5f8461c04db69995dc1349019bc302e742b171c5707d5",
+          "panoptic_ids_not_direct_coco_foreign_keys": {
+            "count": 133,
+            "examples": [
+              210443,
+              210444,
+              210445,
+              210446,
+              210447
+            ]
+          }
+        }
+      ]
+    },
+    "tests": {
+      "passed": 112,
+      "warnings": 75,
+      "new_tests": 6,
+      "command": ".\\.venv\\Scripts\\python.exe -m pytest -q --disable-warnings"
+    },
+    "archives": {
+      "images.tar.gz": {
+        "publisher_md5": "0ce6f951a38d85b8c4f9f9f038889360",
+        "agent_streaming_md5": "PASS",
+        "four_selected_extracted_members_sha256_match": true
+      },
+      "masks.tar.gz": {
+        "publisher_md5": "ea889e87d5af386d806c43bbb38aaaa4",
+        "agent_streaming_md5": "PASS",
+        "four_selected_extracted_members_sha256_match": true
+      },
+      "meta.tar.gz": {
+        "publisher_md5": "504b4e48d621f03972e3e4f2b1105e79",
+        "agent_md5": "PASS",
+        "two_json_lines_files_byte_match": true
+      },
+      "train.tar.gz": {
+        "publisher_md5": "805822d17eee63325894f39598b0edbb",
+        "agent_md5": "PASS",
+        "extracted_train_json_sha256": "32469e72763033b3c4e3507a475967fb344a068472877fb55bb201c8ecc2ffb0",
+        "extracted_metadata_matches_archive": true
+      }
+    },
+    "archive_check_method": "Separate read-only streaming archive checks after CLI measurement; no extraction to disk. CLI field records original user-reported status before these supplemental checks.",
+    "cache_inventory": {
+      "m1-5b3-pilot-01": "raw/3 originals and pinned manifests available; primary reference for 3",
+      "m1-5b3-pairs-01": "accepted train/3 394x394 outputs and receipt verified, unchanged",
+      "m1-5b3-pairs-repeat-01": "all four repeated Train3 output hashes and manifest receipt verified",
+      "m1-2a-audit-01": "only raw661; historical INCOMPLETE report; original source hashes match accepted661 duplicate",
+      "m1-2a-audit-02": "raw661 and1972 originals; primary references with approved source hashes",
+      "m1-2d-ground-01": "accepted Train661 and Val1972 processed outputs verified unchanged",
+      "4235_HF_raw": "NOT FOUND in prioritized original caches; prior 4235 entries were metadata only"
+    },
+    "supplemental_metadata": {
+      "coco_licenses": [
+        {
+          "id": 1,
+          "name": "unknown"
+        },
+        {
+          "id": 2,
+          "name": "CC-BY 4.0"
+        },
+        {
+          "id": 3,
+          "name": null
+        }
+      ],
+      "four_target_coco_image_license_ids": {
+        "3": 2,
+        "661": 2,
+        "1972": 2,
+        "4235": 2
+      },
+      "coco_extra_fields_in_all_four_targets": "empty; no explicit Panoptic category crosswalk found",
+      "meta_tar_members": [
+        "test_meta.json",
+        "train_meta.json"
+      ],
+      "aux_lat_lon": "all four match swapped lower-left XY, not geographic lat/lon center; never used for GSD"
+    },
+    "source_footprint_metadata_checks": {
+      "3": {
+        "status": "PASS_METADATA_SCREEN",
+        "nearest_opposite_footprint_lower_bound_m": 1568809.5872391006
+      },
+      "661": {
+        "status": "PASS_METADATA_SCREEN",
+        "nearest_opposite_footprint_lower_bound_m": 229224.8107304475
+      },
+      "1972": {
+        "status": "PASS_METADATA_SCREEN",
+        "nearest_opposite_footprint_lower_bound_m": 53360.17495042414
+      },
+      "4235": {
+        "status": "PASS_METADATA_SCREEN",
+        "nearest_opposite_footprint_lower_bound_m": 144149.8121111227
+      }
+    },
+    "manual_spatial_review": {
+      "performed": true,
+      "3_661_1972": "source/known-category overlays viewed; gross pixel alignment preserved, no accuracy claim; geospatial grid differs",
+      "4235": "ID-footprint diagnostic only, not a validated semantic GT. Large top/left black wedge viewed; coverage HOLD independent of category bridge.",
+      "world_alignment": "not certified from PNG or bbox alone"
+    },
+    "review_outcomes": {
+      "3": "FAIL_STRICT_SOURCE_COMPATIBILITY; prior HF approval unchanged",
+      "661": "FAIL_STRICT_SOURCE_COMPATIBILITY; prior HF approval unchanged",
+      "1972": "FAIL_STRICT_SOURCE_COMPATIBILITY; prior HF approval unchanged",
+      "4235": "NOT COMPARABLE; Zenodo source QA HOLD_OBVIOUS_BLACK_WEDGE and category crosswalk unverified"
+    },
+    "rights_snapshot_checks": {
+      "3": {
+        "source_stac_sha256_match": true,
+        "source_license": "CC-BY-4.0"
+      },
+      "661": {
+        "source_stac_sha256_match": true,
+        "source_license": "CC-BY-4.0"
+      },
+      "1972": {
+        "source_stac_sha256_match": true,
+        "source_license": "CC-BY-4.0"
+      },
+      "4235": {
+        "source_stac_sha256_match": true,
+        "source_license": "CC-BY-4.0"
+      }
+    },
+    "decoder_crosscheck": {
+      "PIL_vs_rasterio_each_Zenodo_source": "PASS_ALL_FOUR",
+      "PIL_vs_rasterio_each_HF_reference": "PASS_ALL_THREE",
+      "HF_vs_Zenodo_rasterio_RGB": "FAIL_ALL_THREE; not just a difference between readers in this environment"
+    },
+    "unchanged_policy": {
+      "crowd_RLE_alone_blocks_semantic": false,
+      "unknown_panoptic_id_category_rejected": true,
+      "automatic_zero_to_nodata": false,
+      "large_black_wedge_blocks": true,
+      "uniform_targets_modified": false,
+      "holdout_pixels_decoded": false,
+      "training_data_or_checkpoint_written": false,
+      "large_pair_generation": false
+    },
+    "recommended_sequence": [
+      "Review Zenodo as a separate source generation, not a drop-in replacement; decide embedded-grid policy explicitly",
+      "Build a JSONL metadata/path adapter with explicit official-split/fold/group/overlap/rights gates; do not infer split from holdout folder",
+      "Obtain and bind a trusted per-image Panoptic ID-category crosswalk; no numeric COCO-ID or all-nonzero shortcut",
+      "Reuse existing exact-area/GSD functions only for individually approved Zenodo images in a new namespace/output; do not overwrite accepted HF artifacts",
+      "Record Crowd disagreement as optional WARN, require canonical-map correctness and manual coverage QA, keep per-ID receipts",
+      "Only after data acceptance, separately integrate a multi-image loader; leave M1-6 and historical smoke/checkpoint provenance fixed"
+    ],
+    "unresolved": [
+      "RGB encoding/release history causing observed differences not proven",
+      "Which original georeferencing should be authoritative for new Zenodo generation; no silent repair",
+      "Panoptic category crosswalk for newly local images such as4235",
+      "190 official-train row licenses unresolved, 16 test row licenses unresolved; 11 metadata bounds differ from HF",
+      "4235 true coverage; do not use large black wedges as background or invent ignore/crop rules"
+    ]
   }
 }

@@ -471,3 +471,95 @@ The real pilot repeatedly downloaded about **74–79 MiB of compressed Parquet c
 **Later:** plan a separate multi-image training loader and useful-size fine-tuning after pilot acceptance. The existing M1-6 Tesla T4 **two-image GPU smoke remains independent** and does not need refactoring now.
 
 **Boundaries:** no Holdout pixel downloads or tuning, no GT54 promotion to canopy truth, no automatic black-to-NoData, no permission to train on uncertain coverage, no changes to commercial legal clearance, no reclassification of past HOLD, and no trained-weight redistribution.
+
+## M1-5C Zenodo local-source compatibility audit (2026-11-06)
+
+**The local archive is readable and authentic, but is NOT an exact drop-in replacement for the accepted HF originals.** Strict raw compatibility is **FAIL for 3/661/1972** (RGB and affine/bounds differ), and **NOT COMPARABLE for 4235** (no trusted HF raw counterpart in the prioritized caches). Panoptic RGB pixels, decoded IDs and source-resolution category-validated binary targets match exactly for the first three. This does not retroactively invalidate their accepted HF datasets, which remain unchanged.
+
+One focused read-only [audit script](../../scripts/m1_5c_zenodo_audit.py) and six tests appended to the existing pilot test file are the only code additions. No loader/preprocessing/model/GPU implementation was migrated. Results are appended under `m1_5c` in [the existing JSON record](M1_5B_PILOT_RESULT.json); all previous values are preserved. Reports/previews remain external under `ouem-data-audits/m1-5c-zenodo-final`.
+
+### Source authentication, inventory and original locations
+
+[Zenodo record11617167, version1.0.0](https://zenodo.org/records/11617167) lists images, masks, COCO annotations and fold metadata. Its image naming convention is `<oam_id>_<image_id>.tif`. Published archive MD5 values for images/masks/meta/train were independently rechecked PASS in this audit, after the user's earlier images/masks checks. A streaming, read-only archive pass also verified that each of the four selected extracted TIFFs and PNGs has the same SHA-256 as its archive member. The metadata JSONL files match meta.tar.gz byte-for-byte, and the extracted COCO train.json matches the authenticated train archive. No files were extracted or modified by these checks. This rules out a selected-file extraction mismatch as the explanation for the observed RGB differences; it does not establish the upstream encoding history.
+
+The reusable CLI itself computes selected source SHA and comparison evidence, not the optional full archive-MD5 pass; the JSON explicitly separates those supplemental authentication checks. All four original and mask hashes are recorded. The large archive checks read local compressed bytes only; no new dataset download occurred.
+
+| Prioritized cache | Actual role / verification |
+| --- | --- |
+| m1-5b3-pilot-01 | raw/3 is the hash-verified HF original RGB/PNG/segments reference |
+| m1-5b3-pairs-01 | Accepted Train3 processed pair and manifest receipt verified unchanged |
+| m1-5b3-pairs-repeat-01 | Repeat Train3 manifest and all four output hashes verified unchanged |
+| m1-2a-audit-01 | raw661 duplicate matches accepted original hashes; historical report is INCOMPLETE, not a new QA PASS |
+| m1-2a-audit-02 | Authoritative local originals/segments for 661 and1972, checked against accepted hashes |
+| m1-2d-ground-01 | Accepted Train661/Val1972 processed products verified unchanged |
+| HF raw4235 | No RGB/PNG/segments reference found in these prioritized original caches; previous4235 evidence was metadata only |
+
+All4,608 TIFFs and4,608 PNGs are present by file enumeration; all4,169 official-train rows have both files. Only target3/661/1972/4235 image pixels were decoded. No Holdout image/label pixels were decoded, trained or evaluated.
+
+### Metadata, partition and rights
+
+`train_meta.json` and `test_meta.json` are **JSON Lines**, despite their suffix: one object per line, not one COCO/JSON object. They contain4,169 and439 rows. The `holdout/images` / `holdout/masks` directory names contain **both official train and test**, so must never determine an image's role. Membership in the metadata file plus fold is authoritative: official train fold0 -> Val, folds1–4 -> Train; official test/fold-1 -> Holdout, excluded from learning/tuning.
+
+The image-ID set, oam_id, fold, height/width and CRS match all4,608 pinned HF inventory rows. All541 source groups remain confined to one official split/fold/role. Internal roles total3,341 Train,828 Val,439 Holdout, including rows whose rights are unresolved. The four protected roles are3/661=Train,1972/4235=Val. Source-object and opposite-role geographic overlap/proximity screens were also rerun using Zenodo metadata-derived extents (not its auxiliary lat/lon), passing for these four; this is not a universal claim of survey independence.
+
+Licenses do **not** match globally. Official train has3,979 explicit CC-BY4.0,177 null and13 unknown; test has423 explicit CC-BY4.0 and16 null. All206 unresolved row declarations differ from the all-CC-BY pinned HF inventory. **Do not fill unknown/null from the HF row, archive name or collection-level declaration.** These are not automatically eligible. COCO license IDs are a lookup: id1=unknown, id2=CC-BY4.0, id3=null, not class IDs. All four audited rows are explicit CC-BY4.0 and their COCO image license IDs resolve to the same declaration; exact source-STAC IDs/hashes and CC-BY-4.0 declarations were rechecked in existing caches. Full attribution stays external; no personal contacts are published and no final commercial clearance is granted.
+
+Bounds fields differ between Zenodo/HF metadata in11 other records (exact IDs in the local audit JSON). None of the four targets is among those11. The auxiliary fields named `lat`/`lon` match **swapped lower-left XY** for these four, not a geographic center. Do not swap-and-trust or use them for GSD; compute the center and local WGS84 intervals from CRS/affine.
+
+### Pixel/ID/geometry comparison
+
+All counts compare decoded arrays under the same environment (Pillow13.0.0/rasterio1.4.3). Pillow and Rasterio decode each inspected TIFF identically here; cross-source Rasterio comparisons also differ. RGB comparison is strict, with no post-hoc tolerance-based PASS.
+
+| ID | Changed RGB pixels / channel values | RGB delta Zenodo-HF | Panoptic RGB/IDs/raw binary | CRS / affine+bounds | Overall original compatibility |
+| --- | ---: | --- | --- | --- | --- |
+| 3 | 9,194 / 14,000 | -6..+8 | PASS / PASS / PASS | same EPSG3395 / FAIL | **FAIL** |
+| 661 | 394,434 / 804,009 | -15..+16 | PASS / PASS / PASS | same EPSG3395 / FAIL | **FAIL** |
+| 1972 | 2,307 / 3,882 | -1..+2 | PASS / PASS / PASS | same EPSG3395 / FAIL | **FAIL** |
+| 4235 | NOT COMPARABLE | NOT COMPARABLE | NOT COMPARABLE to HF | local EPSG3395; no HF raw grid | **NOT COMPARABLE** |
+
+Mean absolute RGB error (8-bit units) is0.00181357 /0.11724265 /0.00035357 respectively. Small values are useful context, not equality. All PNG byte hashes differ from their HF containers, but decoded Panoptic pixels/IDs and validated source binary arrays are equal for the three comparable records. Do not mistake different PNG compression/container bytes for different labels.
+
+All four Zenodo affines exactly reproduce `from_bounds(row.bounds,width,height)`. Their bounds equal the rounded metadata bounds; HF original TIFFs retain a different higher-precision grid. The [fixed official exporter](https://github.com/Restor-Foundation/tcd/blob/05dab754a3fd15b83d6b7606de7310155f4e2df2/tools/generate_dataset.py#L14) demonstrates reconstruction from metadata bounds, consistent with this pattern. **The exact creation/encoding history of these archive bytes is not proven.** Both source formats are JPEG/YCbCr TIFF here; do not attribute the RGB discrepancy to a particular encoder or silently repair the geometry.
+
+Applying the existing ground-aware grid calculation **in memory only** illustrates the migration effect:
+
+| ID | Accepted HF output shape HxW | Proposed from embedded Zenodo grid | Comparison to accepted teacher |
+| --- | --- | --- | --- |
+| 3 | 394x394 | 394x394 | Binary pixel array equal; world grid still different |
+| 661 | 264x264 | 263x264 | Different shape; not the same teacher grid |
+| 1972 | 231x231 | 230x230 | Different shape; not the same teacher grid |
+| 4235 | None | 361x362 diagnostic only | No accepted reference; no category-validated teacher generated |
+
+No new GeoTIFF/training pair was written. Existing raw/accepted inputs must not be replaced merely because image_id is unchanged. New source hashes, affines and output dimensions require a separate source/data-generation identity; historical checkpoint/data fingerprints and M1-6 inputs remain fixed.
+
+### Panoptic categories, semantic QA and visual findings
+
+The local PNGs are **RGB ID-encoded**, not class-index0/1 masks. For3/661/1972 the prior `segments.json` hashes were verified and used to validate IDs/categories before merging1/2. For4235 no corresponding trusted ID-category map is present in the listed local metadata: meta.tar.gz has only the two JSONL files. COCO provides category1/2 and object IDs, but those IDs are not a reliable foreign key for Panoptic PNG values: all133 observed nonzero PNG IDs for4235 are absent from its COCO annotation-ID set (135 objects). COCO `extra` dictionaries were also checked for all four targets and are empty. **Do not use COCO numeric IDs or nonzero PNG values as an unvalidated category shortcut.** A trustworthy, per-image, version/hash-bound Panoptic crosswalk is needed for new images.
+
+Per PR29, this audit does not use COCO Crowd RLE equality as a blocking semantic gate. Known Crowd is included by canonical category; source3/661/1972 mapping passes independently of optional cross-format QA. Unknown canonical IDs/categories remain rejected. The legacy pilot CLI's old blocking gate was not invoked or modified. Optional Crowd disagreement should be recorded as WARN in the future adapter, never used to manufacture/repair a canonical semantic target. Uniform masks remain literal.
+
+Actual previews were viewed for all four. Known-category masks broadly align with vegetation in3/661/1972 without an obvious pixel-orientation shift; this is not quantitative label accuracy or proof of matching world grids. For4235 the displayed color layer is **unvalidated nonzero-ID coverage only**, not an accepted binary teacher. A large top/left artificial-looking black wedge is obvious: **1,660,758 exact-black pixels,4,493 on the unique outer edge**. Thus Zenodo4235 has a separate **coverage HOLD**, not a Crowd-only hold, while source comparison remains NOT COMPARABLE. No RGB-zero-to-NoData, crop, ignore mask or valid_fraction was invented. Other isolated black pixels are review triggers, not an automatic law.
+
+### Minimal implementation plan, in order
+
+1. **Review source/grid policy first.** Treat Zenodo11617167-v1.0.0 as a new source generation. Preserving its embedded grid is possible but is not recovery of the HF original geometry. If exact prior experiment compatibility is required, retain the HF originals. Do not silently attach an old affine to new pixels or reuse old manifests/hashes.
+2. Add a small **local source adapter** to existing preprocessing, with configurable roots and JSONL index, exact filename/image/source binding, official train/test/fold whitelist, source-group/object/overlap checks and explicit CC-BY/source-attribution gates. Do not iterate `holdout/` into training. Unresolved licenses remain held.
+3. Obtain/cache an **authoritative Panoptic ID-category crosswalk**, bound to the actual PNG/source version. The existing three maps can support their identical PNG data after hash verification;4235 and additional images need independent provenance/label validation. A separately authorized label-metadata-only bridge may be an option; no HF pixel/metadata acquisition was performed here. Merely matching an ID or assuming COCO IDs/order is not proof.
+4. Reuse M1-2D `intervals`, `output_grid`, `reduce_area`, `binary` and readback/hash helpers for **individually approved all-valid images**. Use a new output namespace and manifest containing archive/metadata/source hashes, grid and rights. Keep per-image PASS/WARN/REVIEW/HOLD receipts; never rewrite accepted HF pairs or alter literal uniform masks. Coverage and unresolved labels block acceptance; Crowd comparison alone does not.
+5. Only after source/geometry/rights QA, implement a separately reviewed multi-image patch loader using approved manifests. Existing661/1972 loader behavior, M1-4 deterministic checkpoint chain and M1-6 CPU/GPU smoke remain unchanged. No broad model/architecture/loss refactor is needed for this audit.
+
+Remaining issues are geometry-policy approval, encoding/release history, category crosswalk availability, unresolved licenses and4235 coverage. The migration can avoid remote image-row-group transfer, but the archive's availability/integrity alone does not resolve those gates. No new sample was approved automatically and this audit does not finish the earlier new-Val pilot.
+
+### Reproduce and verification scope
+
+```powershell
+.\.venv\Scripts\python.exe scripts/m1_5c_zenodo_audit.py --zenodo '<local-Zenodo-root>' --cache-root '<existing-data-cache-root>' --inventory-cache '<M1-5A-metadata-cache>' --output '<fresh-audit-directory-outside-source-roots>'
+.\.venv\Scripts\python.exe -m pytest -q --disable-warnings
+# Optional archive authentication is separate from the representative CLI:
+Get-FileHash -Algorithm MD5 '<local-Zenodo-root>\archives\images.tar.gz'
+Get-FileHash -Algorithm MD5 '<local-Zenodo-root>\archives\masks.tar.gz'
+```
+
+The audit report compares selected decoded hashes, grids and metadata. Missing HF references yield NOT COMPARABLE, not a guessed PASS. Input hashes/rights receipts and prior JSON records remain unchanged. The COCO scan streams metadata with bounded buffers rather than loading the ~495MB annotations file into memory. It reports only selected IDs; no Holdout image pixels are decoded. Source metadata/authentication checks are distinguished from the user's prior MD5 confirmation. No new package was installed.
+
+Regression: **112 passed**, six new audit tests,75 existing/reused Affine warnings. Tests cover JSONL/duplicates, unknown-license counting, source/fold/Holdout conflicts, exact decoded equality versus small differences/shape/dtype failures, missing reference handling, streaming COCO metadata and strict canonical ID/category validation without a Crowd equality gate. Reports and four previews are external; Git contains code, tests and sanitized audit metadata only.
