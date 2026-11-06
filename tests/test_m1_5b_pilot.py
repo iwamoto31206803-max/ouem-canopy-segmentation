@@ -17,6 +17,134 @@ from rasterio.transform import from_origin
 
 sys.path.insert(0,str(Path(__file__).parents[1]/'scripts'))
 import m1_5b_pilot as pilot
+import m1_5d_zenodo_prepare as zen
+
+
+def test_zenodo_binary_policy():
+    rgb = np.full((4,4,3),100,np.uint8)
+    ann = np.zeros_like(rgb)
+    assert not zen.semantic_binary(rgb,ann,[]).any()
+    ann[:,:,2] = 1
+    assert zen.semantic_binary(rgb,ann,[1,2]).all()
+    for bad in [[3], [True], []]:
+        with pytest.raises(ValueError): zen.semantic_binary(rgb,ann,bad)
+    with pytest.raises(ValueError): zen.semantic_binary(rgb,ann[:2],[1])
+    with pytest.raises(ValueError): zen.semantic_binary(rgb,ann.astype(np.int32),[1])
+
+
+def test_zenodo_validity_requires_review():
+    rgb = np.full((5,5,3),90,np.uint8); rgb[0,0] = 0
+    review = dict(coverage='ALL_VALID',alignment='PASS',quality='PASS',black_wedge=False,basis='visual review')
+    with pytest.raises(ValueError): zen.validity(rgb,review)
+    review['black_pixels_reviewed'] = True
+    assert zen.validity(rgb,review)['edge_black_pixels'] == 1
+    review['black_wedge'] = True
+    with pytest.raises(ValueError): zen.validity(rgb,review)
+
+
+@pytest.fixture
+def zenodo_local(tmp_path):
+    root = tmp_path/'source'; (root/'archives/dataset/holdout').mkdir(parents=True)
+    row = dict(image_id=3,oam_id='source3',validation_fold=1,license='CC-BY 4.0',crs='EPSG:3395',
+               bounds=[0,0,2,2],height=20,width=20,meta='https://example.org/source_meta.json')
+    other = dict(row,image_id=20,oam_id='other',validation_fold=0,bounds=[10000000,10000000,10000002,10000002],meta='https://example.org/other_meta.json')
+    (root/'archives/train_meta.json').write_text(json.dumps(row)+'\n'+json.dumps(other)+'\n')
+    (root/'archives/test_meta.json').write_text('')
+    coco = root/'archives/dataset/holdout/train.json'
+    coco.write_text(json.dumps(dict(annotations=[dict(id=88,image_id=3,category_id=1)])))
+    for directory in ['images','masks']: (root/'extracted/dataset/holdout'/directory).mkdir(parents=True)
+    tif = root/'extracted/dataset/holdout/images/source3_3.tif'
+    with rasterio.open(tif,'w',driver='GTiff',width=20,height=20,count=3,dtype='uint8',crs=row['crs'],transform=from_origin(0,2,.1,.1)) as dst:
+        dst.write(np.full((3,20,20),100,np.uint8))
+    png = root/'extracted/dataset/holdout/masks/source3_3.png'
+    ann = np.zeros((20,20,3),np.uint8); ann[:10,:,0] = 9; Image.fromarray(ann).save(png)
+    evidence_dir = tmp_path/'evidence'; evidence_dir.mkdir()
+    stac = evidence_dir/'source3-stac.json'
+    stac.write_text(json.dumps(dict(id='source3',bbox=[-1,-1,1,1],properties={'license':'CC-BY-4.0',
+        'providers':[dict(name='test provider',roles=['licensor'])],'oam:producer_name':'test'},
+        assets={'metadata':{'href':row['meta']}})))
+    proof = dict(source_hashes={p.name:zen.sha(p) for p in [tif,png]},stac_path=stac.name,
+                 source_evidence=dict(snapshot_sha256=zen.sha(stac),url='https://example.org/stac'),
+                 review=dict(coverage='ALL_VALID',alignment='PASS',quality='PASS',black_wedge=False,basis='synthetic'))
+    evidence = dict(source_generation=zen.GENERATION,metadata_hashes={n:zen.sha(root/'archives'/n) for n in ['train_meta.json','test_meta.json']},
+                    coco_sha256=zen.sha(coco),archive_evidence={'scope':'synthetic fixture, no publisher archive'},samples={'3':proof})
+    path = evidence_dir/'reviews.json'; path.write_text(json.dumps(evidence))
+    return root,path,evidence,row
+
+
+def test_zenodo_local_partition_and_duplicates(zenodo_local):
+    root,_,_,row = zenodo_local
+    assert zen.local_index(root)[0]['official_split'] == 'train'
+    test = root/'archives/test_meta.json'
+    test.write_text(json.dumps(dict(row,validation_fold=-1)))
+    with pytest.raises(ValueError): zen.local_index(root)
+    test.write_text(json.dumps(dict(row,image_id=999,validation_fold=-1)))
+    with pytest.raises(ValueError): zen.local_index(root)
+
+
+def test_zenodo_convert_grid_readback_and_determinism(zenodo_local,tmp_path):
+    root,path,evidence,row = zenodo_local
+    outputs = []
+    for index in range(2):
+        output = tmp_path/f'out{index}'; output.mkdir()
+        outputs.append(zen.convert(root,row,evidence['samples']['3'],[1],path.parent,output))
+    assert outputs[0]['output_hashes'] == outputs[1]['output_hashes']
+    assert outputs[0]['output_shape'] == [4,4]
+    assert outputs[0]['output_bounds'] == row['bounds']
+    assert outputs[0]['canopy_fraction_mean'] == .5
+    assert outputs[0]['category_level_per_id_validation'] == 'NOT_VERIFIED'
+
+
+def test_zenodo_reject_source_generation_hash_license(zenodo_local,tmp_path):
+    root,path,evidence,row = zenodo_local
+    evidence['source_generation'] = 'hf'; path.write_text(json.dumps(evidence))
+    with pytest.raises(ValueError,match='generation'): zen.prepare(root,path,[3],tmp_path/'out')
+    evidence['source_generation'] = zen.GENERATION
+    evidence['metadata_hashes']['train_meta.json'] = '0'*64; path.write_text(json.dumps(evidence))
+    with pytest.raises(ValueError,match='Hash'): zen.prepare(root,path,[3],tmp_path/'out')
+    for license_value in [None,'unknown','CC-BY-NC 4.0','CC-BY-SA 4.0']:
+        with pytest.raises(ValueError,match='LICENSE'):
+            zen.convert(root,dict(row,license=license_value),evidence['samples']['3'],[1],path.parent,tmp_path/'out')
+    with pytest.raises(ValueError,match='4235'):
+        zen.convert(root,dict(row,image_id=4235),{},[],path.parent,tmp_path/'out')
+
+
+def test_zenodo_overlap_and_holdout_gate():
+    row = dict(image_id=1,oam_id='a',validation_fold=1,official_split='train',license='CC-BY 4.0',
+               wgs84_bounds=[0,0,1,1],center=[.5,.5])
+    other = dict(row,image_id=2,oam_id='b',validation_fold=0)
+    with pytest.raises(ValueError,match='FOOTPRINT'): zen.separation(row,[row,other])
+
+
+def test_zenodo_fresh_output_protection(tmp_path):
+    source = tmp_path/'source'; source.mkdir()
+    with pytest.raises(ValueError): zen.fresh(source,[source])
+    with pytest.raises(ValueError): zen.fresh(source/'child',[source])
+
+
+def test_zenodo_prepare_manifest_and_hold(zenodo_local,tmp_path):
+    root,path,evidence,row = zenodo_local
+    output = tmp_path/'new'
+    result = zen.prepare(root,path,[3],output)
+    assert result['status'] == 'PASS_CANDIDATE'
+    assert result['source_generation'] == zen.GENERATION
+    assert json.loads((output/'manifest.json').read_text()) == result
+    with pytest.raises(ValueError): zen.prepare(root,path,[3],output)
+    evidence['samples']['3']['source_hashes']['source3_3.png'] = '0'*64
+    path.write_text(json.dumps(evidence))
+    held = zen.prepare(root,path,[3],tmp_path/'held')
+    assert held['status'] == 'HOLD'
+    assert not list((tmp_path/'held').rglob('*.tif'))
+    assert 'Hash mismatch' in held['samples'][0]['reason']
+    with pytest.raises(ValueError,match='Holdout/unknown'): zen.prepare(root,path,[999],tmp_path/'unknown')
+
+
+def test_zenodo_prepare_holdout_pixels_never_read(zenodo_local,tmp_path):
+    root,path,evidence,row = zenodo_local
+    (root/'archives/test_meta.json').write_text(json.dumps(dict(row,image_id=999,oam_id='holdout',validation_fold=-1)))
+    evidence['metadata_hashes']['test_meta.json'] = zen.sha(root/'archives/test_meta.json')
+    path.write_text(json.dumps(evidence))
+    with pytest.raises(ValueError,match='Holdout/unknown'): zen.prepare(root,path,[999],tmp_path/'unknown')
 
 
 @pytest.fixture(autouse=True)
