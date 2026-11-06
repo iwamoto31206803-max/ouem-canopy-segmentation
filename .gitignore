@@ -5,6 +5,7 @@ __pycache__/
 *.pth
 *.pt
 *.ckpt
+*.zip
 *.tif
 *.tiff
 /data/
