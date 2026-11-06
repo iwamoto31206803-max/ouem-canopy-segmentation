@@ -1031,6 +1031,134 @@ Regression: **167 passed,482 warnings**, six added CPU-only tests (including tin
 
 User G1-B acceptance requires actual import/data/initializer gates, official-model CUDA forward/CE/backward, finite nonzero component gradients, all four active representative updates and finite optimizer state, measured time/VRAM, safe local checkpoint plus Drive SHA match, and separate-process state restore. Until the user supplies those JSONs, GPU optimizer/checkpoint/restore and actual Python3.13/PyTorch2.11/Satlas CUDA compatibility remain **NOT_VERIFIED**, VRAM/timing/loss are **NOT_MEASURED**. This is not G2 multi-image learning, accuracy evaluation or any change to the G0 dataset.
 
+## M1-7 G2 — Train7 bounded20 implementation (2026-11-06)
+
+**Codex: implementation/CPU verification only; G2 GPU execution NOT_VERIFIED.** User-reported G1-B Tesla T4 evidence after PR38: one-step PASS, loss0.6986804008483887, peak allocated1,810,123,776bytes, Drive checkpoint SHA match and separate-process model/optimizer/CPU-CUDA-Python RNG restore PASS. Those are G1-B observations, not newly measured G2 results or a promise that20 steps fit.
+
+New entry point `scripts/m1_7_g2_train.py` reuses G1-B preflight, official-model arguments, safe checkpoint I/O, finite/update checks, CUDA memory/timing, RNG/fingerprints and backup. Two small backward-compatible extensions to G1-B: optional explicit integer crop (default top-left unchanged), and optional omission of per-step initial eval (default G1-B behavior unchanged). G2 uses one train-mode forward per optimizer step; it performs no Val/GSI evaluation. Tests add one G2 file. Existing G0 manifest/40 products/G1-A ZIP/old checkpoints are unchanged; no new data/dependency/architecture/loss.
+
+### Fixed configuration / sampler
+
+Same official initializer SHA `f8abf21cadaab2a71859e9d172bec4e5d6b7cc9710882a2f6a4d8aae826db036`, pretrained Backbone/FPN and fresh Upsample/SEGMENT2. **Never initialize a new G2 run from a G1-B trained checkpoint.** That file fails the initializer hash; resume accepts only the distinct G2 checkpoint kind. Frozen Zenodo10 identity/manifest SHA remains mandatory. G1-B preflight rechecks CUDA/imports, G1-A context, all40 products and initializer, then G2 repeats product checks on patch loading. No HF/Val/Holdout/GT54 training inputs.
+
+Default seed0,224×224,batch1,FP32,all layers,AdamW lr1e-4/decay.01/betas(.9,.999)/eps1e-8; no AMP/TF32/scheduler/augmentation/padding. Only10 or20 is an allowed stopping ceiling, with20 the default. Seed is recorded/config-bound; no CLI hyperparameter/patch relaxation or CPU fallback.
+
+Sampler uses a **private** `random.Random(seed)` so it does not consume model/Python RNG. Sort seven Train IDs, shuffle one cycle at a time, choose x/y uniformly from inclusive integer valid extents, and retain the first20 entries. No repeat within a cycle; a scene at a cycle boundary may appear consecutively after all seven have been visited. At20, six scenes occur3 times and one twice. Each schedule entry stores step/cycle/image_id/oam_id/crop_xywh. Same crop is applied to RGB/mask/fraction/validity; values and uniform masks are preserved. Target positive fraction is measured after cropping, not used to redraw or rank patches.
+
+Full schedule and SHA are saved before training in preflight/result and in checkpoints. Resume validates its exact saved schedule, crop bounds, dataset/source identities, history prefix, next/completed/remaining steps, and immutable lineage receipt, then uses **the stored schedule without calling the generator again**. It does not depend on regenerating Python's shuffle after a version change. Environment/Git differences require an explicit override and remain documented; config/data/initializer/schedule/state checks cannot be bypassed.
+
+### Persistence / exactly-once scope
+
+Fresh local output and a fresh persistent `--backup` root are required for a new run; this is distinct from the G1-B backup. Immutable `lineage.json` binds run ID, UUID,config,data,initializer,schedule SHA. Step10/20 checkpoint folders are individually new, byte-copied and SHA-checked, with receipts. Each checkpoint stores full model/AdamW/CPU-CUDA-Python RNG, full schedule, successful history, executed/remaining step lists, Git/environment/initializer/data/config/lineage and state fingerprints. No historical artifact is overwritten.
+
+Both uninterrupted and resumed step11 must exclusive-create the **same SHA-keyed continuation claim** in the original persistent lineage. A normal resume is only step10→11..20; step20 is terminal/restore-only. Resume must point at the existing lineage whose SHA and step10 receipt match the loaded checkpoint. An already consumed claim stops **before another optimizer step**. A continuous20 run therefore cannot later silently replay its step10; restore-only inspection is still allowed.
+
+This protects one managed lineage under a **single-operator, nonconcurrent** workflow. It is not a distributed exactly-once transaction guarantee for multiple Drive mounts, arbitrary metadata deletion or copied/forked lineages. Never run two Colab sessions against the same lineage or remove claims automatically. Failure after a claim may leave that claim consumed even if an update did not finish; preserve all evidence and decide recovery explicitly rather than silently replaying steps. Do not copy a pre-claim lineage to evade the protection.
+
+Every successful step gets exclusive local and Drive-segment JSON containing actual ID/crop/positive fraction/loss/finite gradients/updates/timings/VRAM. Final result includes all history, scene counts, complete schedule, checkpoints/backup receipts and restore checks; resumed logs contain the original prefix plus newly executed steps. In-progress failure detail is retained under `active_step`. Final JSON is copied and SHA-checked under a fresh `segments/<segment_id>/` directory. If backup/save/logging fails, stop with FAIL, keep available local data, and never rerun optimizer steps automatically. A process/VM kill can lose the currently unjournaled step; no transactional guarantee is claimed. Peak numbers on a resumed process are segment-local; earlier observations remain in the saved history.
+
+### Colab cells — choose ONE training route
+
+Cell1: manually choose GPU and mount Drive. Clone a separate reviewed G2 commit so G1-A/G1-B checkouts remain protected. Do not reinstall the working CUDA torch/torchvision. Satlas0.3.1 and existing verifier dependencies must import; inspect pip check if anything is missing rather than changing versions automatically.
+
+```python
+from pathlib import Path
+import subprocess, sys, json, os, shutil, hashlib
+COMMIT = '<full-reviewed-G2-commit-SHA>'
+assert len(COMMIT)==40 and all(c in '0123456789abcdef' for c in COMMIT)
+repo = Path('/content/ouem-canopy-segmentation-g2')
+if not repo.exists():
+    subprocess.run(['git','clone','https://github.com/iwamoto31206803-max/ouem-canopy-segmentation.git',str(repo)],check=True)
+assert not subprocess.check_output(['git','-C',str(repo),'status','--porcelain'],text=True).strip()
+subprocess.run(['git','-C',str(repo),'fetch','origin',COMMIT],check=True)
+subprocess.run(['git','-C',str(repo),'checkout',COMMIT],check=True)
+from google.colab import drive
+drive.mount('/content/drive')
+assert os.path.ismount('/content/drive')
+base = Path('/content/drive/MyDrive/OUEM_Canopy_Segmentation')
+dataset = Path('/content/zenodo10-g0')
+g1a_result = base/'02_datasets/zenodo10_g0/zenodo10-g1a-result-01.json'
+receipt = json.loads((repo/'docs/implementation/M1_7_G1A_TRANSFER.json').read_text())
+if not dataset.exists():
+    # Adjust only the actual uploaded ZIP path, not the expected SHA.
+    zip_path = base/'02_datasets/zenodo10_g0/zenodo10-g0.zip'
+    g1a_result = Path('/content/g2-g1a-transfer-01.json')
+    subprocess.run([sys.executable,str(repo/'scripts/m1_7_dataset.py'),'unpack','--archive',str(zip_path),
+                    '--expected-zip-sha256',receipt['zip_sha256'],'--output',str(dataset),'--result-json',str(g1a_result)],check=True)
+subprocess.run([sys.executable,str(repo/'scripts/m1_7_dataset.py'),'verify','--root',str(dataset),
+                '--manifest',str(dataset/'manifest.json'),'--expected-sha256',receipt['dataset']['manifest_sha256']],check=True)
+```
+
+Cell2: verify/copy the official **initial**, not trained, checkpoint. A local file is reused only if its fixed SHA matches. Preflight saves the20-entry plan without constructing/training the large model. Ensure storage for both step10/20 checkpoints and copies; exact sizes are measured at save, not assumed here.
+
+```python
+import torch, torchvision, satlaspretrain_models
+from importlib.metadata import version
+print(sys.version, torch.__version__, torch.version.cuda, version('satlaspretrain-models'))
+subprocess.run([sys.executable,'-m','pip','check'],check=True)
+def sha(path):
+    with path.open('rb') as f: return hashlib.file_digest(f,'sha256').hexdigest()
+initial = Path('/content/aerial_swinb_si.pth')
+expected = 'f8abf21cadaab2a71859e9d172bec4e5d6b7cc9710882a2f6a4d8aae826db036'
+if not initial.exists():
+    source = base/'01_pretrained/aerial_swinb_si.pth'
+    assert sha(source)==expected
+    with source.open('rb') as src, initial.open('xb') as dst: shutil.copyfileobj(src,dst,1024**2)
+assert sha(initial)==expected
+RUN_ID = 'm1-7-g2-01'
+common = [sys.executable,str(repo/'scripts/m1_7_g2_train.py'),'--data',str(dataset),
+          '--checkpoint',str(initial),'--g1a-result',str(g1a_result),'--run-id',RUN_ID,'--seed','0']
+preflight = Path('/content/g2-preflight-01')
+subprocess.run(common+['--preflight-only','--output',str(preflight)],check=True)
+plan = json.loads((preflight/'result.json').read_text())
+assert plan['status']=='G2_PREFLIGHT_PASS_TRAINING_NOT_RUN' and len(plan['schedule'])==20
+```
+
+Cell3: choose A **or** B before running. Do not run both against one lineage. Route A executes20 continuously. Route B intentionally stops at10 and resumes once to20, so **total GPU updates are still20**, not two full runs.
+
+```python
+STOP_AFTER = 20  # A:20; B:10. Choose once, before execution.
+run = Path('/content/g2-run-01')
+lineage = base/'03_experiments'/RUN_ID  # MUST be fresh for the initial invocation
+subprocess.run(common+['--output',str(run),'--backup',str(lineage),'--stop-after',str(STOP_AFTER)],check=True)
+result = json.loads((run/'result.json').read_text())
+assert result['status']=='G2_BOUNDED_STEPS_PASS_RESTORE_PENDING'
+if STOP_AFTER==10:
+    ten = next(c for c in result['checkpoints'] if c['step']==10)
+    resumed = Path('/content/g2-resumed-01')  # new local output; SAME original lineage
+    subprocess.run(common+['--output',str(resumed),'--backup',str(lineage),'--stop-after','20',
+                          '--resume',str(lineage/'step10'/ten['filename']),'--resume-sha256',ten['sha256']],check=True)
+    run = resumed
+    result = json.loads((run/'result.json').read_text())
+assert result['completed_steps']==20 and sorted(result['scene_counts'].values())==[2,3,3,3,3,3,3]
+print(result['scene_counts'], result['checkpoints'])
+# Final JSON is automatically persisted, with SHA verification, in the lineage segment.
+assert sha(Path(result['backup_segment'])/'result.json')==sha(run/'result.json')
+```
+
+Cell4: separate-process **state verification only**, from backed-up step20. This does not consume another optimizer step. Step10 restore-only is also allowed, but replaying step11 after its claim is not.
+
+```python
+twenty = next(c for c in result['checkpoints'] if c['step']==20)
+restore = Path('/content/g2-restore20-01')
+subprocess.run(common+['--output',str(restore),'--backup',str(lineage),
+                      '--resume',str(lineage/'step20'/twenty['filename']),'--resume-sha256',twenty['sha256'],'--restore-only'],check=True)
+restored = json.loads((restore/'result.json').read_text())
+assert restored['status']=='G2_STATE_RESTORE_PASS_NO_TRAINING'
+assert all(v=='PASS' for v in restored['restore_checks'].values())
+assert sha(Path(restored['backup_segment'])/'result.json')==sha(restore/'result.json')
+```
+
+After a session reset, remount, recover immutable lineage/checkpoint receipts and segment result JSON, restore data via G1-A, and use the same reviewed commit/config by default. If step11 claim already exists, do not remove it or silently start again. `--allow-environment-change` is an explicit diagnostic exception for environment/Git only, never a data/config override. Any save/backup/OOM/nonfinite failure stops; preserve JSON/checkpoints and review before recovery.
+
+### CPU evidence / GPU and G3 boundary
+
+**193 passed,502 warnings** including26 new G2 cases and all G0/G1-A/G1-B regressions. Tests verify seeded cycle/count/bounds, invalid Val/Holdout/source/crop/config/checkpoint metadata, history prefix and pending steps, nonzero crop alignment, literal uniform targets, bad SHA, no overwrite, claim replay refusal, nonfinite-stop diagnostics and backup-failure log/checkpoint preservation. A tiny CPU Dropout model using real CPU and Python RNG gives **bitwise-equal final model/AdamW/CPU RNG/Python RNG fingerprints** for continuous20 versus10-save→11..20 restore. CUDA RNG is mocked in those tests; this is **not GPU bitwise evidence**. No second full GPU reference run is required.
+
+Real frozen-data CPU input audit: all40 products and all20 scheduled crops passed. Under Python3.11/seed0,661 occurs2 times and3/493/1022/1280/1358/2243 each3 times; every crop is `[1,3,224,224]` RGB and `[1,224,224]` target, all valid. Target positive fractions span0.0198899880–0.9152781963; these are label properties, not accuracy. This CPU plan SHA is `b9987052715504b704e456d2f8b4aef67b40fb3f8c65467c5b5ae006587d0a10`; the user's actual Colab preflight plan is the authoritative run plan, with Python/software version recorded. No actual real-data model training occurred in Codex.
+
+G2 GPU20 updates, GPU timing/VRAM, large checkpoint10/20/Drive I/O, state restore and continuation numerics remain **NOT_VERIFIED / NOT_MEASURED** until the user supplies JSON. State-fingerprint equality on restore and completion without exceptions are plumbing evidence; bitwise GPU continuation is a distinct unmeasured claim. Loss decrease/accuracy improvement is **not an acceptance condition**. G3 will separately define frozen Val3 IoU/F1/CE aggregation and qualitative GSI inference; no such evaluation, new data, label creation, black-border rescue or architecture/loss change is part of this PR.
+
 ## M1-5D — Deferred black-border recovery research note (2026-11-06)
 
 **Decision: DEFER recovery implementation and keep all current HOLD decisions unchanged.** The project now prioritizes (1) a compact review of scientific comparisons / evaluation design, then (2) a small GPU fine-tuning and reproducibility run using *already quality-reviewed Zenodo samples*, then (3) deciding whether a larger clean-only dataset is sufficient. Investigate border recovery only if subsequent evidence shows that the additional data are valuable enough to justify the complexity. This is not permission to relax coverage gates or mix dataset generations. The M1-5D-3 pilot identified **7 new PASS_CANDIDATE (Train5, Val2)** among 18 screened images; **11 HOLD**, mostly artificial-looking edge-connected black areas. Together with M1-5D-2 this gives **10 candidate images (Train7, Val3)**; formal dataset acceptance and sufficiently representative Val evaluation are separate steps. The observed 11/18 hold rate is **not a population prevalence estimate**.
