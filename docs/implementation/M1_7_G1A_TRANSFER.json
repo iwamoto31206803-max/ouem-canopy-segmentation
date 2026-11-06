@@ -1,0 +1,255 @@
+{
+  "colab_validation": "NOT_VERIFIED: user-run only; no Drive upload or authentication performed",
+  "compression": "ZIP_STORED; fixed member order/time/mode",
+  "dataset": {
+    "acceptance": "accepted_for_M1_7_smoke",
+    "dataset_id": "ouem-zenodo10-e3db510b1125931d",
+    "manifest_sha256": "c2f4ccd56da8770cd73ef1db299d67d5528dcab8ea0051da1c2d5f8174a850ca",
+    "products": 40,
+    "status": "PASS",
+    "train": 7,
+    "val": 3
+  },
+  "file_count": 41,
+  "files": [
+    {
+      "bytes": 52841,
+      "path": "manifest.json",
+      "sha256": "c2f4ccd56da8770cd73ef1db299d67d5528dcab8ea0051da1c2d5f8174a850ca"
+    },
+    {
+      "bytes": 48902,
+      "path": "train/1022/canopy_fraction.tif",
+      "sha256": "7c9e5d2c7f0e118c108d4b2f33b7a39e55768ab3c0746132281ad0f20520e29a"
+    },
+    {
+      "bytes": 6829,
+      "path": "train/1022/canopy_mask.tif",
+      "sha256": "2d8ebf33ace088684df96beb542fcbdebf7306268098f424ee0e0126bdb24068"
+    },
+    {
+      "bytes": 461147,
+      "path": "train/1022/rgb.tif",
+      "sha256": "942a688c336f7878409b5c0b7bb6aeac5a8c5da50ab66a969dbfbf7968d2c89f"
+    },
+    {
+      "bytes": 3895,
+      "path": "train/1022/valid_fraction.tif",
+      "sha256": "af77c687182596c8a2b4629618dceeb6102e91c433e938e34d3b0b33d5078e58"
+    },
+    {
+      "bytes": 25972,
+      "path": "train/1280/canopy_fraction.tif",
+      "sha256": "6369fa0237624c37c3fc3c9b5ff40b7426eee4db797f12d5c63100ba1fadec7f"
+    },
+    {
+      "bytes": 3476,
+      "path": "train/1280/canopy_mask.tif",
+      "sha256": "cc2e10ea119343f2201c8b382bea6ea2de02c4a256ac72f5776b650bdc10141d"
+    },
+    {
+      "bytes": 258126,
+      "path": "train/1280/rgb.tif",
+      "sha256": "6dc7eee1c92047d4d611a42cca0f6129771fd59b94d5c14a6124f65f2470fe20"
+    },
+    {
+      "bytes": 2505,
+      "path": "train/1280/valid_fraction.tif",
+      "sha256": "28d8329efdfbadadddafbc222a55c86b09c7cb8b269cccc7e8b5b97b726fbe03"
+    },
+    {
+      "bytes": 24763,
+      "path": "train/1358/canopy_fraction.tif",
+      "sha256": "6cb3bd43ee841d6aeb22f7a75644d49117c354f44cd234968176944e59da1e21"
+    },
+    {
+      "bytes": 3666,
+      "path": "train/1358/canopy_mask.tif",
+      "sha256": "e91ce65931e2f1ee2ed6fa52edb1ffa85040f7410399913c8a75464fd971c599"
+    },
+    {
+      "bytes": 185815,
+      "path": "train/1358/rgb.tif",
+      "sha256": "e2c9d666de3ac7f1d6d8f77074d832c9ded6a36f29ee22550a4b46dc0a5ddbb3"
+    },
+    {
+      "bytes": 2011,
+      "path": "train/1358/valid_fraction.tif",
+      "sha256": "15d5f6df645625998c9c98db5ede4792ec74d6290f8be8e6410f8165139bc828"
+    },
+    {
+      "bytes": 29899,
+      "path": "train/2243/canopy_fraction.tif",
+      "sha256": "be04799f33db01dca6cfa23356669be5c590e61c885bfbb7cf1aabaaf57ba08a"
+    },
+    {
+      "bytes": 4386,
+      "path": "train/2243/canopy_mask.tif",
+      "sha256": "d7a02ab659eb9e89e7d84f9ad7ec3d65c4d55bc91b45754666c92ab071c179d7"
+    },
+    {
+      "bytes": 403409,
+      "path": "train/2243/rgb.tif",
+      "sha256": "e1cc0a4eb242e19414bf0fb3dc91c210b21359168addfc04c6e8b5a10457a04b"
+    },
+    {
+      "bytes": 3760,
+      "path": "train/2243/valid_fraction.tif",
+      "sha256": "e64d7441056f8c049b6beefb2fadedee43b0a8e24231e4bbfea5798544968e00"
+    },
+    {
+      "bytes": 30460,
+      "path": "train/3/canopy_fraction.tif",
+      "sha256": "c24ed22e7d7d91bea4ad99d77552856c60de059ccd3347d2d46227000c3483d1"
+    },
+    {
+      "bytes": 4612,
+      "path": "train/3/canopy_mask.tif",
+      "sha256": "4983b7c3a433bbcc711eb485e9c7ef974112152170bc3045c47cc25e7a8f3d51"
+    },
+    {
+      "bytes": 417100,
+      "path": "train/3/rgb.tif",
+      "sha256": "e33adf868d426e0f02f5367ded1a2cbca1dee7c1d8d7c3c66b170d5aad6c6b78"
+    },
+    {
+      "bytes": 3769,
+      "path": "train/3/valid_fraction.tif",
+      "sha256": "23fb49b85ea7c26cca320edabe4d983c2914b9cef8620324571b7fb3fbc8f7ad"
+    },
+    {
+      "bytes": 34647,
+      "path": "train/493/canopy_fraction.tif",
+      "sha256": "16eb92efd896025c025ac29263dd2ac9a7eda455e1f3fe790d74cf2550f1175e"
+    },
+    {
+      "bytes": 4789,
+      "path": "train/493/canopy_mask.tif",
+      "sha256": "9d1a1be79803b163724c9dbd47ccb85cf4aae4b9a62745d15997b33b1121907b"
+    },
+    {
+      "bytes": 407815,
+      "path": "train/493/rgb.tif",
+      "sha256": "4adcf69c4dc90521979d9103df94eedceacf3954dbf856cf94c0f18b639e100f"
+    },
+    {
+      "bytes": 3855,
+      "path": "train/493/valid_fraction.tif",
+      "sha256": "536d10255d5a9e616382ec76ff7323e54375fac39eaf57137aea8a39b3c416a1"
+    },
+    {
+      "bytes": 16885,
+      "path": "train/661/canopy_fraction.tif",
+      "sha256": "97baec8574afe2dd0bc5d83322b49f3d9fbc47e9b097477aa72aea15020f2e1f"
+    },
+    {
+      "bytes": 2665,
+      "path": "train/661/canopy_mask.tif",
+      "sha256": "c6753a7f5b8b9c29c02ea92288628f03f3e7a52a60dfa6aa999815f24abcf89f"
+    },
+    {
+      "bytes": 192375,
+      "path": "train/661/rgb.tif",
+      "sha256": "d6682cda62eedbe481c99971dec845e83bc16eb8f2a207d9291e85d7dbcd2fe2"
+    },
+    {
+      "bytes": 1967,
+      "path": "train/661/valid_fraction.tif",
+      "sha256": "d1b9557bd5fdcffb8b7e4653975a04ca294524b7ea9bc7f22a550fd5c6dfd7af"
+    },
+    {
+      "bytes": 11152,
+      "path": "val/1972/canopy_fraction.tif",
+      "sha256": "13c7bdacaab6d99a7c60dcb45896642c81124222457fd9111d6bde97a5bb8b09"
+    },
+    {
+      "bytes": 1863,
+      "path": "val/1972/canopy_mask.tif",
+      "sha256": "5ca7bf9cee25df0dc4b105cbff8e3435715d1c6d693f8f41806cf585003e750e"
+    },
+    {
+      "bytes": 134647,
+      "path": "val/1972/rgb.tif",
+      "sha256": "0ca063164c9b8ef766c2fbe8d367eff07d48e9eaad06afecfca77a5c0329a437"
+    },
+    {
+      "bytes": 1590,
+      "path": "val/1972/valid_fraction.tif",
+      "sha256": "354d781219ea5e5a0adb3e32376a258fc88ba440fd695e2ebec7c2e6d7cc01cb"
+    },
+    {
+      "bytes": 84538,
+      "path": "val/269/canopy_fraction.tif",
+      "sha256": "b79713675ac88a2d491db676780af94d485d37c3d603081944363bd129078e5c"
+    },
+    {
+      "bytes": 10121,
+      "path": "val/269/canopy_mask.tif",
+      "sha256": "9f62ed7e3395631e2ad995f970d33c96794242d0f21bfa0f9bdb45af4ea18c6a"
+    },
+    {
+      "bytes": 464987,
+      "path": "val/269/rgb.tif",
+      "sha256": "ad6a71951aad676f338ef75f9c21c76aeada3b7161129121bb05965227f47129"
+    },
+    {
+      "bytes": 4594,
+      "path": "val/269/valid_fraction.tif",
+      "sha256": "f720a43ab17b8baed4773447d2a98efda06f12f6544b6e54baabbb3c1d29a304"
+    },
+    {
+      "bytes": 15192,
+      "path": "val/3785/canopy_fraction.tif",
+      "sha256": "1502fc477ae246b8b1a596b22cff0bfabc1681bbf5a45e43b236c49f5cccecae"
+    },
+    {
+      "bytes": 2694,
+      "path": "val/3785/canopy_mask.tif",
+      "sha256": "99d1478735d4633caeeb4d63a5b0aa22abb6dac7c57f51323ed4cb78ed843e12"
+    },
+    {
+      "bytes": 264978,
+      "path": "val/3785/rgb.tif",
+      "sha256": "5b2069b95675e665be861fafd16dd11c72ef2b3c9d3c7e5792e63de3dbc34c1b"
+    },
+    {
+      "bytes": 2736,
+      "path": "val/3785/valid_fraction.tif",
+      "sha256": "cc2e4bec93741a6141c94708033071b3303581e0f6d8081a74c837e28525b439"
+    }
+  ],
+  "status": "PASS",
+  "tests": {
+    "new_transfer_cases": 18,
+    "pytest": "161 passed, 472 warnings"
+  },
+  "utc": "2026-11-06T07:10:48.416301+00:00",
+  "windows_unpack_validation": {
+    "checks": [
+      "ZIP_SHA",
+      "CANONICAL_WHITELIST",
+      "NO_DUPLICATES_OR_LINKS",
+      "ALL_MEMBER_SHA",
+      "FIXED_MANIFEST_SHA",
+      "40_PRODUCTS_GRID_DTYPE_LABEL_VALIDITY",
+      "TRAIN7_VAL3"
+    ],
+    "dataset": {
+      "acceptance": "accepted_for_M1_7_smoke",
+      "dataset_id": "ouem-zenodo10-e3db510b1125931d",
+      "manifest_sha256": "c2f4ccd56da8770cd73ef1db299d67d5528dcab8ea0051da1c2d5f8174a850ca",
+      "products": 40,
+      "status": "PASS",
+      "train": 7,
+      "val": 3
+    },
+    "file_count": 41,
+    "status": "PASS",
+    "utc": "2026-11-06T07:11:23.370702+00:00",
+    "zip_bytes": 3646561,
+    "zip_sha256": "db282971016895a23052c3006992d3a06c5008c9d98b4e23e1551c1d16ab8521"
+  },
+  "zip_bytes": 3646561,
+  "zip_name": "zenodo10-g0.zip",
+  "zip_sha256": "db282971016895a23052c3006992d3a06c5008c9d98b4e23e1551c1d16ab8521"
+}

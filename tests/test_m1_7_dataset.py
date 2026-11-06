@@ -4,6 +4,8 @@ import json
 from pathlib import Path
 import shutil
 import sys
+import stat
+import zipfile
 
 import numpy as np
 import pytest
@@ -91,3 +93,85 @@ def test_frozen_cross_role_overlap(frozen):
     b['output_bounds']=a['output_bounds']
     path,digest=seal(root,m)
     with pytest.raises(ValueError,match='overlap'):g0.verify(root,path,digest)
+
+
+@pytest.fixture
+def transfer(frozen,tmp_path,monkeypatch):
+    root,m=frozen;_,digest=seal(root,m)
+    monkeypatch.setattr(g0,'MANIFEST_SHA256',digest);monkeypatch.setattr(g0,'DATASET_ID',m['dataset_id'])
+    report=g0.pack(root,tmp_path/'bundle')
+    return root,tmp_path/'bundle/zenodo10-g0.zip',report
+
+
+def test_transfer_deterministic_pack_and_safe_unpack(transfer,tmp_path):
+    root,archive,report=transfer
+    assert report['file_count']==41 and report['dataset']['products']==40
+    repeat=g0.pack(root,tmp_path/'repeat')
+    assert repeat['zip_sha256']==report['zip_sha256']
+    result=g0.unpack_report(archive,report['zip_sha256'],tmp_path/'colab',tmp_path/'result.json')
+    assert result['status']=='PASS' and result['dataset']['dataset_id']==g0.DATASET_ID
+    assert json.loads((tmp_path/'result.json').read_text())==result
+    for item in report['files']:
+        assert g0.sha(root/item['path'])==g0.sha(tmp_path/'colab'/item['path'])==item['sha256']
+    with pytest.raises(ValueError):g0.pack(root,tmp_path/'bundle')
+
+
+@pytest.mark.parametrize('attack',['traversal','absolute','backslash','drive','duplicate','case_duplicate','extra','missing','unexpected','symlink','directory','compression','manifest','bytes'])
+def test_transfer_rejects_unsafe_archives(transfer,tmp_path,attack):
+    _,archive,_=transfer
+    with zipfile.ZipFile(archive) as src:
+        members=[(info.filename,src.read(info)) for info in src.infolist()]
+    name,data=members[-1]
+    replacements={'traversal':'../escape.tif','absolute':'/escape.tif','backslash':'train\\escape.tif',
+                  'drive':'C:/escape.tif','duplicate':members[0][0],'case_duplicate':members[0][0].upper(),
+                  'unexpected':'notes.txt'}
+    if attack in replacements:members[-1]=(replacements[attack],data)
+    if attack=='extra':members.append(('extra.txt',b'extra'))
+    if attack=='missing':members.pop()
+    if attack=='manifest':members=[(n,b'{}' if n=='manifest.json' else d) for n,d in members]
+    if attack=='bytes':members[-1]=(name,b'wrong')
+    bad=tmp_path/'bad.zip'
+    with zipfile.ZipFile(bad,'x') as dest:
+        for i,(n,d) in enumerate(members):
+            info=zipfile.ZipInfo(n);info.create_system=3;info.external_attr=(stat.S_IFREG|0o644)<<16
+            if i==len(members)-1:
+                if attack=='symlink':info.external_attr=(stat.S_IFLNK|0o777)<<16
+                if attack=='directory':info.external_attr=(stat.S_IFDIR|0o755)<<16
+                if attack=='compression':info.compress_type=zipfile.ZIP_DEFLATED
+            dest.writestr(info,d)
+    with pytest.raises((ValueError,zipfile.BadZipFile)):g0.unpack(bad,g0.sha(bad),tmp_path/'out')
+    assert not (tmp_path/'out').exists()
+    assert not (tmp_path/'escape.tif').exists()
+
+
+def test_transfer_pin_limits_and_overwrite_protection(transfer,tmp_path,monkeypatch):
+    root,archive,report=transfer
+    with pytest.raises(ValueError):g0.unpack(archive,'0'*64,tmp_path/'out')
+    assert not (tmp_path/'out').exists()
+    existing=tmp_path/'existing';existing.mkdir();(existing/'keep').write_text('protected')
+    failed=g0.unpack_report(archive,report['zip_sha256'],existing,tmp_path/'failed.json')
+    assert failed['status']=='FAIL' and (existing/'keep').read_text()=='protected'
+    assert json.loads((tmp_path/'failed.json').read_text())['dataset_usable'] is False
+    with pytest.raises(FileExistsError):g0.unpack_report(archive,report['zip_sha256'],tmp_path/'new',tmp_path/'failed.json')
+    with pytest.raises(ValueError):g0.unpack_report(archive,report['zip_sha256'],root,root/'result.json')
+    monkeypatch.setattr(g0,'MAX_TRANSFER_BYTES',1)
+    with pytest.raises(ValueError,match='limit'):g0.unpack(archive,report['zip_sha256'],tmp_path/'large')
+
+
+def test_pack_refuses_bad_input_before_creation(frozen,tmp_path,monkeypatch):
+    root,m=frozen;_,digest=seal(root,m)
+    monkeypatch.setattr(g0,'MANIFEST_SHA256',digest)
+    (root/m['samples'][0]['split']/str(m['samples'][0]['image_id'])/'rgb.tif').unlink()
+    with pytest.raises(OSError):g0.pack(root,tmp_path/'not-created')
+    assert not (tmp_path/'not-created').exists()
+
+
+def test_transfer_partial_output_is_never_a_pass(transfer,tmp_path,monkeypatch):
+    _,archive,report=transfer
+    def fail_after_copy(*args,**kwargs): raise ValueError('simulated final grid verification failure')
+    monkeypatch.setattr(g0,'verify',fail_after_copy)
+    output=tmp_path/'partial'
+    result=g0.unpack_report(archive,report['zip_sha256'],output,tmp_path/'partial-result.json')
+    assert result['status']=='FAIL' and result['dataset_usable'] is False
+    assert output.exists()  # preserved for diagnosis; never silently deleted/reused
+    assert json.loads((tmp_path/'partial-result.json').read_text())['status']=='FAIL'

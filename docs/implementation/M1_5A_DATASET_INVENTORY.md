@@ -814,6 +814,105 @@ Local Windows portable verification and independent-directory transfer verificat
 
 After G0 PR review/merge and transferred-package verification, implement a separately reviewed Zenodo-aware input path: the old M1-6/M1-3A loaders remain HF/two-image specific and must not be passed a fabricated legacy manifest. Begin G1 with a224×224 all-valid batch1 patch as planned (minimum frozen dimension230), verify official initializer hash/versions and measure an actual GPU optimizer step/resources. Those operations, full training and GPU acceptance are **not performed by G0**. Frozen data admission does not resolve per-ID Panoptic category mapping, absolute positional accuracy, annotation completeness or commercial final clearance.
 
+## M1-7 G1-A — ZIP transfer preparation (2026-11-06)
+
+**Windows PASS; actual Drive upload/authentication and Colab execution NOT_VERIFIED / user-operated. No GPU or training.** Existing `m1_7_dataset.py` now has `pack` / `unpack`; no new script, notebook, dependency or data generation. The following cells are the single Colab recipe. G0 manifest and old data/checkpoints are unchanged.
+
+Measured archive: external `m1-7-g1a-transfer-01/zenodo10-g0.zip` under the local data-cache root. Upload **this ZIP only**, not the Python sources, original images, checkpoints or contact-bearing rights snapshots. [Transfer receipt / complete41-file inventory](M1_7_G1A_TRANSFER.json) records each relative name, byte size and SHA256, plus actual Windows unpack result.
+
+| Item | Fixed value |
+| --- | --- |
+| ZIP SHA256 | `db282971016895a23052c3006992d3a06c5008c9d98b4e23e1551c1d16ab8521` |
+| ZIP size | **3,646,561 bytes** |
+| Members | **41**: fixed `manifest.json` plus40 TIFFs, no directory entries/sidecar/previews |
+| Dataset ID | `ouem-zenodo10-e3db510b1125931d` |
+| Manifest SHA256 | `c2f4ccd56da8770cd73ef1db299d67d5528dcab8ea0051da1c2d5f8174a850ca` |
+
+ZIP_STORED is intentional: the TIFFs are already compressed, and fixed sorted paths, timestamp1980-01-01 and regular-file permissions remove host mtime/metadata variation. Synthetic repeat packs produced identical ZIP SHA. The real ZIP's entire payload was read back against the fixed manifest. Packaging reads only whitelisted files, even if the source folder has the old checksum sidecar.
+
+### Windows packaging and manual upload
+
+```powershell
+.\.venv\Scripts\python.exe scripts/m1_7_dataset.py pack --root '<verified-G0-dataset-root>' --output '<fresh-external-transfer-directory>'
+Get-FileHash -Algorithm SHA256 '<transfer-directory>\zenodo10-g0.zip'
+# Local extraction test; do not reuse an existing destination or result filename.
+.\.venv\Scripts\python.exe scripts/m1_7_dataset.py unpack --archive '<transfer-directory>\zenodo10-g0.zip' --expected-zip-sha256 db282971016895a23052c3006992d3a06c5008c9d98b4e23e1551c1d16ab8521 --output '<fresh-external-unpack-root>' --result-json '<transfer-directory>\windows-result.json'
+```
+
+`pack` runs existing G0 `verify` before creating the ZIP/output directory, then checks the original file hashes before/after streaming. The actual ZIP was safely unpacked to new external `m1-7-g1a-unpack-check-01`; both the extracted set and original G0 root subsequently passed the existing **verify CLI** again. All40 TIFF SHA, grids/dtypes/ranges, threshold0.5, validity and Train7/Val3 separation passed. The committed manifest was rechecked unchanged.
+
+Manually open Google Drive in the browser, choose a new transfer folder and upload the ZIP as an ordinary file. Wait until the upload finishes; do not unzip/import/convert images in Drive. Record the folder's mounted path for the cells below. Codex did not open Drive, authenticate or upload. Keep the Git receipt/checksum trusted independently of the uploaded file; a checksum provided beside a corrupted ZIP is not independent evidence.
+
+### Colab cells — user executes, CPU runtime is sufficient
+
+Cell1: clone the public repository at the **reviewed G1-A commit**, then mount Drive yourself. Use the full commit SHA from the reviewed PR, not an unpinned latest main. Existing clone directories are not reset or replaced.
+
+```python
+from pathlib import Path
+import subprocess, sys, importlib.util
+G1A_COMMIT = '<full-reviewed-G1-A-commit-SHA>'
+if len(G1A_COMMIT) != 40 or any(c not in '0123456789abcdef' for c in G1A_COMMIT):
+    raise ValueError('Set the reviewed full Git commit SHA first')
+repo = Path('/content/ouem-canopy-segmentation')
+if repo.exists():
+    raise FileExistsError('Use a fresh Colab session/destination; existing clone is protected')
+subprocess.run(['git','clone','https://github.com/iwamoto31206803-max/ouem-canopy-segmentation.git',str(repo)], check=True)
+subprocess.run(['git','-C',str(repo),'checkout',G1A_COMMIT], check=True)
+missing = [p for p in ['numpy','rasterio'] if importlib.util.find_spec(p) is None]
+if missing:
+    raise RuntimeError(f'Install only missing verifier dependencies, then rerun dependency check: {missing}')
+# If necessary, use %pip install <the missing numpy/rasterio packages> in a separate
+# cell and record installed versions. Never reinstall torch for data verification.
+from google.colab import drive
+drive.mount('/content/drive')  # user authentication only
+```
+
+Cell2: set your uploaded ZIP path. Validate its SHA through the CLI **before any extraction directory is created**. Read expected SHA/size from the pinned Git receipt, not from Drive. The command also uses existing G0 `verify` after extraction and saves PASS/FAIL JSON.
+
+```python
+import json
+receipt = json.loads((repo/'docs/implementation/M1_7_G1A_TRANSFER.json').read_text())
+archive = Path('/content/drive/MyDrive/<your-transfer-folder>/zenodo10-g0.zip')
+output = Path('/content/zenodo10-g0')
+result_json = Path('/content/zenodo10-g1a-result-01.json')
+if output.exists() or result_json.exists():
+    raise FileExistsError('Existing dataset/result is protected; inspect it or use a fresh session')
+subprocess.run([sys.executable, str(repo/'scripts/m1_7_dataset.py'), 'unpack',
+                '--archive', str(archive), '--expected-zip-sha256', receipt['zip_sha256'],
+                '--output', str(output), '--result-json', str(result_json)], check=True)
+result = json.loads(result_json.read_text())
+assert result['status'] == 'PASS'
+assert result['zip_bytes'] == receipt['zip_bytes']
+assert result['file_count'] == 41 and result['dataset']['products'] == 40
+assert result['dataset']['train'] == 7 and result['dataset']['val'] == 3
+assert result['dataset']['dataset_id'] == 'ouem-zenodo10-e3db510b1125931d'
+assert result['dataset']['manifest_sha256'] == 'c2f4ccd56da8770cd73ef1db299d67d5528dcab8ea0051da1c2d5f8174a850ca'
+print(result)
+```
+
+Cell3: optional explicit G0 verify CLI repeat and result recovery. User may download the existing JSON from Colab's file panel instead of copying it to Drive. This cell contains no training or CUDA operation.
+
+```python
+subprocess.run([sys.executable, str(repo/'scripts/m1_7_dataset.py'), 'verify',
+                '--root', str(output), '--manifest', str(output/'manifest.json'),
+                '--expected-sha256', receipt['dataset']['manifest_sha256']], check=True)
+# Optional user-run copy of the result JSON to an existing Drive folder; never overwrite.
+import shutil
+drive_result = archive.parent/'zenodo10-g1a-result-01.json'
+with result_json.open('rb') as src, drive_result.open('xb') as dst:
+    shutil.copyfileobj(src, dst)
+```
+
+### Failure behavior / PASS conditions
+
+`unpack` rejects wrong ZIP SHA, noncanonical/traversal/absolute/Windows-drive/backslash paths, duplicate paths (including case variants), directory/link/special/encrypted entries, unsupported compression, missing/extra members, bad member bytes and expansion beyond64MiB. It validates **every member** before creating a fresh external destination, never calls extractall, and creates files exclusively. It rechecks archive SHA after copying and all extracted SHA plus existing G0 grid/label verification. Source ZIP, originals and pre-existing output files are not overwritten. A fresh result JSON outside the dataset is reserved with exclusive creation; unexpected extraction/verification exceptions are recorded as FAIL with nonzero exit. Input/result-path errors before reservation may only raise; check paths first.
+
+Never treat a partial output directory as accepted: FAIL JSON says `dataset_usable=false`. Retain it for diagnosis; the CLI neither deletes it nor silently reuses it. Inspect before choosing new paths/a fresh session. The archive/expanded limit is specific to this fixed tiny package, not a general archive extraction tool. No GPU learning follows automatically.
+
+Colab PASS requires: trusted ZIP SHA+size, canonical41 members and all hashes, the fixed G0 manifest SHA/identity/generation, exactly40 product TIFFs, grids/dtypes/labels/all-valid consistency, and Train7/Val3. A successful Drive mount or upload alone is not PASS. Preserve the Colab result JSON and actual Git/dependency environment for review; only the user-run result can establish Colab validation. Missing dependencies or failures are not a GPU/model result.
+
+Windows measured packaging, safe unpack/report, independent G0 verify on source/extracted sets: **PASS**. Regression: **161 passed,472 warnings**,18 added transfer cases. Tests cover deterministic packing, ZIP pin, mutation/missing/extra/unsafe/duplicate/link/directory members, limits, no overwrite, prepack rejection and FAIL reports for partial output. Drive upload/authentication, actual Colab execution and GPU/model training remain **NOT_VERIFIED / NOT_RUN**. No new dependency was installed.
+
 ## M1-5D — Deferred black-border recovery research note (2026-11-06)
 
 **Decision: DEFER recovery implementation and keep all current HOLD decisions unchanged.** The project now prioritizes (1) a compact review of scientific comparisons / evaluation design, then (2) a small GPU fine-tuning and reproducibility run using *already quality-reviewed Zenodo samples*, then (3) deciding whether a larger clean-only dataset is sufficient. Investigate border recovery only if subsequent evidence shows that the additional data are valuable enough to justify the complexity. This is not permission to relax coverage gates or mix dataset generations. The M1-5D-3 pilot identified **7 new PASS_CANDIDATE (Train5, Val2)** among 18 screened images; **11 HOLD**, mostly artificial-looking edge-connected black areas. Together with M1-5D-2 this gives **10 candidate images (Train7, Val3)**; formal dataset acceptance and sufficiently representative Val evaluation are separate steps. The observed 11/18 hold rate is **not a population prevalence estimate**.
