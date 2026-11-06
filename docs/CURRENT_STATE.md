@@ -32,7 +32,7 @@
 | --- | --- |
 | Zenodo10 dataset ID | `ouem-zenodo10-e3db510b1125931d` |
 | Zenodo10 manifest SHA-256 | `c2f4ccd56da8770cd73ef1db299d67d5528dcab8ea0051da1c2d5f8174a850ca` |
-| Source archive ZIP SHA-256 | `db282971016895a23052c3006992d3a06c5008c9d98b4e23e1551c1d16ab8521` |
+| Frozen Zenodo10 transfer ZIP SHA-256 | `db282971016895a23052c3006992d3a06c5008c9d98b4e23e1551c1d16ab8521` |
 | Ai2 initial model SHA-256 | `f8abf21cadaab2a71859e9d172bec4e5d6b7cc9710882a2f6a4d8aae826db036` |
 | G2 Step20 checkpoint SHA-256 | `47044e414c27718d37ea2d67a89f88cc24e2777757db07cfad2286ead2b9e767` |
 | G3-A run ID | `m1-7-g3a-01` |
