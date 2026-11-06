@@ -9,7 +9,7 @@
 - **Preferred model:** Ai2 SatlasPretrain `Aerial_SwinB_SI` official Swin-B backbone/FPN plus freshly initialized official 2-class SEGMENT head, fine-tuned on license-verified OAM-TCD data.
 - **Source generation:** Zenodo `11617167-v1.0.0` is the active source for the existing smoke set; the previous Hugging Face inventory and black-border pilots remain historical evidence. Avoid silently mixing their metadata or license assertions.
 - **Current processing:** near-0.50m local-ground scale transformation, aligned RGB/fraction/binary/validity rasters; fixed labels, thresholds and provenance. Do not claim native GSI-equivalent image fidelity.
-- **No commercial release or public checkpoint redistribution planned**. Final organizational rights review remains outstanding.
+- **No public release or redistribution of trained model/checkpoint weights is planned**. Internal and potentially commercial inference remain intended uses, subject to a separate final organizational rights review.
 
 ## 2. Verified small-run lineage
 
@@ -25,6 +25,8 @@
 | G3-D | Additional raw-probability / rank / calibration diagnostics | DEFERRED |
 | GSI qualitative model evaluation | New Satlas fine-tuned model on several real GSI scenes | NOT RUN / NOT ACCEPTED |
 | Generic large-data training and OUEM handoff | Variable-size data/Trainer/general inference package | NOT IMPLEMENTED / NOT ACCEPTED |
+
+**Acceptance boundary:** The ten archived G0 sample records are accepted for **smoke testing only** and each records `category_level_per_id_validation=NOT_VERIFIED`. R1 may test these as backward-compatible fixtures, but must make separate, auditable QA dispositions before counting them toward its new training-dataset target.
 
 ## 3. Pinned smoke references
 
@@ -65,7 +67,7 @@ Step0 Head/Upsample equality with the original training-time initialization is *
 
 ## 5. Important open items
 
-- **Data:** first expansion to **~100 total accepted images** (provisional 80 Train / 20 Val); rights, mask categories, black-border validity, source scene independence and meaningful geographic/tree-cover diversity; no holdout/GT54 leakage.
+- **Data:** first expansion to **~100 R1-accepted images** (provisional 80 Train / 20 Val; archived Zenodo10 images count only after R1 requalification); rights, mask categories, black-border validity, source scene independence and meaningful geographic/tree-cover diversity; no holdout/GT54 leakage.
 - **Model:** yet to deliver demonstrably useful canopy masks; loss behavior on larger data, source-domain generalization, and GSI visual suitability unknown.
 - **Scaling:** hard-coded Zenodo10 sample/size constraints, 20-step-only Trainer, per-step full dataset validation, fixed Val3 crops, Colab interruption resilience, compute cost.
 - **Commercial:** source attribution and Satlas/ImageNet lineage reviewed at an appropriate deployment gate; no current commercial production signoff.
