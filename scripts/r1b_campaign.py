@@ -77,18 +77,32 @@ def inputs(plan_path,expected_sha,cache,expected_id=None):
 
 
 class Campaign:
+    schema=SCHEMA
+    read_inputs=staticmethod(inputs)
+
+    @classmethod
+    def checked_limits(cls,limits):
+        limits=dict(DEFAULT_LIMITS if limits is None else limits)
+        if set(limits)!=set(DEFAULT_LIMITS) or any(type(v) is not int or v<=0 or v>DEFAULT_LIMITS[k] for k,v in limits.items()):raise Stop('Limits may only be positive and no higher than reviewed proposals')
+        return limits
+
+    @staticmethod
+    def contract_metadata(plan):return {}
+
+    @staticmethod
+    def protected_inputs(plan):return []
+
     def __init__(self,root,registry):
         self.root=Path(root).absolute();self.registry=Path(registry).absolute();self.closed=True;self.poisoned=False
         ordinary(self.root);ordinary(self.registry)
 
     @classmethod
     def create(cls,root,registry,plan_path,plan_sha,cache,campaign_id,limits=None,protected_roots=()):
-        plan,targets,metadata=inputs(plan_path,plan_sha,cache)
-        limits=dict(DEFAULT_LIMITS if limits is None else limits)
-        if set(limits)!=set(DEFAULT_LIMITS) or any(type(v) is not int or v<=0 or v>DEFAULT_LIMITS[k] for k,v in limits.items()):raise Stop('Limits may only be positive and no higher than reviewed proposals')
+        plan,targets,metadata=cls.read_inputs(plan_path,plan_sha,cache)
+        limits=cls.checked_limits(limits)
         if not re.fullmatch('[A-Za-z0-9_-]{1,80}',campaign_id):raise Stop('Invalid campaign ID')
         c=cls(root,registry);cache=Path(cache).resolve();repo=Path(__file__).resolve().parents[1]
-        protected=[cache,repo,*[Path(p).resolve() for p in protected_roots]]
+        protected=[cache,repo,*[Path(p).resolve() for p in [*protected_roots,*cls.protected_inputs(plan)]]]
         for destination in (c.root.resolve(),c.registry.resolve()):
             for source in protected:
                 if destination==source or source in destination.parents or destination in source.parents:raise Stop('Protected input/repository overlap')
@@ -100,12 +114,15 @@ class Campaign:
         # Permanent claim, including failed initializations: no silent campaign reset.
         c.entry.mkdir(exist_ok=False)
         c.root.mkdir(parents=True,exist_ok=False)
-        c.contract=dict(schema=SCHEMA,campaign_id=campaign_id,created_utc=datetime.now(timezone.utc).isoformat(),
+        c.contract=dict(schema=cls.schema,campaign_id=campaign_id,created_utc=datetime.now(timezone.utc).isoformat(),
             plan_id=plan['plan_id'],plan_sha256=plan_sha,targets=targets,metadata_sha256=metadata,
             cache_root=str(cache),cache_verification='archives/train_meta.json and test_meta.json; image bytes NOT_VERIFIED',
             protected_roots=[str(p) for p in protected],
             limits=limits,registry_binding=binding,registry_root=str(c.registry.resolve()),
             execution_gate='OFFLINE_SAFETY_ONLY_NOT_REAL_DATA_APPROVAL')
+        extra=cls.contract_metadata(plan)
+        if set(extra)&set(c.contract):raise Stop('Contract extension cannot replace base fields')
+        c.contract.update(extra)
         selected={str(r['image_id']):r for r in plan['plan']['pool'] if str(r['image_id']) in targets}
         c.contract['source_files']={i:dict(rgb=f"extracted/dataset/holdout/images/{selected[i]['oam_id']}_{i}.tif",
             annotation=f"extracted/dataset/holdout/masks/{selected[i]['oam_id']}_{i}.png",byte_validation='NOT_VERIFIED_R1B2B_REQUIRED') for i in targets}
@@ -122,7 +139,7 @@ class Campaign:
 
     def _load(self,plan_path,plan_sha,expected_id=None):
         raw=(self.root/'contract.json').read_bytes();self.contract=json.loads(raw)
-        if self.contract.get('schema')!=SCHEMA or self.contract['registry_root']!=str(self.registry.resolve()):raise Stop('Contract/registry mismatch')
+        if self.contract.get('schema')!=self.schema or self.contract['registry_root']!=str(self.registry.resolve()):raise Stop('Contract/registry mismatch')
         self.entry=self.registry/self.contract['registry_binding'];ordinary(self.entry)
         for p in self.entry.iterdir():
             ordinary(p)
@@ -130,8 +147,9 @@ class Campaign:
         anchor=json.loads((self.entry/'anchor.json').read_bytes())
         if anchor!=dict(root=str(self.root.resolve()),contract_sha256=hash_bytes(raw)):raise Stop('Registry anchor/contract SHA mismatch')
         self._contract_sha=hash_bytes(raw)
-        plan,targets,metadata=inputs(plan_path,plan_sha,Path(self.contract['cache_root']),expected_id)
+        plan,targets,metadata=self.read_inputs(plan_path,plan_sha,Path(self.contract['cache_root']),expected_id)
         if (plan['plan_id']!=self.contract['plan_id'] or plan_sha!=self.contract['plan_sha256'] or targets!=self.contract['targets'] or metadata!=self.contract['metadata_sha256']):raise Stop('Fixed campaign input mismatch')
+        if any(self.contract.get(k)!=v for k,v in self.contract_metadata(plan).items()):raise Stop('Contract extension mismatch')
         head=json.loads((self.entry/'head.json').read_bytes())
         files=sorted((self.root/'events').iterdir());prev=None;state=dict(operations={},fatal=None)
         if len(files)!=head['sequence']:raise Stop('Orphan/missing journal record: STOP')
@@ -362,7 +380,7 @@ class Campaign:
         finally:guard.unlink()
 
 
-def main(argv=None):
+def main(argv=None,*,campaign_type=Campaign):
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('action',choices=['init','inspect','resume-check','reconcile'])
     for name in ('root','registry','plan','cache'):p.add_argument('--'+name,type=Path,required=name!='cache')
     p.add_argument('--plan-sha256',required=True);p.add_argument('--plan-id');p.add_argument('--campaign-id')
@@ -371,12 +389,12 @@ def main(argv=None):
     a=p.parse_args(argv)
     if a.action=='init':
         if not a.cache or not a.campaign_id:p.error('init requires --cache and --campaign-id')
-        if a.plan_id:inputs(a.plan,a.plan_sha256,a.cache,a.plan_id)
-        Campaign.create(a.root,a.registry,a.plan,a.plan_sha256,a.cache,a.campaign_id,protected_roots=a.protect_root)
-    elif a.action=='reconcile':Campaign.reconcile(a.root,a.registry,a.plan,a.plan_sha256,acknowledge_stopped_owner=a.acknowledge_stopped_owner,expected_lock_sha=a.lock_sha256,expected_id=a.plan_id)
+        if a.plan_id:campaign_type.read_inputs(a.plan,a.plan_sha256,a.cache,a.plan_id)
+        campaign_type.create(a.root,a.registry,a.plan,a.plan_sha256,a.cache,a.campaign_id,protected_roots=a.protect_root)
+    elif a.action=='reconcile':campaign_type.reconcile(a.root,a.registry,a.plan,a.plan_sha256,acknowledge_stopped_owner=a.acknowledge_stopped_owner,expected_lock_sha=a.lock_sha256,expected_id=a.plan_id)
     elif a.action=='resume-check':
-        with Campaign.open(a.root,a.registry,a.plan,a.plan_sha256,a.plan_id):pass
-    result=Campaign.inspect(a.root,a.registry,a.plan,a.plan_sha256,a.plan_id);print(json.dumps(result,indent=2));return 0 if result['status']=='CLEAN_PAUSED' else 2
+        with campaign_type.open(a.root,a.registry,a.plan,a.plan_sha256,a.plan_id):pass
+    result=campaign_type.inspect(a.root,a.registry,a.plan,a.plan_sha256,a.plan_id);print(json.dumps(result,indent=2));return 0 if result['status']=='CLEAN_PAUSED' else 2
 
 
 if __name__=='__main__':raise SystemExit(main())
