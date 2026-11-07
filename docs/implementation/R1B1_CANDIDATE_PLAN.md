@@ -57,15 +57,38 @@ distribution after screening this predeclared cohort. Do not select retrospectiv
 by Val scores, predictions, apparent urban character or canopy abundance; preserve
 uniform masks. Any revised stratification requires a new reviewed plan.
 
-Plan ID: `ouem-r1b1-9e721bd3d064910606bb8a43d89365bb70daeb82027553d766d6065f778a51cb`.
+`plan.completeness` separately checks actual pool and initial-batch totals and
+Train/Val counts. For N slots, expected Val = floor(N/5), Train = N-floor(N/5),
+following the declared four-Train/one-Val order (21 slots = 17/4). Missing candidates
+or wrong split counts produce completeness HOLD, `gate="HOLD_INCOMPLETE_COHORT"`,
+a blocker and CLI exit **2** after writing a diagnostic report. A complete initial
+batch cannot hide a short pool, or vice versa. Estimates on incomplete plans cover
+only the available subset and never authorize the requested complete batch.
+
+Candidate fields explicitly distinguish `representative_metadata_bounds_wgs84`
+and `representative_metadata_center` (selected tile; diversity uses its center)
+from `group_metadata_bounds_wgs84` and `group_metadata_center` (union of known
+TCD tiles sharing oam_id). `group_metadata_member_count` records aggregation size.
+Separation uses the group union, not just the representative. Neither envelope is
+automatically a complete original/STAC footprint. The ambiguous old
+`metadata_bounds_wgs84` / `metadata_center` names are removed.
+
+Plan ID: `ouem-r1b1-fbb4ed018dc3cfded676d6ba09229ef7ccfb80fa7bef9b9b67a1df84864fcc5a`.
 It is `ouem-r1b1-` plus SHA-256 of the complete report before adding `plan_id`,
 using the existing G0 `encoded()` serializer (sorted keys, ASCII escaped,
 indent=2, UTF-8, final newline). This is a **plan** ID, not an R1 dataset ID.
 Two fresh runs produced byte-identical reports, file SHA-256
-`b6aab092e52d35991d51f6eb38e5266e2cd2dcea3bea3223ccf8898e60117063`.
+`47263941638588f2a94e462ff04d247cd94df2426c92e42b86ac1a43a20e7ffe`.
 This byte SHA describes the generated LF reports; Git text checkout may change
 line endings. The canonicalized plan ID is the cross-platform content identity,
 not a promise that a checked-out text file retains that byte SHA.
+
+This supersedes plan `ouem-r1b1-9e721bd3d064910606bb8a43d89365bb70daeb82027553d766d6065f778a51cb`
+(original PR commit a9e7387, retained in Git history). Completeness receipts,
+explicit tile/group fields and the resource execution gate changed the ID. All
+150 selected IDs/order, including the initial 25, are unchanged. The report's
+`supersedes_plan_id` and `revision_reason` record this lineage; the optional CLI
+argument adds the predecessor only when explicitly supplied.
 
 ## Resource model and proposed ceilings
 
@@ -98,9 +121,9 @@ Proposed first-batch envelope, **subject to review; not an assertion of fit**:
   max 25 STAC requests, at most 65,536 bytes per response. Cache reuse is preferred;
   failures/retries consume the same cumulative budget. No automatic archive fetch.
 * Incremental disk ceiling proposal: **94 MiB (98,566,144 bytes)**, separate from
-  the already-existing canonical cache. The modeled peak is **48,849,434 bytes**:
+  the already-existing canonical cache. The modeled peak is **48,948,126 bytes**:
   two deterministic output runs 28,212,000; previews 14,584,600; report/manifest
-  allowance 2,593,752; STAC snapshots 1,638,400; temporary files 1,820,682.
+  allowance 2,692,444; STAC snapshots 1,638,400; temporary files 1,820,682.
   Apply 2x headroom, round upward to whole MiB. Reports reserve twice the encoded
   selection-plan bytes plus two historical maximum manifest sizes per image.
   Temporary allowance is the largest selected raw TIFF+PNG pair plus one observed
@@ -164,6 +187,11 @@ planning succeeded; it does not authorize bulk image processing or declare QA PA
    request, delete a stale lock, reset counters or switch to a fresh allowance.
    Resume must match plan/input hashes and reconcile completed/partial files.
    Only owned, hash-checked temporary paths may be cleaned after review.
+   The machine-readable `resource_execution_gate` remains HOLD with
+   `actual_batch_peak_measured=false`. R1b-2 must measure retained/temporary bytes,
+   persist cumulative transfer/storage usage and STOP **before** the next HTTP
+   request/write/reservation exceeds either approved limit. The 94MiB proposal
+   is not an observed peak or automatic execution permission.
 3. Collect only missing, bounded STAC evidence (or reuse verified snapshots).
    Publish sanitized evidence references, not contacts. Resolve rights/identity
    conflicts before creating training pairs. Network failure remains HOLD.
@@ -201,13 +229,17 @@ Set-Location $Repo
   --pairs-dir "$Audits/m1-5d3-pairs-01" `
   --preview-dir "$Audits/m1-5d3-screen-01" `
   --preview-dir "$Audits/m1-5d3-reserve-01" `
-  --seed 0 --pool-size 150 --batch-size 25 --output $NewPlanPath
+  --seed 0 --pool-size 150 --batch-size 25 `
+  --supersedes-plan-id ouem-r1b1-9e721bd3d064910606bb8a43d89365bb70daeb82027553d766d6065f778a51cb `
+  --output $NewPlanPath
 ```
 
 Output requires a fresh file outside protected data/evidence directories; existing
 reports are not overwritten. Missing measurements => no disk estimate/HOLD, not
-fabricated numbers. Exit 0 means **plan written**, not candidates accepted or the
-R1b-2 gate released. Different evidence/measurement inputs produce a new plan ID.
+fabricated numbers. Exit 0 means a **count/split-complete plan was written**, not
+candidates accepted or the R1b-2 gate released. A shortfall writes HOLD and exits
+2. Invalid input fails without claiming completeness.
+Different evidence/measurement inputs produce a new plan ID.
 No old scripts, manifests, cache files, checkpoints or dataset acceptances change.
 
 Tests use synthetic metadata and byte-size fixtures, not real image QA. They check
@@ -216,9 +248,14 @@ rights, metadata generation/hash pins, budget arithmetic, and output preservatio
 Actual pixel/category/validity/visual/rights/source-byte audits remain R1b-2 work.
 
 Measured on Windows/Python 3.11.9 with the existing venv:
-`python -m pytest -q` → **283 passed, 1 skipped, 676 warnings (67.65s)**;
-new planner tests → **16 passed (0.86s)**. The skip is the existing Windows
+`python -m pytest -q` → **289 passed, 1 skipped, 676 warnings (67.88s)**;
+new planner tests → **22 passed (0.95s)**. The skip is the existing Windows
 symlink-creation limitation; warning categories are existing rasterio/Affine
 pending deprecations and the existing duplicate-ZIP negative case.
 Two complete local planning runs matched byte-for-byte, and the G0 manifest
 retains its fixed SHA `c2f4ccd56da8770cd73ef1db299d67d5528dcab8ea0051da1c2d5f8174a850ca`.
+Review tests additionally cover Train/Val shortage, a short pool with a complete
+first batch, nonmultiple-of-five slot quotas, CLI HOLD/nonzero exit, and the
+actual aggregate envelope passed into separation. Candidate IDs/order were
+compared to a9e7387 and are unchanged; the regenerated report is byte-identical
+across two new runs. Both count/split checks pass for the real 150/25 cohort.

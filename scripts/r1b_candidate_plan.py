@@ -60,7 +60,7 @@ def cached_rights(row, evidence_dirs):
 
 
 def select(rows, protected, holds, seed=0, pool_size=150, batch_size=25, evidence_dirs=()):
-    if type(pool_size) is not int or not 1 <= pool_size <= 200 or not 20 <= batch_size <= 30 or batch_size > pool_size:
+    if type(pool_size) is not int or type(batch_size) is not int or not 1 <= pool_size <= 200 or not 20 <= batch_size <= 30 or batch_size > pool_size:
         raise ValueError('Pool <=200 and pilot 20..30 within pool required')
     if type(seed) is not int: raise ValueError('Integer seed required')
     if len({r['image_id'] for r in rows}) != len(rows): raise ValueError('Duplicate image ID')
@@ -130,7 +130,11 @@ def select(rows, protected, holds, seed=0, pool_size=150, batch_size=25, evidenc
         cells[cell]+=1;biomes[str(r['biome'])]+=1
         evidence=cached_rights(r,evidence_dirs)
         chosen.append(dict(image_id=r['image_id'],oam_id=r['oam_id'],split=role(r),validation_fold=r['validation_fold'],row_license=r['license'],official_split=r['official_split'],
-            original_source_identity_sha256=identity(r),metadata_center=r['center'],metadata_bounds_wgs84=r['wgs84_bounds'],
+            original_source_identity_sha256=identity(r),
+            representative_metadata_center=r['center'],representative_metadata_bounds_wgs84=r['wgs84_bounds'],
+            group_metadata_center=group_info[r['oam_id']]['center'],
+            group_metadata_bounds_wgs84=group_info[r['oam_id']]['wgs84_bounds'],
+            group_metadata_member_count=len(by_oam[r['oam_id']]),
             geographic_cell=list(cell),biome=r['biome'],shape=[r['height'],r['width']],rights=evidence,
             metadata_separation=guard,canopy_fraction='NOT_MEASURED',image_conditions='NOT_VERIFIED',
             status='HOLD',pending=['SOURCE_BYTE_AND_ARCHIVE_AUTHENTICATION','RIGHTS_AND_ATTRIBUTION_REVIEW',
@@ -139,11 +143,25 @@ def select(rows, protected, holds, seed=0, pool_size=150, batch_size=25, evidenc
         reasons[r['image_id']]='SELECTED_PROVISIONAL_HOLD'
     for r,_ in remaining: reasons[r['image_id']]='RESERVE_NOT_SELECTED_POOL_LIMIT'
     return dict(seed=seed,requested_pool=pool_size,requested_batch=batch_size,pool=chosen,
+                completeness=completeness(chosen,pool_size,batch_size),
                 initial_batch_ids=[c['image_id'] for c in chosen[:batch_size]],
                 counts=dict(Counter(c['split'] for c in chosen)),
                 reasons_by_image={str(k):v for k,v in sorted(reasons.items())},
                 reason_counts=dict(Counter(reasons.values())),geographic_cells=len(cells),biomes=len(biomes),
                 external_independence='NOT_VERIFIED: TCD group envelopes checked; full original/STAC coverage not established')
+
+
+def completeness(chosen, pool_size, batch_size):
+    """Validate the actual prefix, not merely the nominal selection-slot count."""
+    result={};reasons=[]
+    for name,n,actual in [('pool',pool_size,chosen),('initial_batch',batch_size,chosen[:batch_size])]:
+        expected={'train':n-n//5,'val':n//5}
+        counts={split:sum(c['split']==split for c in actual) for split in ('train','val')}
+        ok=len(actual)==n and counts==expected
+        result[name]=dict(status='PASS' if ok else 'HOLD',expected_count=n,actual_count=len(actual),
+                          expected_split_counts=expected,actual_split_counts=counts)
+        if not ok:reasons.append(name.upper()+'_COUNT_OR_SPLIT_SHORTFALL')
+    return dict(status='HOLD' if reasons else 'PASS',reasons=reasons,**result)
 
 
 def measurements(pair_dirs, preview_dirs, stac_dirs):
@@ -211,6 +229,7 @@ def main(argv=None):
     p.add_argument('--pool-size',type=int,default=150)
     p.add_argument('--batch-size',type=int,default=25)
     p.add_argument('--seed',type=int,default=0)
+    p.add_argument('--supersedes-plan-id',help='Optional reviewed predecessor plan; does not grant acceptance')
     p.add_argument('--output',type=Path,required=True)
     a=p.parse_args(argv)
     if a.output.exists():raise ValueError('Fresh plan report required')
@@ -243,10 +262,20 @@ def main(argv=None):
     report['r1b2_execution_ready']=False
     report['r1b2_blockers']=['REVIEW_AND_APPROVE_BUDGET','BOUNDED_PERSISTENT_LEDGER_AND_NEW_COHORT_SCREEN_WRAPPER_NOT_IMPLEMENTED',
         'PER_IMAGE_RIGHTS_AND_EXTERNAL_SOURCE_REVIEW','ALL_INITIAL_CANDIDATES_REQUIRE_VISUAL_QA']
+    if plan['completeness']['status']!='PASS':
+        report['gate']='HOLD_INCOMPLETE_COHORT'
+        report['r1b2_blockers'].append('CANDIDATE_COUNT_OR_SPLIT_SHORTFALL')
+    report['resource_execution_gate']=dict(status='HOLD',actual_batch_peak_measured=False,
+        requirements=['R1B2_MEASURE_ACTUAL_RETAINED_AND_TEMPORARY_BYTES',
+                      'RESERVE_BEFORE_HTTP_OR_WRITE_AND_STOP_BEFORE_CUMULATIVE_LIMIT',
+                      'NO_BUDGET_RESET_OR_AUTOMATIC_INCREASE'])
+    if a.supersedes_plan_id:
+        report['supersedes_plan_id']=a.supersedes_plan_id
+        report['revision_reason']='PR43 review: actual cohort/split validation, explicit representative/group extents, measured-resource execution gate'
     report['plan_id']='ouem-r1b1-'+hashlib.sha256(encoded(report)).hexdigest()
     with a.output.open('xb') as stream:stream.write(encoded(report))
     print(json.dumps(dict(plan_id=report['plan_id'],pool=len(plan['pool']),initial_batch=len(plan['initial_batch_ids']),gate=report['gate'])))
-    return 0  # Plan creation succeeded; gate and every candidate remain explicitly HOLD.
+    return 2 if plan['completeness']['status']=='HOLD' else 0
 
 
 if __name__=='__main__':raise SystemExit(main())
