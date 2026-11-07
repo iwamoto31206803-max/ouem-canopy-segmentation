@@ -73,6 +73,7 @@ class Approval:
         if not isinstance(scopes,list) or len(scopes)!=len(set(scopes)) or not set(scopes)<=SCOPES:raise Stop('INVALID_SCOPE')
         allowed=a.get('allowed_image_ids')
         if not isinstance(allowed,list) or not allowed or any(type(i) is not int or str(i) not in c['targets'] for i in allowed) or len(set(allowed))!=len(allowed):raise Stop('INVALID_ALLOWED_IMAGE_IDS')
+        if hasattr(campaign,'validate_approval'):campaign.validate_approval(a,c)
         limits=a.get('artifact_limits',{})
         if set(limits)!={'preview','report','stac','geotiff'} or any(type(v) is not int or not 0<v<=32*1024**2 for v in limits.values()):raise Stop('INVALID_ARTIFACT_LIMITS')
         if limits['stac']>c['limits']['response_bytes']:raise Stop('STAC_BUFFER_LIMIT')
@@ -261,7 +262,7 @@ class Runner:
         self.connection_factory=connection_factory
         if sha(Path(plan_path))!=campaign.contract['plan_sha256']:raise Stop('PLAN_SHA_MISMATCH')
         cache=Path(campaign.contract['cache_root'])
-        checked_plan,targets,_=inputs(plan_path,campaign.contract['plan_sha256'],cache,campaign.contract['plan_id'])
+        checked_plan,targets,_=campaign.read_inputs(plan_path,campaign.contract['plan_sha256'],cache,campaign.contract['plan_id'])
         if targets!=campaign.contract['targets']:raise Stop('FIXED_TARGETS_MISMATCH')
         self.order=list(checked_plan['plan']['initial_batch_ids'])
         self.rows=local_index(cache);self.index={r['image_id']:r for r in self.rows}
@@ -388,6 +389,8 @@ class Runner:
                 report['checks']['geometry']=dict(status='PASS',crs=str(src.crs),affine=list(t)[:6],bounds=list(src.bounds),
                     ground_gsd=intervals(src.crs,*(t*(src.width/2,src.height/2)),t.a,-t.e),proposed_050_shape=list(shape),proposed_ground_gsd=gsd)
             black,_,_=component_report(np.all(rgb==0,axis=2),mask)
+            if hasattr(self.c,'coverage_diagnostics'):
+                report['coverage_review']=self.c.coverage_diagnostics(rgb,mask,black)
             report['checks']['validity']=dict(status='HOLD' if not valid or black['border_connected_pixels']/mask.size>=.01 else 'PASS',
                 raster_masks_all_valid=bool(valid),black_components=black,visual_all_valid='NOT_VERIFIED')
             grouped=self.group_index[row['oam_id']]
@@ -423,7 +426,7 @@ class Runner:
         return report
 
 
-def main(argv=None):
+def main(argv=None,*,campaign_type=Campaign):
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('action',choices=['check-approval','run'])
     for name in ('root','registry','plan','approval'):p.add_argument('--'+name,type=Path,required=True)
     p.add_argument('--plan-sha256',required=True);p.add_argument('--approval-sha256',required=True)
@@ -432,14 +435,15 @@ def main(argv=None):
     a=p.parse_args(argv)
     if a.action=='run' and not a.execute:raise Stop('EXPLICIT_EXECUTE_FLAG_REQUIRED')
     # Read-only control inspection first. No image/HTTP before approval validation.
-    view=Campaign.inspect(a.root,a.registry,a.plan,a.plan_sha256)
+    view=campaign_type.inspect(a.root,a.registry,a.plan,a.plan_sha256)
     if view['status']!='CLEAN_PAUSED':raise Stop('CAMPAIGN_RECONCILIATION_REQUIRED')
     class Context:pass
     context=Context();context.contract=view['contract'];context.root=a.root;context._contract_sha=sha(a.root/'contract.json')
+    if hasattr(campaign_type,'validate_approval'):context.validate_approval=campaign_type.validate_approval
     validated=Approval(context,a.approval,a.approval_sha256)
     if a.ids is not None:validated.select_ids([int(i) for i in context.contract['targets']],a.ids)
     if a.action=='check-approval':print(json.dumps(dict(status='APPROVAL_BINDING_CHECKED',data_execution=False)));return 0
-    with Campaign.open(a.root,a.registry,a.plan,a.plan_sha256) as campaign:
+    with campaign_type.open(a.root,a.registry,a.plan,a.plan_sha256) as campaign:
         runner=Runner(campaign,a.plan,a.approval,a.approval_sha256)
         summary=runner.run_batch(a.ids,run_id=a.run_id,fetch_missing=a.fetch_missing_stac)
         print(json.dumps(dict(run_id=summary['run_id'],results=summary['results'],r1_acceptance='HOLD')))
