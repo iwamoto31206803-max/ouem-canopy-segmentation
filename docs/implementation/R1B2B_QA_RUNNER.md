@@ -330,3 +330,29 @@ Warnings are existing affine deprecations and the deliberate duplicate-ZIP fixtu
 the Windows symlink-dependent case remains skipped. CLI --help, non-executable
 JSON template checks and git diff --check also passed. Synthetic QA fixtures only;
 no real Campaign/approval/source QA/HTTP executed. R1 acceptance remains HOLD.
+
+### PR #46 review follow-up: direct Python API guards
+
+Every image-bearing QA entry explicitly checks Approval.require_image before
+source access or delegation: run_one, STAC fetch/check, report/preview/geotiff,
+shared encode, duplicate check and internal HOLD diagnostic. Runner.target also
+continues enforcing the subset. The full 25-image metadata catalog and grouped
+independence checks are retained; approval limits pixel access, not those checks.
+
+Synthetic regression tests call all ten paths with an unapproved planned image,
+block source readers and Campaign.reserve, verify no HTTP factory use, compare
+ledger/usage and all existing output hashes, and test CLI rejection before Runner
+construction. Delegated target lookup is deliberately blocked to prove direct
+API guards do not depend on it. This does not sandbox arbitrary modified Python
+code or grant authority to bypass the managed adapters.
+
+No Campaign contract/budget, run/duplicate semantics, production approval template
+or existing source data are changed. The template remains approved:false and R1
+acceptance remains HOLD. Real image QA/HTTP/production Campaign initialization
+remain unexecuted.
+
+Follow-up full regression on Windows / existing venv:
+`python -m pytest -q`: **396 passed, 1 skipped, 2569 warnings in 178.00 s**.
+Warnings remain affine deprecations and the intentional duplicate-ZIP fixture;
+the Windows symlink-dependent case remains skipped. `git diff --check` passed;
+the production template was separately confirmed approved:false and unchanged.

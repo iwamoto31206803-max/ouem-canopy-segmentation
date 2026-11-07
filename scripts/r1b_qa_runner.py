@@ -117,6 +117,7 @@ class Saved:
     def __init__(self,campaign,approval):self.c=campaign;self.a=approval
 
     def _hold(self,op,image_id,split,exc):
+        self.a.require_image(image_id)
         # Optional diagnostic is itself charged. Original reservation stays pending.
         data=encoded(dict(status='HOLD',operation_id=op,reason=type(exc).__name__,
             observed_bytes=getattr(exc,'observed',None),limit=getattr(exc,'limit',None),memory_peak='NOT_MEASURED'))
@@ -140,11 +141,13 @@ class Saved:
             self._hold(op,image_id,split,exc);raise
 
     def report(self,op,image_id,split,value):
+        self.a.require_image(image_id)
         def encode(buf):
             for text in json.JSONEncoder(sort_keys=True,ensure_ascii=True,allow_nan=False).iterencode(value):buf.write(text.encode('utf-8'))
         return self.encode(op,image_id,split,'report',f'artifacts/reports/{op}.json',encode)
 
     def preview(self,op,image_id,split,rgb,mask):
+        self.a.require_image(image_id)
         def encode(buf):
             canvas=Image.new('RGB',(rgb.shape[1]*3,rgb.shape[0]))
             for i,array in enumerate((rgb,np.repeat((mask*255)[:,:,None],3,axis=2),overlay(rgb,mask))):canvas.paste(Image.fromarray(array),(i*rgb.shape[1],0))
@@ -152,6 +155,7 @@ class Saved:
         return self.encode(op,image_id,split,'preview',f'artifacts/previews/{op}.jpg',encode)
 
     def geotiff(self,op,image_id,split,array,crs,transform):
+        self.a.require_image(image_id)
         def encode(buf):
             estimate=2*array.nbytes+65536
             if estimate>self.a.record['max_buffer_bytes']:raise BufferLimit(estimate,self.a.record['max_buffer_bytes'])
@@ -206,6 +210,7 @@ class Stac:
     def __init__(self,runner):self.r=runner
 
     def fetch(self,image_id,split,url=None):
+        self.r.approval.require_image(image_id)
         r=self.r;row=r.target(image_id,split);r.approval.require('stac_network')
         expected=STAC_BASE+row['oam_id']
         if url is not None and url!=expected:raise Stop('STAC_URL_NOT_ALLOWED')
@@ -289,6 +294,7 @@ class Runner:
         return row
 
     def check_stac(self,image_id,split,path,expected_sha):
+        self.approval.require_image(image_id)
         row=self.target(image_id,split);self.approval.require('qa_local');ordinary(path)
         local=self.approval.record.get('local_stac',{}).get(str(image_id))
         pinned=local and path.resolve()==Path(local['path']).resolve() and expected_sha==local['sha256']
@@ -303,6 +309,7 @@ class Runner:
                     attribution='Named licensor/producer retained in external hashed STAC; human review required',bbox=item['bbox'])
 
     def ensure_unstarted(self,image_id):
+        self.approval.require_image(image_id)
         if any(f'{prefix}-{image_id}' in self.c.state['operations'] for prefix in ('qa-preview','qa-report')):
             raise Stop('duplicate QA operation already started')
 
@@ -333,6 +340,8 @@ class Runner:
         return summary
 
     def run_one(self,image_id,split,*,fetch_missing=False,run_id=None):
+        # Enforce the API boundary explicitly, before target lookup or source I/O.
+        self.approval.require_image(image_id)
         row=self.target(image_id,split);self.approval.require('qa_local')
         self.approval.require('qa_preview');self.approval.require('qa_report')
         if fetch_missing:self.approval.require('stac_network')

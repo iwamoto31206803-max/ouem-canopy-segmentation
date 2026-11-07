@@ -429,7 +429,8 @@ def test_changed_allowed_ids_requires_new_sha(data):
         with pytest.raises(c.Stop,match='SHA_MISMATCH'):q.Approval(campaign,path,digest,test_mode=True)
 
 
-def test_cli_rejects_ids_before_runner(data,monkeypatch):
+@pytest.mark.parametrize('image_id',[1,2,25])
+def test_cli_rejects_ids_before_runner(data,monkeypatch,image_id):
     with opened(data) as campaign:path,digest=approval(data,campaign,dict(allowed_image_ids=[0,4]))
     original=q.Approval
     monkeypatch.setattr(q,'Approval',lambda campaign,path,digest:original(campaign,path,digest,test_mode=True))
@@ -437,4 +438,37 @@ def test_cli_rejects_ids_before_runner(data,monkeypatch):
     monkeypatch.setattr(q,'Runner',forbidden)
     with pytest.raises(c.Stop,match='IMAGE_NOT_IN_EXECUTION_APPROVAL'):
         q.main(['run','--execute','--root',str(data['root']),'--registry',str(data['registry']),'--plan',str(data['plan_path']),
-            '--plan-sha256',data['plan_sha'],'--approval',str(path),'--approval-sha256',digest,'--ids','1'])
+            '--plan-sha256',data['plan_sha'],'--approval',str(path),'--approval-sha256',digest,'--ids',str(image_id)])
+
+
+@pytest.mark.parametrize('entry',['run_one','target','check_stac','fetch','report','preview','geotiff','encode','hold','ensure_unstarted'])
+def test_direct_api_denies_unapproved_before_any_effect(data,monkeypatch,entry):
+    with opened(data) as campaign:
+        factory=Factory(Response(stac_body(1)))
+        r=runner(data,campaign,factory,changes=dict(allowed_image_ids=[0,4]))
+        # Approval narrows pixel access, not the full fixed-cohort metadata checks.
+        assert len(r.order)==25 and len(r.group_catalog)==25
+        before=copy.deepcopy(campaign.state);usage=campaign.usage()
+        files={str(p.relative_to(campaign.root)):c.sha(p) for p in campaign.root.rglob('*') if p.is_file()}
+        def forbidden(*args,**kwargs):raise AssertionError('UNAPPROVED SIDE EFFECT')
+        monkeypatch.setattr(q.rasterio,'open',forbidden)
+        monkeypatch.setattr(q.Image,'open',forbidden)
+        monkeypatch.setattr(campaign,'reserve',forbidden)
+        # Even delegated target lookup must not replace each public entry guard.
+        if entry in ('run_one','check_stac','fetch'):monkeypatch.setattr(r,'target',forbidden)
+        actions={
+            'run_one':lambda:r.run_one(1,'train'),
+            'target':lambda:r.target(1,'train'),
+            'check_stac':lambda:r.check_stac(1,'train',Path('must-not-read.json'),'0'*64),
+            'fetch':lambda:r.stac.fetch(1,'train'),
+            'report':lambda:r.saved.report('denied',1,'train',{}),
+            'preview':lambda:r.saved.preview('denied',1,'train',None,None),
+            'geotiff':lambda:r.saved.geotiff('denied',1,'train',None,None,None),
+            'encode':lambda:r.saved.encode('denied',1,'train','report','artifacts/denied.json',forbidden),
+            'hold':lambda:r.saved._hold('denied',1,'train',q.BufferLimit(2,1)),
+            'ensure_unstarted':lambda:r.ensure_unstarted(1),
+        }
+        with pytest.raises(c.Stop,match='IMAGE_NOT_IN_EXECUTION_APPROVAL'):actions[entry]()
+        assert not factory.instances and not factory.requests
+        assert campaign.state==before and campaign.usage()==usage
+        assert files=={str(p.relative_to(campaign.root)):c.sha(p) for p in campaign.root.rglob('*') if p.is_file()}
