@@ -79,10 +79,10 @@ def opened(s):return c.Campaign.open(s['root'],s['registry'],s['plan_path'],s['p
 
 def approval(s,campaign,changes=None):
     contract=campaign.contract
-    a=dict(schema='ouem-r1b-qa-approval-v1',approved=True,approval_id='offline-fixture',reviewer_ref='synthetic test, not human production approval',mode='offline_test',
+    a=dict(schema='ouem-r1b-qa-approval-v2',approved=True,approval_id='offline-fixture',reviewer_ref='synthetic test, not human production approval',mode='offline_test',
         campaign_id=contract['campaign_id'],contract_sha256=campaign._contract_sha,plan_id=contract['plan_id'],plan_sha256=contract['plan_sha256'],targets=contract['targets'],
         limits=contract['limits'],cache_root=contract['cache_root'],output_root=str(campaign.root.resolve()),environment=q.environment(),
-        scopes=['qa_local','qa_preview','qa_report','stac_network','geotiff_adapter'],
+        allowed_image_ids=[int(i) for i in contract['targets']],scopes=['qa_local','qa_preview','qa_report','stac_network','geotiff_adapter'],
         artifact_limits=dict(preview=1024**2,report=131072,stac=65536,geotiff=1024**2),max_input_pixels=64,max_buffer_bytes=2*1024**2,
         local_stac={},coco_sha256=c.sha(s['cache']/'archives/dataset/holdout/train.json'))
     a['test_fixture_sha256']=c.hash_bytes(q.FIXTURE_MARKER)
@@ -375,8 +375,66 @@ def test_cli_summary_via_explicit_offline_test_injection(data,monkeypatch):
     monkeypatch.setattr(q,'Approval',lambda campaign,path,digest,**kw:original_approval(campaign,path,digest,test_mode=True))
     monkeypatch.setattr(q,'Runner',lambda campaign,plan,path,digest:original_runner(campaign,plan,path,digest,test_mode=True,connection_factory=Factory(Response(stac_body()))))
     result=q.main(['run','--execute','--root',str(s['root']),'--registry',str(s['registry']),'--plan',str(s['plan_path']),
-        '--plan-sha256',s['plan_sha'],'--approval',str(path),'--approval-sha256',digest,'--ids','0','4'])
+        '--plan-sha256',s['plan_sha'],'--approval',str(path),'--approval-sha256',digest,'--ids','0','4','--run-id','first'])
     assert result==2
-    summary=json.loads((s['root']/'artifacts/reports/qa-summary.json').read_bytes())
+    summary=json.loads((s['root']/'artifacts/reports/qa-summary-first.json').read_bytes())
     assert summary['requested_ids']==[0,4] and len(summary['not_processed_ids'])==23
     assert summary['r1_acceptance']=='HOLD' and summary['usage_snapshot_before_summary']['requests']==0
+
+
+@pytest.mark.parametrize('ids',[None,[],[0,0],[25],[True]])
+def test_invalid_approval_subset(data,ids):
+    with opened(data) as campaign:
+        with pytest.raises(c.Stop,match='INVALID_ALLOWED_IMAGE_IDS'):
+            runner(data,campaign,changes=dict(allowed_image_ids=ids))
+
+
+def test_two_approved_images_default_and_denied_access(data):
+    with opened(data) as campaign:
+        r=runner(data,campaign,changes=dict(allowed_image_ids=[0,4],scopes=['qa_local','qa_preview','qa_report']))
+        with pytest.raises(c.Stop,match='IMAGE_NOT_IN_EXECUTION_APPROVAL'):r.run_batch([0,1])
+        assert not campaign.state['operations']
+        with pytest.raises(c.Stop,match='SCOPE_NOT_APPROVED'):r.run_batch(fetch_missing=True)
+        with pytest.raises(c.Stop,match='SCOPE_NOT_APPROVED'):
+            r.saved.geotiff('denied-tiff',0,'train',np.ones((8,8),np.uint8),'EPSG:3395',from_origin(0,1,.1,.1))
+        summary=r.run_batch(run_id='two-images')
+        assert summary['requested_ids']==[0,4]
+        assert summary['r1_acceptance']=='HOLD' and not summary['new_network_permitted']
+        assert campaign.usage()['requests']==0
+        before=copy.deepcopy(campaign.state)
+        with pytest.raises(c.Stop,match='duplicate QA'):r.run_batch([0],run_id='different-run')
+        assert campaign.state==before
+
+
+def test_sequential_disjoint_approvals_preserve_runs_and_budget(data):
+    digests=[];sizes=[]
+    for image_id,run_id in [(0,'first'),(4,'second')]:
+        with opened(data) as campaign:
+            r=runner(data,campaign,changes=dict(approval_id=run_id,allowed_image_ids=[image_id],scopes=['qa_local','qa_preview','qa_report']))
+            summary=r.run_batch(run_id=run_id)
+            sizes.append(campaign.usage())
+            digests.append(c.sha(data['root']/f'artifacts/reports/qa-summary-{run_id}.json'))
+    assert c.sha(data['root']/'artifacts/reports/qa-summary-first.json')==digests[0]
+    assert summary['completed_campaign_report_ids']==[0,4] and len(summary['not_processed_ids'])==23
+    assert sizes[1]['disk_bytes']>sizes[0]['disk_bytes']
+    assert summary['r1_acceptance']=='HOLD'
+
+
+def test_changed_allowed_ids_requires_new_sha(data):
+    with opened(data) as campaign:
+        path,digest=approval(data,campaign,dict(allowed_image_ids=[0]))
+        checked=q.Approval(campaign,path,digest,test_mode=True)
+        record=json.loads(path.read_bytes());record['allowed_image_ids']=[4];path.write_bytes(c.encoded(record))
+        with pytest.raises(c.Stop,match='APPROVAL_CHANGED'):checked.require_image(0)
+        with pytest.raises(c.Stop,match='SHA_MISMATCH'):q.Approval(campaign,path,digest,test_mode=True)
+
+
+def test_cli_rejects_ids_before_runner(data,monkeypatch):
+    with opened(data) as campaign:path,digest=approval(data,campaign,dict(allowed_image_ids=[0,4]))
+    original=q.Approval
+    monkeypatch.setattr(q,'Approval',lambda campaign,path,digest:original(campaign,path,digest,test_mode=True))
+    def forbidden(*a,**kw):raise AssertionError('RUNNER MUST NOT ACCESS IMAGES')
+    monkeypatch.setattr(q,'Runner',forbidden)
+    with pytest.raises(c.Stop,match='IMAGE_NOT_IN_EXECUTION_APPROVAL'):
+        q.main(['run','--execute','--root',str(data['root']),'--registry',str(data['registry']),'--plan',str(data['plan_path']),
+            '--plan-sha256',data['plan_sha'],'--approval',str(path),'--approval-sha256',digest,'--ids','1'])

@@ -1,0 +1,23 @@
+{
+  "schema": "ouem-r1b-qa-approval-v2",
+  "approved": false,
+  "approval_id": "REQUIRES_NEW_INDEPENDENT_REVIEW",
+  "reviewer_ref": "NOT_APPROVED",
+  "mode": "production_qa",
+  "allowed_image_ids": [1638, 1241],
+  "scopes": ["qa_local", "qa_preview", "qa_report"],
+  "campaign_id": "REVIEW_REQUIRED",
+  "contract_sha256": "REVIEW_REQUIRED",
+  "plan_id": "REVIEW_REQUIRED",
+  "plan_sha256": "REVIEW_REQUIRED",
+  "targets": {},
+  "limits": {},
+  "cache_root": "REVIEW_REQUIRED",
+  "output_root": "REVIEW_REQUIRED",
+  "environment": {},
+  "artifact_limits": {"preview": 1048576, "report": 131072, "stac": 65536, "geotiff": 1048576},
+  "max_input_pixels": 4194304,
+  "max_buffer_bytes": 33554432,
+  "coco_sha256": "REVIEW_REQUIRED",
+  "local_stac": {}
+}
