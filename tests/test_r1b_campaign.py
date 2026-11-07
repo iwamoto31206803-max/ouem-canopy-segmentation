@@ -293,3 +293,64 @@ def test_changed_owner_lock_blocks_operations_and_is_not_deleted(setup):
         with pytest.raises(m.Stop,match='Owner lock'):c.__exit__(None,None,None)
         assert lock.read_bytes()==b'other owner'
         lock.write_bytes(owned)  # test fixture restores its own lock; never automatic recovery
+
+
+def test_written_receipt_is_durable_and_normal_commit_matches_it(setup):
+    s=setup;create(s)
+    with open_campaign(s) as c:
+        c.reserve('receipt',0,'train','report','artifacts/receipt',20)
+        c.write_bytes('receipt',b'good')
+        receipt=dict(bytes=4,sha256=m.hash_bytes(b'good'))
+        assert inspect(s)['operations']['receipt']['written_file']==receipt
+        c.commit('receipt')
+        assert c.state['operations']['receipt']['file']==receipt
+    assert inspect(s)['status']=='CLEAN_PAUSED'
+
+
+def test_reserved_commit_rejected_even_if_a_partial_was_supplied_outside_api(setup):
+    s=setup;create(s)
+    with pytest.raises(m.Stop):
+        with open_campaign(s) as c:
+            c.reserve('unwritten',0,'train','report','artifacts/unwritten',20)
+            (s['root']/'artifacts/unwritten.partial').write_bytes(b'not written by API')
+            with pytest.raises(m.Stop,match='WRITTEN'):c.commit('unwritten')
+    report=inspect(s)
+    assert report['operations']['unwritten']['status']=='RESERVED'
+    assert not (s['root']/'artifacts/unwritten').exists()
+
+
+@pytest.mark.parametrize('problem',['same_size_change','size_change','missing'])
+def test_changed_partial_cannot_be_published(setup,problem):
+    s=setup;create(s)
+    with pytest.raises(m.Stop):
+        with open_campaign(s) as c:
+            c.reserve('edited',0,'train','report','artifacts/edited',20);c.write_bytes('edited',b'good')
+            partial=s['root']/'artifacts/edited.partial'
+            if problem=='missing':partial.unlink()
+            else:partial.write_bytes(b'evil' if problem=='same_size_change' else b'changed length')
+            c.commit('edited')
+    report=inspect(s)
+    assert report['status']=='STOP' and report['operations']['edited']['status']=='INTERRUPTED'
+    assert report['operations']['edited']['written_file']['sha256']==m.hash_bytes(b'good')
+    assert not (s['root']/'artifacts/edited').exists()
+
+
+def test_interrupted_commit_rejected_and_stale_reconcile_guard_is_visible(setup):
+    s=setup;create(s)
+    with pytest.raises(RuntimeError), open_campaign(s) as c:
+        c.reserve('broken',0,'train','stac','artifacts/broken',20,network_bytes=16)
+        with pytest.raises(OSError):c.receive('broken',lambda n:(_ for _ in ()).throw(OSError('interrupt')))
+        with pytest.raises(m.Stop):c.commit('broken')
+        raise RuntimeError('stop interrupted owner')
+    with pytest.raises(m.Stop):
+        with open_campaign(s) as c:c.commit('broken')
+    reconcile(s)
+    report=inspect(s);assert report['status']=='CLEAN_PAUSED'
+    entry=s['registry']/report['contract']['registry_binding'];guard=entry/'reconcile.lock'
+    guard.write_bytes(b'crashed after campaign lock release, before guard cleanup')
+    before=guard.read_bytes();report=inspect(s)
+    assert report['status']=='STOP'
+    assert report['stop_reasons']==['RECONCILIATION_LOCK_PRESENT']
+    assert report['reconcile_lock_sha256']==m.hash_bytes(before)
+    assert guard.read_bytes()==before
+    with pytest.raises(m.Stop,match='reconciliation'):open_campaign(s)

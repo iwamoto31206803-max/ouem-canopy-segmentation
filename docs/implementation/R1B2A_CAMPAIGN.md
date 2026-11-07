@@ -211,6 +211,26 @@ double operation rejection, path protection, Windows hard-link publication,
 simulated reparse attributes, journal/head/artifact corruption and orphan head
 failure. No test performs actual network requests or source image processing.
 
+### PR #44 independent-review hardening
+
+`write_bytes()` checks the actual completed partial against the supplied bytes,
+then journals `written_file={bytes, sha256}` with state WRITTEN. `commit()` accepts
+only that persisted WRITTEN state; an externally supplied partial in RESERVED
+does not qualify, and INTERRUPTED cannot publish. It rechecks the partial's size
+and SHA against the recorded receipt before linking, and checks the published
+link against that same receipt before settlement. Missing/changed bytes cause
+STOP/INTERRUPTED with the receipt and existing fault/publication records retained.
+Older WRITTEN records without a receipt fail closed; no receipt is reconstructed
+from whatever file happens to be present. Cooperative filesystem ownership remains
+required; this is not a guarantee against arbitrary concurrent external writers.
+
+`inspect()` reports a retained `reconcile.lock` as STOP even if all operations are
+settled and the campaign owner lock is absent. `stop_reasons` distinguishes
+UNRESOLVED_OPERATIONS, CAMPAIGN_OWNER_LOCK_PRESENT, RECONCILIATION_LOCK_PRESENT and
+FATAL_ACCOUNTING_STATE; `reconcile_lock_sha256` identifies the guard for review.
+Inspection never deletes or repairs it. Recovery of that stale guard still
+requires independent review, rather than silently declaring CLEAN_PAUSED.
+
 A read-only check of the real R1b-1 plan ID/file SHA and both local Zenodo metadata
 pins plus its 25 target roles passed. This is **input-contract verification only**:
 no source pixels, real STAC retrieval, full-batch QA, outputs, peak or real campaign
@@ -232,8 +252,8 @@ contract or interpret its creation as real-data approval.
 
 Measured verification on Windows/Python 3.11.9, existing venv:
 
-* Full suite: **317 passed, 1 skipped, 676 warnings (86.43s)**.
-* Campaign-only synthetic tests: **28 passed (15.50s)**.
+* Full suite: **323 passed, 1 skipped, 676 warnings (87.49s)**.
+* Campaign-only synthetic tests: **34 passed (17.44s)**.
 * The skip is the existing Windows real-symlink-creation limitation; this module's
   reparse guard is tested with simulated Windows file attributes. Actual local
   exclusive locks, hard-link publication and subprocess crash behavior were tested.

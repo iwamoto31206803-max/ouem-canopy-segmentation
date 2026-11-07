@@ -295,7 +295,10 @@ class Campaign:
         if not isinstance(data,bytes) or len(data)>op['max_output_bytes']:raise Stop('Output exceeds reservation')
         self._space(16384);partial,_=self._paths(op)
         try:
-            durable(partial,data);op['status']='WRITTEN';self._persist('WRITE_COMPLETE')
+            durable(partial,data)
+            receipt=dict(bytes=partial.stat().st_size,sha256=sha(partial))
+            if receipt!=dict(bytes=len(data),sha256=hash_bytes(data)):raise Stop('Written partial differs from supplied bytes')
+            op.update(status='WRITTEN',written_file=receipt);self._persist('WRITE_COMPLETE')
         except BaseException:
             op['status']='INTERRUPTED'
             if not self.poisoned:self._persist('WRITE_INTERRUPTED')
@@ -303,14 +306,20 @@ class Campaign:
 
     def commit(self,operation_id):
         self._ready();op=self._operation(operation_id)
+        if op['status']!='WRITTEN':raise Stop('Commit requires journaled WRITTEN state')
         if not op['network_complete']:raise Stop('Network consumption unresolved')
         partial,final=self._paths(op)
-        if not partial.is_file() or partial.stat().st_size>op['max_output_bytes']:raise Stop('Missing/oversize partial')
-        self._space(16384);ordinary(final);final.parent.mkdir(parents=True,exist_ok=True)
         try:
+            ordinary(partial)
+            if (not partial.is_file() or partial.stat().st_size>op['max_output_bytes'] or
+                    dict(bytes=partial.stat().st_size,sha256=sha(partial))!=op.get('written_file')):
+                raise Stop('Written partial size/SHA mismatch before commit')
+            self._space(16384);ordinary(final);final.parent.mkdir(parents=True,exist_ok=True)
             os.link(partial,final)  # exclusive no-overwrite publication; retain reservation for both names
+            receipt=dict(bytes=final.stat().st_size,sha256=sha(final))
+            if receipt!=op['written_file']:raise Stop('Published file differs from written receipt')
             partial.unlink()
-            op.update(status='SUCCESS',charged_network_bytes=op['received_bytes'],file=dict(bytes=final.stat().st_size,sha256=sha(final)))
+            op.update(status='SUCCESS',charged_network_bytes=op['received_bytes'],file=receipt)
             self._persist('COMMIT')
         except BaseException:
             op['status']='INTERRUPTED'
@@ -320,10 +329,16 @@ class Campaign:
     @classmethod
     def inspect(cls,root,registry,plan_path,plan_sha,expected_id=None):
         c=cls(root,registry);c._load(plan_path,plan_sha,expected_id)
+        reasons=[]
+        if c.usage()['unresolved_operations']:reasons.append('UNRESOLVED_OPERATIONS')
+        if (c.root/'campaign.lock').exists():reasons.append('CAMPAIGN_OWNER_LOCK_PRESENT')
+        if (c.entry/'reconcile.lock').exists():reasons.append('RECONCILIATION_LOCK_PRESENT')
+        if c.state['fatal']:reasons.append('FATAL_ACCOUNTING_STATE')
         return dict(contract=c.contract,usage=c.usage(),operations=c.state['operations'],
                     partial_files=[dict(operation_id=o['operation_id'],path=str(p.relative_to(c.root)).replace('\\','/'),bytes=p.stat().st_size,sha256=sha(p)) for o in c.state['operations'].values() if o['status'] not in TERMINAL for p in c._paths(o) if p.is_file()],
                     lock_sha256=sha(c.root/'campaign.lock') if (c.root/'campaign.lock').exists() else None,
-                    status='STOP' if c.usage()['unresolved_operations'] or (c.root/'campaign.lock').exists() or c.state['fatal'] else 'CLEAN_PAUSED')
+                    reconcile_lock_sha256=sha(c.entry/'reconcile.lock') if (c.entry/'reconcile.lock').exists() else None,
+                    stop_reasons=reasons,status='STOP' if reasons else 'CLEAN_PAUSED')
 
     @classmethod
     def reconcile(cls,root,registry,plan_path,plan_sha,*,acknowledge_stopped_owner=False,expected_lock_sha=None,expected_id=None):
