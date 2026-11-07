@@ -72,9 +72,9 @@ Replace the three placeholders with the independently checked values:
 
 ```powershell
 .\.venv\Scripts\python.exe -B scripts\r1b3_batch.py check --batch 2 `
-  --candidate-sha256 <reviewed-candidate-sha256> `
+  --candidate-sha256 "PASTE_REVIEWED_CANDIDATE_SHA256" `
   --approval "C:\dev\ouem-data-audits\r1b3-batch02-local-01-approval-approved.json" `
-  --approval-sha256 <reviewed-approved-sha256>
+  --approval-sha256 "PASTE_REVIEWED_APPROVAL_SHA256"
 ```
 
 In addition to the existing Runner's check-approval, the wrapper ensures that
@@ -88,9 +88,9 @@ Only following a separate explicit execution authorization:
 
 ```powershell
 .\.venv\Scripts\python.exe -B scripts\r1b3_batch.py execute --batch 2 `
-  --candidate-sha256 <reviewed-candidate-sha256> `
+  --candidate-sha256 "PASTE_REVIEWED_CANDIDATE_SHA256" `
   --approval "C:\dev\ouem-data-audits\r1b3-batch02-local-01-approval-approved.json" `
-  --approval-sha256 <reviewed-approved-sha256> --execute
+  --approval-sha256 "PASTE_REVIEWED_APPROVAL_SHA256" --execute
 $QaExit = $LASTEXITCODE
 "QA native exit=$QaExit"
 ```
