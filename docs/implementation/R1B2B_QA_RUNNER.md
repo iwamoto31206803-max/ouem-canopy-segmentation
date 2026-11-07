@@ -31,7 +31,7 @@ HTTP connection classes. Never add this test marker to the canonical dataset.
 The test API assumes a trusted mock callback, not a sandbox for arbitrary Python;
 all tests independently block real socket connections.
 
-### Approval contract: `ouem-r1b-qa-approval-v1`
+### Approval contract: `ouem-r1b-qa-approval-v2`
 
 | Field | Required value/binding |
 | --- | --- |
@@ -41,6 +41,7 @@ all tests independently block real socket connections.
 | `campaign_id`, `contract_sha256` | Exact frozen campaign and contract bytes |
 | `plan_id`, `plan_sha256`, `targets` | Exact campaign plan and full 25-ID Train/Val map |
 | `limits` | Exact frozen network/request/response/storage limits; no implicit changes |
+| `allowed_image_ids` | Nonempty unique integer subset of frozen 25 IDs. Omitted CLI IDs use only this subset. Changes require a new independently reviewed approval and SHA. v1 approvals are rejected. |
 | `cache_root`, `output_root` | Exact fixed cache and resolved campaign destination |
 | `environment` | Exact `environment()` fingerprint described below |
 | `scopes` | Explicit subset of `qa_local`, `qa_preview`, `qa_report`, `stac_network`, `geotiff_adapter` |
@@ -194,7 +195,7 @@ R1 manifest**. COCO annotation IDs are never equated with panoptic segment IDs.
 No category crosswalk is invented and background0 is not treated as nodata.
 
 Each preview/report has a fixed operation name, path, size/SHA and Campaign receipt.
-The final managed `qa-summary.json` binds campaign/plan/approval, requested/results/
+The run-specific managed `qa-summary-<run_id>.json` binds campaign/plan/approval, requested/results/
 unprocessed IDs and a usage snapshot **before** the summary write. Campaign.inspect
 gives later complete usage. Interrupted runs may have only prior per-image reports
 and the ledger, not a final summary; STOP is never a completed cohort PASS.
@@ -258,3 +259,100 @@ Windows / Python3.11.9, existing venv, no installations:
   `c2f4ccd56da8770cd73ef1db299d67d5528dcab8ea0051da1c2d5f8174a850ca`;
   this checkout's unchanged R1b-1 plan SHA remains
   `98abe4b98cb629c3c596f70718db2854a2df675f6c7781792823f33f6115fcbc`.
+
+## First two-image smoke: plan only, NOT AUTHORIZED
+
+Targets: 1638 (Train), 1241 (Val). No real Campaign initialization, approval,
+image QA or HTTP is performed in this PR. The JSON template is non-executable.
+
+1. Read-only: check clean merged commit, Plan ID/SHA, metadata/COCO SHA,
+   environment fingerprint, cache, output destination and permanent Registry.
+2. Initialize only after separate explicit administrative approval, following
+   R1B2A_CAMPAIGN.md. Initialization permanently claims the cohort. Reuse any
+   existing Campaign; never recreate its Registry or reset past consumption.
+3. Independently review a new external v2 approval bound to the exact contract,
+   environment and paths, with allowed_image_ids=[1638,1241] and only qa_local,
+   qa_preview, qa_report scopes. Record the expected approval SHA separately.
+   This PR issues no approval. The template's false boolean and placeholders
+   must not be treated as an approved record.
+4. Run check-approval as above. It checks bindings only, without source QA.
+5. Only after approval, explicitly run --execute --run-id smoke-local-01.
+   Omit --ids to process only the approved two, or pass --ids 1638 1241.
+   Never add --fetch-missing-stac. No geotiff_adapter is approved.
+6. Campaign inspect and human review: record actual cumulative usage and STOP
+   reasons; review reports/previews, source hashes, RGB/PNG formats/dimensions,
+   labels, CRS/affine/GSD, nodata/black borders/validity, canopy fraction and
+   spatial alignment. Missing STAC evidence remains HOLD.
+
+Effective first-smoke communication budget is zero, enforced by no STAC scope.
+The immutable Campaign's 2 MiB ceiling is not communication permission; retain
+it unchanged rather than resetting usage. The 94 MiB whole-Campaign storage
+ceiling is a proposal, not a measured peak or a fresh allowance for each run.
+Measure actual storage including reservations and reports using inspect.
+
+Each run has an explicit unique --run-id or a generated UUID. Managed
+qa-run-<run_id>.json and qa-summary-<run_id>.json preserve approval identity/SHA,
+selected IDs and this run's results. Summaries additionally index previously
+completed report IDs, without promoting them to R1 PASS. The usage snapshot
+precedes the summary write; inspect gives later complete usage.
+
+Image operation IDs remain qa-preview-<image_id> and qa-report-<image_id>.
+Previously started images are refused even with a different run ID. All selected
+IDs are checked before processing any image. Interrupted operations require
+explicit inspect/reconciliation, not automatic retry. A crash may leave only
+start receipts and per-image records. Never delete locks or rewrite the ledger.
+
+Previously unprocessed images require a new independently reviewed approval/SHA,
+a new run ID and the SAME Campaign/Registry and cumulative budgets. Past outputs
+are never overwritten. Two successful images do not authorize the remaining 23.
+All R1 acceptance, including Zenodo10, remains HOLD. Real source QA, real storage
+peak and production execution remain NOT_VERIFIED; tests use synthetic fixtures
+and blocked sockets only.
+
+Approved first-smoke invocation (non-executing placeholders; do not run before gates 1-4):
+
+```powershell
+.\.venv\Scripts\python.exe scripts/r1b_qa_runner.py run --execute `
+  --root $CampaignRoot --registry $PermanentRegistry `
+  --plan $Plan --plan-sha256 $PlanSHA `
+  --approval $ReviewedApproval --approval-sha256 $ApprovalSHA `
+  --run-id smoke-local-01 --ids 1638 1241
+```
+
+The template retains STAC/GeoTIFF artifact size fields because the approval schema
+requires all four caps; these fields grant no scope. Populate targets/limits from
+the existing frozen contract exactly, never from a smaller recreated Campaign.
+
+### Verification record (2026-11-07, Windows / existing venv)
+
+`python -m pytest -q`: **384 passed, 1 skipped, 2269 warnings, 158.65 s**.
+Warnings are existing affine deprecations and the deliberate duplicate-ZIP fixture;
+the Windows symlink-dependent case remains skipped. CLI --help, non-executable
+JSON template checks and git diff --check also passed. Synthetic QA fixtures only;
+no real Campaign/approval/source QA/HTTP executed. R1 acceptance remains HOLD.
+
+### PR #46 review follow-up: direct Python API guards
+
+Every image-bearing QA entry explicitly checks Approval.require_image before
+source access or delegation: run_one, STAC fetch/check, report/preview/geotiff,
+shared encode, duplicate check and internal HOLD diagnostic. Runner.target also
+continues enforcing the subset. The full 25-image metadata catalog and grouped
+independence checks are retained; approval limits pixel access, not those checks.
+
+Synthetic regression tests call all ten paths with an unapproved planned image,
+block source readers and Campaign.reserve, verify no HTTP factory use, compare
+ledger/usage and all existing output hashes, and test CLI rejection before Runner
+construction. Delegated target lookup is deliberately blocked to prove direct
+API guards do not depend on it. This does not sandbox arbitrary modified Python
+code or grant authority to bypass the managed adapters.
+
+No Campaign contract/budget, run/duplicate semantics, production approval template
+or existing source data are changed. The template remains approved:false and R1
+acceptance remains HOLD. Real image QA/HTTP/production Campaign initialization
+remain unexecuted.
+
+Follow-up full regression on Windows / existing venv:
+`python -m pytest -q`: **396 passed, 1 skipped, 2569 warnings in 178.00 s**.
+Warnings remain affine deprecations and the intentional duplicate-ZIP fixture;
+the Windows symlink-dependent case remains skipped. `git diff --check` passed;
+the production template was separately confirmed approved:false and unchanged.

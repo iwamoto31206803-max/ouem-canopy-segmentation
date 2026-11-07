@@ -5,9 +5,11 @@ import http.client
 import io
 import json
 import platform
+import re
 from pathlib import Path
 import ssl
 import subprocess
+import uuid
 from urllib.parse import urlparse
 
 import numpy as np
@@ -59,7 +61,7 @@ class Approval:
         expected=dict(campaign_id=c['campaign_id'],contract_sha256=campaign._contract_sha,
             plan_id=c['plan_id'],plan_sha256=c['plan_sha256'],targets=c['targets'],
             limits=c['limits'],cache_root=c['cache_root'],output_root=str(campaign.root.resolve()),environment=environment())
-        if a.get('schema')!='ouem-r1b-qa-approval-v1' or a.get('approved') is not True or not a.get('approval_id') or not a.get('reviewer_ref'):
+        if a.get('schema')!='ouem-r1b-qa-approval-v2' or a.get('approved') is not True or not a.get('approval_id') or not a.get('reviewer_ref'):
             raise Stop('INVALID_APPROVAL_RECORD')
         if any(encoded(a.get(k))!=encoded(v) for k,v in expected.items()):raise Stop('APPROVAL_BINDING_MISMATCH')
         if a.get('mode')!=('offline_test' if test_mode else 'production_qa'):raise Stop('APPROVAL_MODE_MISMATCH')
@@ -69,6 +71,8 @@ class Approval:
         if not test_mode and a['environment']['git_dirty']:raise Stop('CLEAN_PINNED_COMMIT_REQUIRED')
         scopes=a.get('scopes')
         if not isinstance(scopes,list) or len(scopes)!=len(set(scopes)) or not set(scopes)<=SCOPES:raise Stop('INVALID_SCOPE')
+        allowed=a.get('allowed_image_ids')
+        if not isinstance(allowed,list) or not allowed or any(type(i) is not int or str(i) not in c['targets'] for i in allowed) or len(set(allowed))!=len(allowed):raise Stop('INVALID_ALLOWED_IMAGE_IDS')
         limits=a.get('artifact_limits',{})
         if set(limits)!={'preview','report','stac','geotiff'} or any(type(v) is not int or not 0<v<=32*1024**2 for v in limits.values()):raise Stop('INVALID_ARTIFACT_LIMITS')
         if limits['stac']>c['limits']['response_bytes']:raise Stop('STAC_BUFFER_LIMIT')
@@ -83,6 +87,17 @@ class Approval:
         if sha(self.path)!=self.sha256:raise Stop('APPROVAL_CHANGED')
         if hash_bytes(encoded(self.record))!=self.record_sha:raise Stop('APPROVAL_CHANGED_IN_MEMORY')
         if scope not in self.record['scopes']:raise Stop('SCOPE_NOT_APPROVED:'+scope)
+
+    def require_image(self,image_id):
+        self.require('qa_local')
+        if type(image_id) is not int or image_id not in self.record['allowed_image_ids']:raise Stop('IMAGE_NOT_IN_EXECUTION_APPROVAL')
+
+    def select_ids(self,order,requested=None):
+        self.require('qa_local')
+        ids=[i for i in order if i in self.record['allowed_image_ids']] if requested is None else list(requested)
+        if not ids or len(set(ids))!=len(ids):raise Stop('EMPTY_OR_DUPLICATE_IDS')
+        for image_id in ids:self.require_image(image_id)
+        return ids
 
 
 class BufferLimit(Stop):
@@ -102,6 +117,7 @@ class Saved:
     def __init__(self,campaign,approval):self.c=campaign;self.a=approval
 
     def _hold(self,op,image_id,split,exc):
+        self.a.require_image(image_id)
         # Optional diagnostic is itself charged. Original reservation stays pending.
         data=encoded(dict(status='HOLD',operation_id=op,reason=type(exc).__name__,
             observed_bytes=getattr(exc,'observed',None),limit=getattr(exc,'limit',None),memory_peak='NOT_MEASURED'))
@@ -112,6 +128,7 @@ class Saved:
         self.c.write_bytes(key,data);self.c.commit(key)
 
     def encode(self,op,image_id,split,kind,path,encoder):
+        self.a.require_image(image_id)
         self.a.require({'preview':'qa_preview','report':'qa_report','geotiff':'geotiff_adapter'}[kind])
         cap=min(self.a.record['artifact_limits'][kind],self.a.record['max_buffer_bytes'])
         self.c.reserve(op,image_id,split,kind,path,cap)
@@ -124,11 +141,13 @@ class Saved:
             self._hold(op,image_id,split,exc);raise
 
     def report(self,op,image_id,split,value):
+        self.a.require_image(image_id)
         def encode(buf):
             for text in json.JSONEncoder(sort_keys=True,ensure_ascii=True,allow_nan=False).iterencode(value):buf.write(text.encode('utf-8'))
         return self.encode(op,image_id,split,'report',f'artifacts/reports/{op}.json',encode)
 
     def preview(self,op,image_id,split,rgb,mask):
+        self.a.require_image(image_id)
         def encode(buf):
             canvas=Image.new('RGB',(rgb.shape[1]*3,rgb.shape[0]))
             for i,array in enumerate((rgb,np.repeat((mask*255)[:,:,None],3,axis=2),overlay(rgb,mask))):canvas.paste(Image.fromarray(array),(i*rgb.shape[1],0))
@@ -136,6 +155,7 @@ class Saved:
         return self.encode(op,image_id,split,'preview',f'artifacts/previews/{op}.jpg',encode)
 
     def geotiff(self,op,image_id,split,array,crs,transform):
+        self.a.require_image(image_id)
         def encode(buf):
             estimate=2*array.nbytes+65536
             if estimate>self.a.record['max_buffer_bytes']:raise BufferLimit(estimate,self.a.record['max_buffer_bytes'])
@@ -190,6 +210,7 @@ class Stac:
     def __init__(self,runner):self.r=runner
 
     def fetch(self,image_id,split,url=None):
+        self.r.approval.require_image(image_id)
         r=self.r;row=r.target(image_id,split);r.approval.require('stac_network')
         expected=STAC_BASE+row['oam_id']
         if url is not None and url!=expected:raise Stop('STAC_URL_NOT_ALLOWED')
@@ -252,7 +273,7 @@ class Runner:
             b=[min(x[0] for x in bounds),min(x[1] for x in bounds),max(x[2] for x in bounds),max(x[3] for x in bounds)]
             self.group_catalog.append(dict(members[0],wgs84_bounds=b,center=[(b[0]+b[2])/2,(b[1]+b[3])/2]))
         self.group_index={r['oam_id']:r for r in self.group_catalog}
-        for key,split in campaign.contract['targets'].items():self.target(int(key),split)
+        for key in self.approval.record['allowed_image_ids']:self.target(key,campaign.contract['targets'][str(key)])
         chosen=[self.index[int(k)] for k in campaign.contract['targets']]
         self.duplicate_sources={r['image_id'] for r in chosen for other in chosen if r['image_id']!=other['image_id'] and
             (r['oam_id']==other['oam_id'] or (identity(r) is not None and identity(r)==identity(other)))}
@@ -264,6 +285,7 @@ class Runner:
     def target(self,image_id,split):
         self.c._ready()
         if type(image_id) is not int or self.c.contract['targets'].get(str(image_id))!=split:raise Stop('UNPLANNED_ID_OR_SPLIT')
+        self.approval.require_image(image_id)
         row=self.index[image_id]
         if row['official_split']!='train' or ('val' if row['validation_fold']==0 else 'train')!=split:raise Stop('OFFICIAL_ROLE_MISMATCH')
         stem=f"{row['oam_id']}_{image_id}"
@@ -272,6 +294,7 @@ class Runner:
         return row
 
     def check_stac(self,image_id,split,path,expected_sha):
+        self.approval.require_image(image_id)
         row=self.target(image_id,split);self.approval.require('qa_local');ordinary(path)
         local=self.approval.record.get('local_stac',{}).get(str(image_id))
         pinned=local and path.resolve()==Path(local['path']).resolve() and expected_sha==local['sha256']
@@ -285,13 +308,45 @@ class Runner:
                     image_license=receipt['image_license'],annotation_license=receipt['annotation_license'],
                     attribution='Named licensor/producer retained in external hashed STAC; human review required',bbox=item['bbox'])
 
-    def run_one(self,image_id,split,*,fetch_missing=False):
+    def ensure_unstarted(self,image_id):
+        self.approval.require_image(image_id)
+        if any(f'{prefix}-{image_id}' in self.c.state['operations'] for prefix in ('qa-preview','qa-report')):
+            raise Stop('duplicate QA operation already started')
+
+    def run_batch(self,ids=None,*,run_id=None,fetch_missing=False):
+        ids=self.approval.select_ids(self.order,ids)
+        self.approval.require('qa_preview');self.approval.require('qa_report')
+        if fetch_missing:self.approval.require('stac_network')
+        run_id=run_id or uuid.uuid4().hex
+        if not isinstance(run_id,str) or not re.fullmatch('[A-Za-z0-9][A-Za-z0-9_-]{0,63}',run_id):raise Stop('INVALID_RUN_ID')
+        for image_id in ids:
+            self.target(image_id,self.c.contract['targets'][str(image_id)]);self.ensure_unstarted(image_id)
+        if any(f'{prefix}-{run_id}' in self.c.state['operations'] for prefix in ('qa-run','qa-summary')):raise Stop('DUPLICATE_RUN_ID')
+        binding=dict(run_id=run_id,campaign_id=self.c.contract['campaign_id'],plan_id=self.c.contract['plan_id'],
+            approval_id=self.approval.record['approval_id'],approval_sha256=self.approval.sha256,
+            allowed_image_ids=self.approval.record['allowed_image_ids'],requested_ids=ids)
+        self.saved.report(f'qa-run-{run_id}',ids[0],self.c.contract['targets'][str(ids[0])],dict(binding,status='STARTED',r1_acceptance='HOLD'))
+        results=[]
+        for image_id in ids:
+            result=self.run_one(image_id,self.c.contract['targets'][str(image_id)],fetch_missing=fetch_missing,run_id=run_id)
+            results.append(dict(image_id=image_id,technical=result['technical_status'],r1_acceptance=result['r1_acceptance']))
+        reported=[i for i in self.order if self.c.state['operations'].get(f'qa-report-{i}',{}).get('status')=='SUCCESS']
+        summary=dict(binding,results=results,not_requested_this_run_ids=[i for i in self.order if i not in ids],
+            completed_campaign_report_ids=reported,not_processed_ids=[i for i in self.order if i not in reported],
+            technical_status='FAIL' if any(r['technical']=='FAIL' for r in results) else 'HOLD' if any(r['technical']=='HOLD' for r in results) else 'PASS',
+            r1_acceptance='HOLD',usage_snapshot_before_summary=self.c.usage(),process_memory_peak='NOT_MEASURED',
+            new_network_permitted='stac_network' in self.approval.record['scopes'])
+        self.saved.report(f'qa-summary-{run_id}',ids[0],self.c.contract['targets'][str(ids[0])],summary)
+        return summary
+
+    def run_one(self,image_id,split,*,fetch_missing=False,run_id=None):
+        # Enforce the API boundary explicitly, before target lookup or source I/O.
+        self.approval.require_image(image_id)
         row=self.target(image_id,split);self.approval.require('qa_local')
         self.approval.require('qa_preview');self.approval.require('qa_report')
         if fetch_missing:self.approval.require('stac_network')
-        if any(f'{prefix}-{image_id}' in self.c.state['operations'] for prefix in ('qa-preview','qa-report')):
-            raise Stop('duplicate QA operation already started')
-        report=dict(image_id=image_id,split=split,technical_status='FAIL',r1_acceptance='HOLD',
+        self.ensure_unstarted(image_id)
+        report=dict(image_id=image_id,split=split,run_id=run_id or uuid.uuid4().hex,technical_status='FAIL',r1_acceptance='HOLD',
                     visual_qa='NOT_VERIFIED',external_independence='NOT_VERIFIED',approval_sha256=self.approval.sha256,
                     source_generation=GENERATION,checks={},evidence={},missing_evidence=[])
         for key in ('category_review','validity_review','independence_review','external_independence_review','r1_review'):
@@ -373,6 +428,7 @@ def main(argv=None):
     for name in ('root','registry','plan','approval'):p.add_argument('--'+name,type=Path,required=True)
     p.add_argument('--plan-sha256',required=True);p.add_argument('--approval-sha256',required=True)
     p.add_argument('--ids',type=int,nargs='+');p.add_argument('--execute',action='store_true');p.add_argument('--fetch-missing-stac',action='store_true')
+    p.add_argument('--run-id',help='Unique campaign run ID; UUID generated if omitted')
     a=p.parse_args(argv)
     if a.action=='run' and not a.execute:raise Stop('EXPLICIT_EXECUTE_FLAG_REQUIRED')
     # Read-only control inspection first. No image/HTTP before approval validation.
@@ -380,23 +436,14 @@ def main(argv=None):
     if view['status']!='CLEAN_PAUSED':raise Stop('CAMPAIGN_RECONCILIATION_REQUIRED')
     class Context:pass
     context=Context();context.contract=view['contract'];context.root=a.root;context._contract_sha=sha(a.root/'contract.json')
-    Approval(context,a.approval,a.approval_sha256)
+    validated=Approval(context,a.approval,a.approval_sha256)
+    if a.ids is not None:validated.select_ids([int(i) for i in context.contract['targets']],a.ids)
     if a.action=='check-approval':print(json.dumps(dict(status='APPROVAL_BINDING_CHECKED',data_execution=False)));return 0
     with Campaign.open(a.root,a.registry,a.plan,a.plan_sha256) as campaign:
         runner=Runner(campaign,a.plan,a.approval,a.approval_sha256)
-        ids=a.ids or runner.order
-        if len(ids)!=len(set(ids)) or any(str(i) not in campaign.contract['targets'] for i in ids):raise Stop('UNPLANNED_OR_DUPLICATE_IDS')
-        results=[]
-        for image_id in ids:
-            result=runner.run_one(image_id,campaign.contract['targets'][str(image_id)],fetch_missing=a.fetch_missing_stac)
-            results.append(dict(image_id=image_id,technical=result['technical_status'],r1_acceptance=result['r1_acceptance']))
-            print(json.dumps(dict(image_id=image_id,technical=result['technical_status'],r1_acceptance=result['r1_acceptance'])))
-        summary=dict(campaign_id=campaign.contract['campaign_id'],plan_id=campaign.contract['plan_id'],approval_sha256=runner.approval.sha256,
-            requested_ids=ids,results=results,not_processed_ids=[i for i in runner.order if i not in ids],
-            technical_status='FAIL' if any(r['technical']=='FAIL' for r in results) else 'HOLD' if any(r['technical']=='HOLD' for r in results) else 'PASS',
-            r1_acceptance='HOLD',usage_snapshot_before_summary=campaign.usage(),process_memory_peak='NOT_MEASURED')
-        runner.saved.report('qa-summary',ids[0],campaign.contract['targets'][str(ids[0])],summary)
-    return 1 if any(r['technical']=='FAIL' for r in results) else 2  # Never imply R1 acceptance.
+        summary=runner.run_batch(a.ids,run_id=a.run_id,fetch_missing=a.fetch_missing_stac)
+        print(json.dumps(dict(run_id=summary['run_id'],results=summary['results'],r1_acceptance='HOLD')))
+    return 1 if summary['technical_status']=='FAIL' else 2
 
 
 if __name__=='__main__':raise SystemExit(main())
