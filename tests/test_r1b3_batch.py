@@ -158,5 +158,5 @@ def test_single_batch_dispatch_only_after_review(monkeypatch):
     cmd, campaign_type = received[0]
     assert cmd[0] == "run" and "--execute" in cmd
     assert cmd[cmd.index("--run-id") + 1] == "r1b3-batch02-local-01"
-    assert cmd[cmd.index("--ids") + 1:] == [str(i) for i in batch_ids]
+    assert cmd[cmd.index("--ids") + 1:cmd.index("--execute")] == [str(i) for i in batch_ids]
     assert campaign_type is cli.scope.ScopeCampaign
