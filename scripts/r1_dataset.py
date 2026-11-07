@@ -7,6 +7,7 @@ import math
 from pathlib import Path
 import re
 import stat
+from dataclasses import dataclass
 
 import numpy as np
 import rasterio
@@ -69,7 +70,7 @@ def contract(m):
     for s in samples:
         if not isinstance(s, dict): raise ValueError('Sample must be an object')
         for key in ('products', 'grid', 'source', 'rights', 'labels', 'category_review',
-                    'validity_review', 'r1_review', 'independence_review'):
+                    'validity_review', 'r1_review', 'independence_review', 'external_independence_review'):
             if key in s and not isinstance(s[key], dict): raise ValueError('Expected object: '+key)
         if type(s['image_id']) is not int or s['image_id'] < 0 or not text(s['oam_id']):
             raise ValueError('Invalid sample identity')
@@ -109,30 +110,40 @@ def contract(m):
         raise ValueError('Dataset identity mismatch')
 
 
-def products(root, sample):
+def products(root, sample, checks=None):
     """One sample only; hash again on read. Returns arrays plus coverage HOLD reasons."""
     arrays = {}; holds = []; grid = sample['grid']
-    for name, product in sample['products'].items():
-        path = safe_path(Path(root), product['path']); require_hash(path, product['sha256'])
-        with rasterio.open(path) as src:
-            if (src.crs != rasterio.crs.CRS.from_user_input(grid['crs']) or
-                    src.transform != Affine(*grid['transform']) or list(src.shape) != grid['shape'] or
-                    not np.allclose(src.bounds, grid['bounds'], rtol=0, atol=1e-8)):
-                raise ValueError('CRS/grid/bounds mismatch: ' + name)
-            if src.nodata is not None or not np.all(src.read_masks() == 255):
-                holds.append('PARTIAL_OR_AMBIGUOUS_RASTER_VALIDITY:' + name)
-            arrays[name] = src.read()
+    if checks is None: checks = []
     h, w = grid['shape']
-    for name, a in arrays.items():
-        count, dtype = (3, np.uint8) if name == 'rgb.tif' else (1, np.uint8 if name == 'canopy_mask.tif' else np.float32)
-        if a.shape != (count, h, w) or a.dtype != dtype:
-            raise ValueError('Channels/dtype mismatch: ' + name)
-        if name != 'rgb.tif' and (not np.isfinite(a).all() or not ((a >= 0) & (a <= 1)).all()):
-            raise ValueError('Pixel range: ' + name)
+    for name in sorted(sample['products']):
+        product = sample['products'][name]
+        entry = dict(product=name, status='FAIL', reasons=[])
+        checks.append(entry)
+        try:
+            path = safe_path(Path(root), product['path']); require_hash(path, product['sha256'])
+            with rasterio.open(path) as src:
+                if (src.crs != rasterio.crs.CRS.from_user_input(grid['crs']) or
+                        src.transform != Affine(*grid['transform']) or list(src.shape) != grid['shape'] or
+                        not np.allclose(src.bounds, grid['bounds'], rtol=0, atol=1e-8)):
+                    raise ValueError('CRS/grid/bounds mismatch: ' + name)
+                if src.nodata is not None or not np.all(src.read_masks() == 255):
+                    entry['reasons'].append('PARTIAL_OR_AMBIGUOUS_RASTER_VALIDITY:' + name)
+                a = src.read()
+            count, dtype = (3, np.uint8) if name == 'rgb.tif' else (1, np.uint8 if name == 'canopy_mask.tif' else np.float32)
+            if a.shape != (count, h, w) or a.dtype != dtype:
+                raise ValueError('Channels/dtype mismatch: ' + name)
+            if name != 'rgb.tif' and (not np.isfinite(a).all() or not ((a >= 0) & (a <= 1)).all()):
+                raise ValueError('Pixel range: ' + name)
+            if name == 'valid_fraction.tif' and not np.all(a == 1):
+                entry['reasons'].append('PARTIAL_VALID_FRACTION')
+            arrays[name] = a
+            entry['status'] = 'HOLD' if entry['reasons'] else 'PASS'
+            holds.extend(entry['reasons'])
+        except (ValueError, OSError, KeyError, TypeError) as exc:
+            entry['reasons'].append(str(exc))
+            raise
     if not np.array_equal(arrays['canopy_mask.tif'], (arrays['canopy_fraction.tif'] >= .5).astype(np.uint8)):
         raise ValueError('Mask/fraction threshold mismatch')
-    if not np.all(arrays['valid_fraction.tif'] == 1):
-        holds.append('PARTIAL_VALID_FRACTION')
     return arrays, holds
 
 
@@ -161,12 +172,17 @@ def admission(s):
     labels = s.get('labels', {})
     if labels.get('policy') != 'upstream_nonzero_binary_with_review' or labels.get('categories') != [1, 2]:
         reasons.append('LABEL_POLICY_OR_CATEGORIES_NOT_VERIFIED')
-    for name in ('category_review', 'validity_review', 'r1_review', 'independence_review'):
+    for name in ('category_review', 'validity_review', 'r1_review', 'independence_review', 'external_independence_review'):
         review = s.get(name, {})
         if (review.get('status') != 'PASS' or not text(review.get('evidence_ref')) or
                 not digest(review.get('evidence_sha256')) or review.get('source_hashes') !=
                 {k: source.get(k) for k in ('image_sha256', 'annotation_sha256')}):
             reasons.append(name.upper() + '_NOT_VERIFIED')
+    external = s.get('external_independence_review', {})
+    if (external.get('scope') != 'official_holdout_and_unlisted_neighbor_sources' or
+            not digest(external.get('catalog_sha256'))):
+        if 'EXTERNAL_INDEPENDENCE_REVIEW_NOT_VERIFIED' not in reasons:
+            reasons.append('EXTERNAL_INDEPENDENCE_REVIEW_NOT_VERIFIED')
     return reasons
 
 
@@ -221,10 +237,10 @@ def verify(root, m):
     except (ValueError, KeyError, TypeError, OverflowError, AttributeError) as exc:
         report['reasons'] = [str(exc)]; return report
     for s in m['samples']:
-        item = dict(image_id=s['image_id'], split=s['split'], technical='PASS', acceptance='HOLD', technical_reasons=[])
+        item = dict(image_id=s['image_id'], split=s['split'], technical='PASS', acceptance='HOLD', technical_reasons=[], product_checks=[])
         try:
             item['acceptance_reasons'] = admission(s) + leaks[s['image_id']]
-            _, item['technical_reasons'] = products(root, s)
+            _, item['technical_reasons'] = products(root, s, item['product_checks'])
             if item['technical_reasons']: item['technical'] = 'HOLD'
             item['acceptance'] = 'PASS' if item['technical'] == 'PASS' and not item['acceptance_reasons'] else 'HOLD'
             if any(r.startswith('CROSS_SPLIT') for r in leaks[s['image_id']]): item['acceptance'] = 'FAIL'
@@ -235,20 +251,49 @@ def verify(root, m):
     for key in ('technical', 'acceptance'):
         values = [s[key] for s in report['samples']]
         report[key] = 'FAIL' if 'FAIL' in values else 'HOLD' if 'HOLD' in values else 'PASS'
-    report['products_verified'] = 4 * sum(s['technical'] != 'FAIL' for s in report['samples'])
-    report['independence_scope'] = 'Declared original source envelopes plus product envelopes; 1km conservative cross-split buffer. External unlisted scenes NOT_VERIFIED.'
+    entries = [p for s in report['samples'] for p in s['product_checks']]
+    report['product_counts'] = dict(expected=4*len(m['samples']), attempted=len(entries),
+                                  not_attempted=4*len(m['samples'])-len(entries),
+                                  **{status.lower(): sum(e['status'] == status for e in entries) for status in ('PASS','HOLD','FAIL')})
+    report['samples_fully_technical_pass'] = sum(s['technical'] == 'PASS' for s in report['samples'])
+    report['independence'] = dict(
+        within_manifest=dict(status='FAIL' if any(r.startswith('CROSS_SPLIT') for values in leaks.values() for r in values)
+                             else 'HOLD' if any(leaks.values()) or any(not text(s.get('source', {}).get('original_source_id')) or not footprint(s.get('source', {}).get('footprint_wgs84')) for s in m['samples']) else 'PASS',
+                             scope='Declared identity/envelope checks within this manifest only; no external catalog scan'),
+        external_sources=dict(status='NOT_VERIFIED',
+                              review_assertions_complete=all('EXTERNAL_INDEPENDENCE_REVIEW_NOT_VERIFIED' not in s['acceptance_reasons'] for s in report['samples']),
+                              scope='Official holdout and unlisted neighboring/aliased sources are not inspected by this offline validator; R1b must supply source-bound catalog review evidence.'))
     return report
 
 
-def load_sample(root, m, image_id, expected_split):
-    """R2 building block after full preflight; rechecks only selected product bytes."""
-    contract(m)
+_PREFLIGHT_SEAL = object()
+
+
+@dataclass(frozen=True)
+class _VerifiedDataset:
+    root: Path
+    manifest_bytes: bytes
+    seal: object
+
+
+def preflight(root, m):
+    """Only a complete technical + acceptance PASS issues a loading context."""
+    snapshot = copy.deepcopy(m)
+    report = verify(root, snapshot)
+    if report['technical'] != 'PASS' or report['acceptance'] != 'PASS':
+        raise ValueError('Dataset preflight HOLD/FAIL; inspect verify() report')
+    return _VerifiedDataset(Path(root).resolve(), json.dumps(snapshot, allow_nan=False).encode('utf-8'), _PREFLIGHT_SEAL)
+
+
+def load_sample(verified, image_id, expected_split):
+    """Requires an in-process full preflight; selected bytes are checked again."""
+    if not isinstance(verified, _VerifiedDataset) or verified.seal is not _PREFLIGHT_SEAL:
+        raise ValueError('Successful dataset preflight context required')
+    m = json.loads(verified.manifest_bytes)
     sample = next((s for s in m['samples'] if s['image_id'] == image_id), None)
     if sample is None or expected_split not in ('train', 'val') or sample['split'] != expected_split:
         raise ValueError('Sample/split mismatch')
-    if admission(sample) or independence(m['samples'])[image_id]:
-        raise ValueError('R1 acceptance HOLD/FAIL')
-    arrays, holds = products(root, sample)
+    arrays, holds = products(verified.root, sample)
     if holds: raise ValueError('Validity HOLD')
     return arrays
 

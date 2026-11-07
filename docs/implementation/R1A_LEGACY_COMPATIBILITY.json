@@ -10,6 +10,28 @@
       "technical": "PASS",
       "acceptance": "HOLD",
       "technical_reasons": [],
+      "product_checks": [
+        {
+          "product": "canopy_fraction.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "canopy_mask.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "rgb.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "valid_fraction.tif",
+          "status": "PASS",
+          "reasons": []
+        }
+      ],
       "acceptance_reasons": [
         "SOURCE_PROVENANCE_NOT_VERIFIED",
         "ORIGINAL_SOURCE_FOOTPRINT_NOT_VERIFIED",
@@ -20,7 +42,8 @@
         "CATEGORY_REVIEW_NOT_VERIFIED",
         "VALIDITY_REVIEW_NOT_VERIFIED",
         "R1_REVIEW_NOT_VERIFIED",
-        "INDEPENDENCE_REVIEW_NOT_VERIFIED"
+        "INDEPENDENCE_REVIEW_NOT_VERIFIED",
+        "EXTERNAL_INDEPENDENCE_REVIEW_NOT_VERIFIED"
       ]
     },
     {
@@ -29,6 +52,28 @@
       "technical": "PASS",
       "acceptance": "HOLD",
       "technical_reasons": [],
+      "product_checks": [
+        {
+          "product": "canopy_fraction.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "canopy_mask.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "rgb.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "valid_fraction.tif",
+          "status": "PASS",
+          "reasons": []
+        }
+      ],
       "acceptance_reasons": [
         "SOURCE_PROVENANCE_NOT_VERIFIED",
         "ORIGINAL_SOURCE_FOOTPRINT_NOT_VERIFIED",
@@ -39,7 +84,8 @@
         "CATEGORY_REVIEW_NOT_VERIFIED",
         "VALIDITY_REVIEW_NOT_VERIFIED",
         "R1_REVIEW_NOT_VERIFIED",
-        "INDEPENDENCE_REVIEW_NOT_VERIFIED"
+        "INDEPENDENCE_REVIEW_NOT_VERIFIED",
+        "EXTERNAL_INDEPENDENCE_REVIEW_NOT_VERIFIED"
       ]
     },
     {
@@ -48,6 +94,28 @@
       "technical": "PASS",
       "acceptance": "HOLD",
       "technical_reasons": [],
+      "product_checks": [
+        {
+          "product": "canopy_fraction.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "canopy_mask.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "rgb.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "valid_fraction.tif",
+          "status": "PASS",
+          "reasons": []
+        }
+      ],
       "acceptance_reasons": [
         "SOURCE_PROVENANCE_NOT_VERIFIED",
         "ORIGINAL_SOURCE_FOOTPRINT_NOT_VERIFIED",
@@ -58,7 +126,8 @@
         "CATEGORY_REVIEW_NOT_VERIFIED",
         "VALIDITY_REVIEW_NOT_VERIFIED",
         "R1_REVIEW_NOT_VERIFIED",
-        "INDEPENDENCE_REVIEW_NOT_VERIFIED"
+        "INDEPENDENCE_REVIEW_NOT_VERIFIED",
+        "EXTERNAL_INDEPENDENCE_REVIEW_NOT_VERIFIED"
       ]
     },
     {
@@ -67,6 +136,28 @@
       "technical": "PASS",
       "acceptance": "HOLD",
       "technical_reasons": [],
+      "product_checks": [
+        {
+          "product": "canopy_fraction.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "canopy_mask.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "rgb.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "valid_fraction.tif",
+          "status": "PASS",
+          "reasons": []
+        }
+      ],
       "acceptance_reasons": [
         "SOURCE_PROVENANCE_NOT_VERIFIED",
         "ORIGINAL_SOURCE_FOOTPRINT_NOT_VERIFIED",
@@ -77,7 +168,8 @@
         "CATEGORY_REVIEW_NOT_VERIFIED",
         "VALIDITY_REVIEW_NOT_VERIFIED",
         "R1_REVIEW_NOT_VERIFIED",
-        "INDEPENDENCE_REVIEW_NOT_VERIFIED"
+        "INDEPENDENCE_REVIEW_NOT_VERIFIED",
+        "EXTERNAL_INDEPENDENCE_REVIEW_NOT_VERIFIED"
       ]
     },
     {
@@ -86,6 +178,28 @@
       "technical": "PASS",
       "acceptance": "HOLD",
       "technical_reasons": [],
+      "product_checks": [
+        {
+          "product": "canopy_fraction.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "canopy_mask.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "rgb.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "valid_fraction.tif",
+          "status": "PASS",
+          "reasons": []
+        }
+      ],
       "acceptance_reasons": [
         "SOURCE_PROVENANCE_NOT_VERIFIED",
         "ORIGINAL_SOURCE_FOOTPRINT_NOT_VERIFIED",
@@ -96,7 +210,8 @@
         "CATEGORY_REVIEW_NOT_VERIFIED",
         "VALIDITY_REVIEW_NOT_VERIFIED",
         "R1_REVIEW_NOT_VERIFIED",
-        "INDEPENDENCE_REVIEW_NOT_VERIFIED"
+        "INDEPENDENCE_REVIEW_NOT_VERIFIED",
+        "EXTERNAL_INDEPENDENCE_REVIEW_NOT_VERIFIED"
       ]
     },
     {
@@ -105,6 +220,28 @@
       "technical": "PASS",
       "acceptance": "HOLD",
       "technical_reasons": [],
+      "product_checks": [
+        {
+          "product": "canopy_fraction.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "canopy_mask.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "rgb.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "valid_fraction.tif",
+          "status": "PASS",
+          "reasons": []
+        }
+      ],
       "acceptance_reasons": [
         "SOURCE_PROVENANCE_NOT_VERIFIED",
         "ORIGINAL_SOURCE_FOOTPRINT_NOT_VERIFIED",
@@ -115,7 +252,8 @@
         "CATEGORY_REVIEW_NOT_VERIFIED",
         "VALIDITY_REVIEW_NOT_VERIFIED",
         "R1_REVIEW_NOT_VERIFIED",
-        "INDEPENDENCE_REVIEW_NOT_VERIFIED"
+        "INDEPENDENCE_REVIEW_NOT_VERIFIED",
+        "EXTERNAL_INDEPENDENCE_REVIEW_NOT_VERIFIED"
       ]
     },
     {
@@ -124,6 +262,28 @@
       "technical": "PASS",
       "acceptance": "HOLD",
       "technical_reasons": [],
+      "product_checks": [
+        {
+          "product": "canopy_fraction.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "canopy_mask.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "rgb.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "valid_fraction.tif",
+          "status": "PASS",
+          "reasons": []
+        }
+      ],
       "acceptance_reasons": [
         "SOURCE_PROVENANCE_NOT_VERIFIED",
         "ORIGINAL_SOURCE_FOOTPRINT_NOT_VERIFIED",
@@ -134,7 +294,8 @@
         "CATEGORY_REVIEW_NOT_VERIFIED",
         "VALIDITY_REVIEW_NOT_VERIFIED",
         "R1_REVIEW_NOT_VERIFIED",
-        "INDEPENDENCE_REVIEW_NOT_VERIFIED"
+        "INDEPENDENCE_REVIEW_NOT_VERIFIED",
+        "EXTERNAL_INDEPENDENCE_REVIEW_NOT_VERIFIED"
       ]
     },
     {
@@ -143,6 +304,28 @@
       "technical": "PASS",
       "acceptance": "HOLD",
       "technical_reasons": [],
+      "product_checks": [
+        {
+          "product": "canopy_fraction.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "canopy_mask.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "rgb.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "valid_fraction.tif",
+          "status": "PASS",
+          "reasons": []
+        }
+      ],
       "acceptance_reasons": [
         "SOURCE_PROVENANCE_NOT_VERIFIED",
         "ORIGINAL_SOURCE_FOOTPRINT_NOT_VERIFIED",
@@ -153,7 +336,8 @@
         "CATEGORY_REVIEW_NOT_VERIFIED",
         "VALIDITY_REVIEW_NOT_VERIFIED",
         "R1_REVIEW_NOT_VERIFIED",
-        "INDEPENDENCE_REVIEW_NOT_VERIFIED"
+        "INDEPENDENCE_REVIEW_NOT_VERIFIED",
+        "EXTERNAL_INDEPENDENCE_REVIEW_NOT_VERIFIED"
       ]
     },
     {
@@ -162,6 +346,28 @@
       "technical": "PASS",
       "acceptance": "HOLD",
       "technical_reasons": [],
+      "product_checks": [
+        {
+          "product": "canopy_fraction.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "canopy_mask.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "rgb.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "valid_fraction.tif",
+          "status": "PASS",
+          "reasons": []
+        }
+      ],
       "acceptance_reasons": [
         "SOURCE_PROVENANCE_NOT_VERIFIED",
         "ORIGINAL_SOURCE_FOOTPRINT_NOT_VERIFIED",
@@ -172,7 +378,8 @@
         "CATEGORY_REVIEW_NOT_VERIFIED",
         "VALIDITY_REVIEW_NOT_VERIFIED",
         "R1_REVIEW_NOT_VERIFIED",
-        "INDEPENDENCE_REVIEW_NOT_VERIFIED"
+        "INDEPENDENCE_REVIEW_NOT_VERIFIED",
+        "EXTERNAL_INDEPENDENCE_REVIEW_NOT_VERIFIED"
       ]
     },
     {
@@ -181,6 +388,28 @@
       "technical": "PASS",
       "acceptance": "HOLD",
       "technical_reasons": [],
+      "product_checks": [
+        {
+          "product": "canopy_fraction.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "canopy_mask.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "rgb.tif",
+          "status": "PASS",
+          "reasons": []
+        },
+        {
+          "product": "valid_fraction.tif",
+          "status": "PASS",
+          "reasons": []
+        }
+      ],
       "acceptance_reasons": [
         "SOURCE_PROVENANCE_NOT_VERIFIED",
         "ORIGINAL_SOURCE_FOOTPRINT_NOT_VERIFIED",
@@ -191,13 +420,32 @@
         "CATEGORY_REVIEW_NOT_VERIFIED",
         "VALIDITY_REVIEW_NOT_VERIFIED",
         "R1_REVIEW_NOT_VERIFIED",
-        "INDEPENDENCE_REVIEW_NOT_VERIFIED"
+        "INDEPENDENCE_REVIEW_NOT_VERIFIED",
+        "EXTERNAL_INDEPENDENCE_REVIEW_NOT_VERIFIED"
       ]
     }
   ],
   "scope": "Offline product verification; R1b review assertions checked, not independently adjudicated",
-  "products_verified": 40,
-  "independence_scope": "Declared original source envelopes plus product envelopes; 1km conservative cross-split buffer. External unlisted scenes NOT_VERIFIED.",
+  "product_counts": {
+    "expected": 40,
+    "attempted": 40,
+    "not_attempted": 0,
+    "pass": 40,
+    "hold": 0,
+    "fail": 0
+  },
+  "samples_fully_technical_pass": 10,
+  "independence": {
+    "within_manifest": {
+      "status": "HOLD",
+      "scope": "Declared identity/envelope checks within this manifest only; no external catalog scan"
+    },
+    "external_sources": {
+      "status": "NOT_VERIFIED",
+      "review_assertions_complete": false,
+      "scope": "Official holdout and unlisted neighboring/aliased sources are not inspected by this offline validator; R1b must supply source-bound catalog review evidence."
+    }
+  },
   "input_manifest_sha256": "c2f4ccd56da8770cd73ef1db299d67d5528dcab8ea0051da1c2d5f8174a850ca",
   "legacy_g0_projection": true,
   "legacy_dataset_id": "ouem-zenodo10-e3db510b1125931d"

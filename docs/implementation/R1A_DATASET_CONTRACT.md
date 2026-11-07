@@ -37,7 +37,7 @@ Each sample contains:
 | `source` | `dataset="restor/tcd Zenodo"`, `revision="zenodo-11617167-v1.0.0"`, `image_sha256`, `annotation_sha256`, `original_source_id`, `footprint_wgs84` |
 | `rights` | `image_license`, `annotation_license`, `original_source_license` (each explicitly `CC-BY-4.0`), `attribution`, `evidence_ref`, `evidence_sha256` |
 | `labels` | `policy="upstream_nonzero_binary_with_review"`, `categories=[1,2]`; retain `per_segment_category_status` if unknown |
-| review objects | `category_review`, `validity_review`, `independence_review`, `r1_review`; described below |
+| review objects | `category_review`, `validity_review`, `independence_review`, `external_independence_review`, `r1_review`; described below |
 
 Paths are exactly `<split>/<image_id>/<product-name>`, relative to a relocatable
 dataset root. Absolute paths, traversal, alternate separators, duplicate paths,
@@ -56,6 +56,17 @@ mapping: COCO annotation IDs must never be treated as segment IDs. Missing
 crosswalks remain explicitly NOT_VERIFIED even if an R1b reviewer accepts the
 official binary semantic policy. Record uncertainty in the evidence; do not
 fabricate PASS or upgrade an existing HOLD merely to satisfy the schema.
+
+`independence_review` concerns the manifest cohort. The separate
+`external_independence_review` must cover official holdout and unlisted neighboring
+or aliased sources: it additionally requires
+`scope="official_holdout_and_unlisted_neighbor_sources"` and the SHA-256 of the
+reviewed metadata catalog in `catalog_sha256`. Like the other reviews it requires
+source-hash binding and a hashed evidence reference. Missing/wrong scope, catalog
+hash or binding is acceptance HOLD. R1b must document the catalog revision and
+coverage, identity aliases, footprint/proximity methods, and unresolved gaps in
+that receipt, without reading holdout pixels. A receipt is an external assertion;
+this offline validator does not perform or certify that catalog investigation.
 
 Evidence references may be sanitized receipt/ledger references or public URLs;
 private STAC/contact details and source images stay outside Git. This offline
@@ -133,15 +144,48 @@ $manifestHash = (Get-FileHash $manifest -Algorithm SHA256).Hash.ToLowerInvariant
 
 Exit codes: 0 = technical/R1 PASS, 2 = HOLD, 1 = FAIL. Reports require a fresh
 file; an existing report is never overwritten. Inspect both statuses, reasons
-and `products_verified`; no exception should be interpreted as success.
+and `product_counts`; no exception should be interpreted as success.
 
-`verify(root, manifest)` is dataset-wide preflight. `load_sample(root, manifest,
-image_id, expected_split)` reads only the selected sample's four products and
-rehashes/checks them; it refuses HOLD/FAIL evidence or split confusion. It performs
-metadata-wide identity/independence guards, but does not rehash every sample.
-R2 must require successful full preflight, pin both dataset ID and manifest SHA,
-stage immutable bytes, and recheck that contract on resume. No unchecked loader
-or Trainer is introduced in R1a.
+`verify(root, manifest)` produces the complete dataset audit report, including
+HOLD/FAIL results. `preflight(root, manifest)` runs that audit and returns an
+in-process, immutable loading context **only when the entire dataset's technical
+and acceptance statuses are PASS**. Failure in an unselected image also blocks
+context creation. Use `load_sample(context, image_id, expected_split)`; passing a
+manifest, report or no context is rejected. The context binds a deep-copied
+manifest snapshot to its resolved dataset root, so callers cannot substitute a
+different root/manifest or change the checked snapshot by mutating their original
+dictionary. Only the selected four products are rehashed/rechecked during loading.
+
+```python
+context = r1_dataset.preflight(dataset_root, manifest)
+arrays = r1_dataset.load_sample(context, image_id, "train")
+```
+
+The context is an accidental-misuse guard, not a security boundary against code
+deliberately accessing private internals; it must not be persisted as a substitute
+for fresh preflight after restart. R2 must pin dataset ID and file-manifest SHA,
+stage immutable bytes, and rerun preflight after resume/relocation. Unselected
+files changed after preflight are detected when selected, not continuously; no
+filesystem locking or whole-dataset rehash on every step is promised. No Trainer
+is introduced.
+
+`product_counts` records `expected`, `attempted`, `pass`, `hold`, `fail` and
+`not_attempted`. Products are checked in sorted filename order; each attempted
+product records its own status/reasons. PASS means that file's hash, grid,
+channels/dtype, value range and declared coverage checks passed. HOLD means its
+coverage is partial/ambiguous. A file failure preserves earlier product results
+and leaves remaining products of that image not attempted; other images continue.
+Cross-product fraction/mask threshold checking is a **sample-level** check: four
+files may individually PASS while the sample FAILs this check. Thus no product
+counter implies sample acceptance. `samples_fully_technical_pass` counts only
+sample technical PASS; the ambiguous old `products_verified` field was removed.
+
+The report separately records `independence.within_manifest` (the automated
+declared-source/footprint check) and `independence.external_sources` (always
+`NOT_VERIFIED` by this offline program, plus `review_assertions_complete`). Even
+complete external assertions do not become a claim that the validator inspected
+official holdout or neighboring sources. Acceptance PASS checks the supplied
+R1b assertions; missing assertions are HOLD. R1b owns the actual external audit.
 
 ## Read-only Zenodo10 compatibility result
 
@@ -180,3 +224,19 @@ The skip is actual symlink creation unavailable in this Windows session; the
 reparse rejection branch is also tested with simulated file attributes. Warnings
 are rasterio/Affine pending deprecations plus the existing duplicate-ZIP test.
 CLI `--help`, the fresh-report path, error exits and `git diff --check` were checked.
+
+The above test counts describe the original PR implementation. The review-update
+results below supersede them for the current code; the original G0–G3-A fixtures
+and source data remain unchanged.
+
+PR #42 independent-review update: complete suite **267 passed, 1 skipped,
+676 warnings (67.41s)**; R1 tests **56 passed, 1 skipped, 154 warnings (20.42s)**.
+Added cases cover unselected-file/evidence/validity failure blocking preflight,
+context/snapshot binding, post-preflight selected-file mutation, accurate product
+counts on HOLD/late file failure/cross-product failure, and missing or incorrectly
+scoped external independence receipts. The existing Windows symlink skip remains.
+The real Zenodo10 audit was rerun: 40 expected/attempted/file-PASS products,
+0 file-HOLD/FAIL/unattempted; 10 sample technical PASS, all R1 HOLD.
+Within-manifest independence is HOLD for missing original-source evidence;
+external separation remains NOT_VERIFIED with incomplete assertions. No source
+rasters, fixed G0 manifest or old experiment artifacts were modified.
