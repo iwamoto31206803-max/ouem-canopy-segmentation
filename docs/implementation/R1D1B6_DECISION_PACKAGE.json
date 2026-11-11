@@ -1,0 +1,243 @@
+{
+  "schema": "ouem-r1d-four-readiness-v1",
+  "mode": "EVIDENCE_ONLY",
+  "source_generation": "zenodo-11617167-v1.0.0",
+  "created_utc": "2026-11-11T06:12:50.703649+00:00",
+  "baseline": "9abf346c8bc709c6e1cc8b475ea4f1fb3079a3b2",
+  "intended_use": "Present internal research on OAM-TCD 0.50m resolution adaptation",
+  "samples": [
+    {
+      "image_id": 717,
+      "oam_id": "5cb64e020a3a5c0005ff12ff",
+      "split": "train",
+      "validation_fold": 2,
+      "source_generation": "zenodo-11617167-v1.0.0",
+      "expected_shape": [
+        390,
+        390
+      ],
+      "source_hashes": {
+        "image_sha256": "bffc85dc4bad7b7f22b1f04af775c9191f17f2d556acfb90fd669329fa67ef68",
+        "annotation_sha256": "44d4677826f698c8c629102181f37d97e8b8c243cbca1386270b87465d45ddf0"
+      },
+      "source_files": {
+        "rgb": "extracted/dataset/holdout/images/5cb64e020a3a5c0005ff12ff_717.tif",
+        "annotation": "extracted/dataset/holdout/masks/5cb64e020a3a5c0005ff12ff_717.png"
+      },
+      "original_source_id": "oin-object:/5cb64d5a0a3a5c0005ff12fd/0/5cb64d5a0a3a5c0005ff12fe",
+      "stac_sha256": "a95aa7d7b6e75fa0604fa7e46e08b7f2f2316a640c04fae7eb9226358926b205",
+      "attribution_provider": "Air Services Bolivia",
+      "observed_categories": [
+        1,
+        2
+      ],
+      "technical": "PASS",
+      "formal_r1": "HOLD"
+    },
+    {
+      "image_id": 1054,
+      "oam_id": "5e25ecee36067e0005c2752e",
+      "split": "train",
+      "validation_fold": 3,
+      "source_generation": "zenodo-11617167-v1.0.0",
+      "expected_shape": [
+        391,
+        391
+      ],
+      "source_hashes": {
+        "image_sha256": "d4d2574ab5ed1fa2412b05738469a8cc92a331dfc12960184bfd89714a806de2",
+        "annotation_sha256": "b50ad44a2b3e63a275af105a41c40d2089c0855ef88f105dd3460742e48ec71b"
+      },
+      "source_files": {
+        "rgb": "extracted/dataset/holdout/images/5e25ecee36067e0005c2752e_1054.tif",
+        "annotation": "extracted/dataset/holdout/masks/5e25ecee36067e0005c2752e_1054.png"
+      },
+      "original_source_id": "oin-object:/5e25e88436067e0005c27528/0/5e25e88436067e0005c27529",
+      "stac_sha256": "cfae39c11e04194b93766f1834877701d6a21f1fb9b4b5fb1552e2345e691350",
+      "attribution_provider": "INGC",
+      "observed_categories": [
+        1,
+        2
+      ],
+      "technical": "PASS",
+      "formal_r1": "HOLD"
+    },
+    {
+      "image_id": 1241,
+      "oam_id": "5dde8d370140b80006d2e547",
+      "split": "val",
+      "validation_fold": 0,
+      "source_generation": "zenodo-11617167-v1.0.0",
+      "expected_shape": [
+        394,
+        394
+      ],
+      "source_hashes": {
+        "image_sha256": "92a4906b0b72c7af894cea39c203128e8694488f17e297dc684b1ced3c206180",
+        "annotation_sha256": "c8297aae50a1b07e24a5448e285e1cf5d0a8035e7229a5958e802d4b279b5bde"
+      },
+      "source_files": {
+        "rgb": "extracted/dataset/holdout/images/5dde8d370140b80006d2e547_1241.tif",
+        "annotation": "extracted/dataset/holdout/masks/5dde8d370140b80006d2e547_1241.png"
+      },
+      "original_source_id": "oin-object:/5dde8cc60140b80006d2e545/0/5dde8cc60140b80006d2e546",
+      "stac_sha256": "d5c26b27d78de2456a0480b8fd5077bfbc9d9ab6bbab41e7abf19c938f11def7",
+      "attribution_provider": "Lapig/UFG",
+      "observed_categories": [
+        2
+      ],
+      "technical": "PASS",
+      "formal_r1": "HOLD"
+    },
+    {
+      "image_id": 461,
+      "oam_id": "5b925da45d406700087d1514",
+      "split": "val",
+      "validation_fold": 0,
+      "source_generation": "zenodo-11617167-v1.0.0",
+      "expected_shape": [
+        337,
+        337
+      ],
+      "source_hashes": {
+        "image_sha256": "7bf295eb8d75f63975b486fe7f48e2fe4f14f8affa4cc092f961a44fe9372d7b",
+        "annotation_sha256": "93a9e2e4186ad1696750312e7e22d302f2c4e306b6a942c955084d8296793c7c"
+      },
+      "source_files": {
+        "rgb": "extracted/dataset/holdout/images/5b925da45d406700087d1514_461.tif",
+        "annotation": "extracted/dataset/holdout/masks/5b925da45d406700087d1514_461.png"
+      },
+      "original_source_id": "oin-object:/5b925be35d406700087d1511/0/5b925be35d406700087d1512",
+      "stac_sha256": "a762bd72bfb082bdc4b0d4ab1d4e0910ef1e9520f32e62ae036d40ac169e900a",
+      "attribution_provider": "DRONEBIRD",
+      "observed_categories": [
+        1
+      ],
+      "technical": "PASS",
+      "formal_r1": "HOLD"
+    }
+  ],
+  "catalog": {
+    "file": "R1D1B6_CATALOG_INDEX.json",
+    "sha256": "0bb9e9501792669d5365a25d11a6e354c410cc72b5cdf4cba73ac784ddfe37a0",
+    "canonical_bytes": 5265,
+    "materialized": true
+  },
+  "evidence": {
+    "review": {
+      "path": "r1d1b3-independent-acceptance-review-01/r1d1b3_independent_review.json",
+      "sha256": "74c6ae7d9c9b44af540beff32d5a63a4755e75f1daaf9a755cec299ce443f808"
+    },
+    "archive": {
+      "path": "r1d1b2-evidence-completion-01/archive_member_receipt.json",
+      "sha256": "8c0f03572e63aa6197a26b2efe8e07a2fa2efe80ff5a028feee3bd29d5ef561f"
+    },
+    "rights": {
+      "path": "r1d1b2-evidence-completion-01/rights_receipt.json",
+      "sha256": "0c87cd94fa10bc1d0b2557a5a000cda83130a8da98f29d4fdf516137b9db32fc"
+    },
+    "independence": {
+      "path": "r1d1b2-evidence-completion-01/independence_receipt.json",
+      "sha256": "e661ff9c50d01d53e5f32b473c163cecfb8aed5ca4a2ec15d5cf567f27ba9944"
+    },
+    "coverage": {
+      "path": "r1d1b2-evidence-completion-01/coverage_receipt.json",
+      "sha256": "879ed88264e255ccb74e88be9309474c8b4361c6ed8d4ce8be4a637b42921447"
+    }
+  },
+  "decisions": {
+    "G3": {
+      "status": "PROPOSED",
+      "recommendation": "ADOPT_FIXED_FOUR_BOUNDED_SCOPE",
+      "scope": "official_holdout_and_unlisted_neighbor_sources",
+      "limits": [
+        "4169 Train +439 Test metadata,541 groups,17 known STAC bbox, exact object-path aliases and1km guard.",
+        "524 group full scene extents, unknown aliases and catalog-external sources remain unresolved.",
+        "No known leakage is a bounded finding. Group envelopes are not complete source scenes."
+      ],
+      "alternatives": [
+        "Adopt the finite scope for these four and current use with residual risks recorded.",
+        "Hold and name the finite missing source facts."
+      ]
+    },
+    "G4": {
+      "status": "PROPOSED",
+      "recommendation": "ADOPT_FIXED_FOUR_OPERATIONAL_REVIEW",
+      "review_scope": "Whole-frame RGB/label overview, edge checks and bounded native sampling tied to source/PNG SHA.",
+      "operational_assertion": "REVIEW_PASS",
+      "adapter_token": "ALL_VALID_REQUIRES_EXPLICIT_HUMAN_DECISION",
+      "ALL_PIXELS_PROVEN_VALID": "NOT_VERIFIED",
+      "alternatives": [
+        "Approve operational whole-tile validity including the legacy ALL_VALID token and all-one valid_fraction semantics.",
+        "Hold and name the exact unresolved coverage suspicion."
+      ]
+    }
+  },
+  "human_authorization": {
+    "status": "PENDING",
+    "reference": null,
+    "date": null
+  },
+  "semantic_label": {
+    "policy": "upstream_nonzero_binary_with_review",
+    "categories": [
+      1,
+      2
+    ],
+    "per_segment_category_status": "NOT_VERIFIED",
+    "rule": "np.any(panoptic_rgb !=0,axis=2).astype(uint8)",
+    "uniform_masks": "PRESERVE"
+  },
+  "resources": {
+    "write_bytes": 67108864,
+    "report_bytes": 8388608,
+    "product_bytes": 2097152,
+    "memory_bytes": 2147483648,
+    "deadline_seconds": 1800,
+    "free_bytes": 268435456,
+    "network_requests": 0,
+    "network_bytes": 0
+  },
+  "offline_boundary": {
+    "candidate": "Windows Sandbox with Networking Disable, approved read-only input/runtime mappings and controlled export",
+    "status": "NOT_VERIFIED",
+    "local_readonly_evidence": {
+      "os_edition": "Professional",
+      "display_version": "26H2",
+      "build": "26300.9818",
+      "sandbox_executable_present": false,
+      "feature_state": "NOT_VERIFIED_QUERY_REQUIRES_ELEVATION",
+      "virtualization_firmware_enabled": true,
+      "vm_monitor_mode_extensions": false,
+      "firewall_profiles_enabled": [
+        "Domain",
+        "Private",
+        "Public"
+      ],
+      "default_outbound_action_raw": 0
+    },
+    "limitations": [
+      "Sandbox feature/readiness not established in this session.",
+      "Firmware enabled flag alone does not establish guest prerequisites.",
+      "Current venv uses host-absolute base paths; guest portable Python/GDAL environment untested.",
+      "Existing enabled firewall profiles do not prove a worker/native outbound block."
+    ],
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/windows-sandbox/windows-sandbox-configure-using-wsb-file",
+      "https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/windows-sandbox/windows-sandbox-sample-configuration"
+    ]
+  },
+  "future_authorization_binding": [
+    "Exact decision-package, catalog/index and evidence receipt SHA",
+    "Four original image/annotation pins, oam/fold/split, use and expected shapes",
+    "Explicit G3 residual-risk and G4 operational ALL_VALID decisions",
+    "Tested offline-runtime/mapping/export evidence and actual runtime/code hashes",
+    "Final run-plan/output paths and unchanged resource limits",
+    "Genuine human reference and date"
+  ],
+  "execution_enabled": false,
+  "formal_r1": {
+    "HOLD": 150
+  },
+  "source_bytes_checked_this_task": false
+}

@@ -1,2 +1,5 @@
 # Preserve the exact bytes of the SHA-256-pinned cross-platform dataset manifest.
 docs/implementation/M1_7_G0_MANIFEST.json -text
+# Preserve the exact bytes of the R1d evidence-only catalog and decision package.
+docs/implementation/R1D1B6_CATALOG_INDEX.json -text
+docs/implementation/R1D1B6_DECISION_PACKAGE.json -text
