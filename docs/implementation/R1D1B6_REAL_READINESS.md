@@ -170,6 +170,8 @@ privileges. The focused new/B5 run completed with **90 passed, 200 warnings in
 14.16 seconds**. The full run includes all 42 new evidence-only cases and the
 unchanged 48 B5 tests, including real Windows Job enforcement against synthetic
 workers, storage ceilings, interrupted publication and two-pass product hashes.
+After LF-only normalization of the new decision JSON, all 42 new tests passed
+again in 3.02 seconds. The JSON attributes preserve those final bytes.
 
 The read-only local receipt check returned exit 0 with all five expected hashes,
 `execution_enabled=false`, `source_bytes_checked=false`, G3/G4 PENDING and all
