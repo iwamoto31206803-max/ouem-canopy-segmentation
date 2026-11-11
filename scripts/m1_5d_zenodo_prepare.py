@@ -164,7 +164,8 @@ def validity(rgb, review):
                 validity_basis=review['basis'],validity='raster checks plus source-bound all-valid visual review')
 
 
-def convert(root, row, proof, categories, evidence_dir, output):
+def convert(root, row, proof, categories, evidence_dir, output, *,
+            product_writer=None, preview=True, expected_shape=None):
     rid = row['image_id']
     if rid == 4235: raise ValueError('HOLD_KNOWN_BLACK_WEDGE_4235')
     if row['license'] != 'CC-BY 4.0': raise ValueError('HOLD_LICENSE')
@@ -192,6 +193,8 @@ def convert(root, row, proof, categories, evidence_dir, output):
         geographic = rasterio.warp.transform_bounds(src.crs,4326,*src.bounds); b = stac['bbox']
         if not (b[0] <= geographic[0] <= geographic[2] <= b[2] and b[1] <= geographic[1] <= geographic[3] <= b[3]): raise ValueError('Outside STAC bbox')
         shape, transform, gsd = output_grid(src.crs,t,src.width,src.height)
+        if expected_shape is not None and list(shape) != list(expected_shape):
+            raise ValueError('Expected output shape mismatch')
         info.update(input_shape=list(src.shape),source_crs=str(src.crs),source_transform=list(t)[:6],source_bounds=list(src.bounds),
             output_crs=str(src.crs),output_bounds=list(src.bounds),output_transform=list(transform)[:6],output_shape=list(shape),
             source_ground_gsd=intervals(src.crs,*(t*(src.width/2,src.height/2)),t.a,-t.e),output_ground_gsd=gsd,
@@ -205,18 +208,25 @@ def convert(root, row, proof, categories, evidence_dir, output):
     output_hashes = {}
     for name,array in products.items():
         path = folder/name
-        with rasterio.open(path,'w',driver='GTiff',height=shape[0],width=shape[1],count=array.shape[0],dtype=array.dtype,
-                           crs=info['output_crs'],transform=transform,compress='deflate') as dst: dst.write(array)
+        profile = dict(driver='GTiff',height=shape[0],width=shape[1],count=array.shape[0],dtype=array.dtype,
+                       crs=info['output_crs'],transform=transform,compress='deflate')
+        if product_writer is None:
+            with rasterio.open(path,'w',**profile) as dst: dst.write(array)
+        else:
+            product_writer(path, array, profile)
         output_hashes[name] = sha(path)
     info.update(image_id=rid,split=partition(row,'train'),output_hashes=output_hashes)
     verify_sample(output,info,products)
-    Image.fromarray(overlay(rgb_out,binary(fraction))).save(folder/'preview.png')
+    if preview:
+        Image.fromarray(overlay(rgb_out,binary(fraction))).save(folder/'preview.png')
     info.update(source_hashes=hashes,rights=rights_info,canopy_fraction_mean=float(fraction.mean()),binary_canopy_ratio=float(binary(fraction).mean()),
         source_positive_pixels=int(mask.sum()),uniform_background=bool(np.all(mask==0)),uniform_canopy=bool(np.all(mask==1)),
         semantic_policy='upstream_nonzero_binary_with_review',category_crosswalk_status='not_available',category_level_per_id_validation='NOT_VERIFIED',
         coco_categories=categories,crowd_policy='canonical binary retained; cross-format disagreement alone WARN',threshold=.5,
         rgb_method='exact overlap area float64; floor(value+0.5) uint8',fraction_method='same area weights; float32',
-        pixel_definition='outer edges preserved; centers col+0.5,row+0.5',preview_sha256=sha(folder/'preview.png'))
+        pixel_definition='outer edges preserved; centers col+0.5,row+0.5')
+    if preview:
+        info['preview_sha256'] = sha(folder/'preview.png')
     return info
 
 
