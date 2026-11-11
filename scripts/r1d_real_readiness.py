@@ -67,7 +67,8 @@ def check_receipts(package, catalog, root):
             'Catalog receipt mismatch')
     for kind, key in [('rights', 'images'), ('independence', 'results'), ('coverage', 'images')]:
         rows = receipts[kind][key]
-        require(len(rows) == 4 and {r['image_id'] for r in rows} == set(TARGETS),
+        require(len(rows) == 4 and all(type(r['image_id']) is int for r in rows)
+                and {r['image_id'] for r in rows} == set(TARGETS),
                 'Receipt targets mismatch')
         for sample in package['samples']:
             row = next(r for r in rows if r['image_id'] == sample['image_id'])
@@ -83,7 +84,8 @@ def check_receipts(package, catalog, root):
                         ('image_license', 'annotation_license', 'original_source_license')),
                         'Rights declarations incomplete')
             if kind == 'independence':
-                require(row['split'] == sample['split'] and row['fold'] == sample['validation_fold']
+                require(row['split'] == sample['split'] and type(row['fold']) is int
+                        and row['fold'] == sample['validation_fold']
                         and row['original_source_id'] == sample['original_source_id']
                         and row['oam_id'] == sample['oam_id'], 'Independence identity mismatch')
                 require(row['guard']['proximity_hold_m'] == 1000
@@ -128,8 +130,13 @@ def check_readiness(package_path, package_sha256, catalog_path, evidence_root=No
             and package['semantic_label']['per_segment_category_status'] == 'NOT_VERIFIED'
             and package['semantic_label']['uniform_masks'] == 'PRESERVE', 'Label policy mismatch')
     samples = package['samples']
-    require([s['image_id'] for s in samples] == list(TARGETS), 'Fixed four order required')
+    require(all(type(s['image_id']) is int for s in samples)
+            and [s['image_id'] for s in samples] == list(TARGETS), 'Fixed four integer IDs required')
     for sample, oam, size, fold in zip(samples, OAMS, SHAPES, FOLDS):
+        require(type(sample['validation_fold']) is int
+                and type(sample['expected_shape']) is list and len(sample['expected_shape']) == 2
+                and all(type(coordinate) is int for coordinate in sample['expected_shape']),
+                'Integer fold and two integer shape coordinates required')
         require(sample['oam_id'] == oam and sample['split'] == TARGETS[sample['image_id']]
                 and sample['validation_fold'] == fold and sample['expected_shape'] == [size, size]
                 and sample['source_generation'] == GENERATION and sample['formal_r1'] == 'HOLD'
@@ -150,13 +157,20 @@ def check_readiness(package_path, package_sha256, catalog_path, evidence_root=No
         require(relative_path(reference['path']).endswith('.json')
                 and re.fullmatch('[0-9a-f]{64}', reference['sha256']), 'Invalid receipt reference')
     catalog = checked_snapshot(catalog_path, CATALOG_SHA)
+    require(type(package['catalog']['canonical_bytes']) is int
+            and type(catalog['oam_groups']) is int
+            and all(type(item['rows']) is int for item in catalog['metadata'])
+            and all(type(image_id) is int for image_id in catalog['reviewed_subject_ids']),
+            'Integer catalog counts and IDs required')
     canonical = json.dumps(catalog, ensure_ascii=False, sort_keys=True,
                            separators=(',', ':'), allow_nan=False).encode('utf-8')
     require(digest(canonical) == CATALOG_SHA and package['catalog']['sha256'] == CATALOG_SHA
             and package['catalog']['canonical_bytes'] == len(canonical)
             and package['catalog']['materialized'] is True, 'Catalog canonical bytes mismatch')
     verified = check_receipts(package, catalog, evidence_root) if evidence_root is not None else {}
-    return dict(status='EVIDENCE_PACKAGE_CHECKED_EXECUTION_BLOCKED',
+    status = ('PACKAGE_SCHEMA_CHECKED_EXECUTION_BLOCKED' if evidence_root is None
+              else 'EVIDENCE_PACKAGE_CHECKED_EXECUTION_BLOCKED')
+    return dict(status=status,
                 package_sha256=package_sha256, catalog_sha256=CATALOG_SHA,
                 receipts_checked=verified, source_bytes_checked=False,
                 g3_g4_approval='PENDING', isolation='NOT_VERIFIED',

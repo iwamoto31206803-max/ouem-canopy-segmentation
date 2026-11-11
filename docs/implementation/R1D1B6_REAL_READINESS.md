@@ -76,20 +76,26 @@ Embedded receipt paths, including original images, archives and previews, are
 never followed. Evidence references have a 4-MiB read ceiling each.
 
 ```powershell
-$PackageSHA = (Get-FileHash docs/implementation/R1D1B6_DECISION_PACKAGE.json -Algorithm SHA256).Hash.ToLower()
+$ExpectedPackageSHA = 'f74a753cf7c65b34f3adce1ee1524e0212f7a146425c7046544b60d4b1150a69'
+$MeasuredPackageSHA = (Get-FileHash docs/implementation/R1D1B6_DECISION_PACKAGE.json -Algorithm SHA256).Hash.ToLower()
+if ($MeasuredPackageSHA -ne $ExpectedPackageSHA) { throw 'STOP: reviewed package SHA mismatch' }
 .\.venv\Scripts\python.exe -B scripts/r1d_real_readiness.py `
   --package docs/implementation/R1D1B6_DECISION_PACKAGE.json `
-  --package-sha256 $PackageSHA `
+  --package-sha256 $ExpectedPackageSHA `
   --catalog-index docs/implementation/R1D1B6_CATALOG_INDEX.json `
   --evidence-root 'C:\dev\ouem-data-audits'
 ```
 
-Pin the expected package SHA from the reviewed PR when operating later. Computing
-it locally in this example shows how to reproduce the measurement. Omitting the
-audit root returns an empty `receipts_checked` map. A successful check always
-returns `EVIDENCE_PACKAGE_CHECKED_EXECUTION_BLOCKED`, `execution_enabled=false`
-and `source_bytes_checked=false`. Exit 0 describes this evidence check. The CLI
-provides no execute option, output directory or image processing path.
+The expected SHA is independently pinned to the reviewed package bytes. Keep
+that expected value when measuring the local file. A package change needs a
+freshly reviewed expected SHA. Omitting the audit root returns
+`PACKAGE_SCHEMA_CHECKED_EXECUTION_BLOCKED` and an empty `receipts_checked` map.
+Only a successful check including all five receipts returns
+`EVIDENCE_PACKAGE_CHECKED_EXECUTION_BLOCKED`. Both paths return
+`execution_enabled=false` and `source_bytes_checked=false`. Exit 0 describes the
+specified checking scope. The CLI provides no execute option, output directory
+or image processing path. IDs, folds, both shape coordinates and catalog
+counts require JSON integers. Floating-point and boolean values are rejected.
 
 The local evidence-only check succeeded for all five original receipt hashes.
 No original TIFF/PNG bytes or archive bytes were read in this task. The expected
@@ -162,7 +168,7 @@ G5/G6 execution and Formal R1 acceptance remain separate future decisions. No
 new coverage threshold, mask-aware loss, patch rescue or contract relaxation is
 introduced by this package.
 
-## Validation on 2026-11-11
+## Initial validation on 2026-11-11
 
 The final full regression run completed with **503 passed, 1 skipped, 3,994
 warnings in 221.76 seconds**. The existing skip requires Windows symlink
@@ -180,3 +186,15 @@ Existing processing code, R1a contract and historical manifests have no diff.
 The original image/archive bytes were not accessed in this task, so this check
 does not refresh their historical authenticity measurements. Real-product,
 Sandbox/network-boundary and guest-runtime validation remain unperformed.
+
+## PR #63 independent-review corrections
+
+The review corrections cover exact JSON integer types, distinct package-only
+and receipt-checked statuses, and the independently pinned CLI hash example.
+The decision-package and canonical-catalog bytes are unchanged.
+
+The updated full suite completed with **545 passed, 1 skipped, 3,994 warnings in
+224.34 seconds**. Focused B5/B6 tests completed with **132 passed, 200 warnings
+in 14.70 seconds**, including 84 B6 synthetic cases. The existing Windows symlink
+privilege skip remains. Both CLI checking scopes were verified with the fixed
+expected package SHA. Execution stays disabled and source bytes remain unread.

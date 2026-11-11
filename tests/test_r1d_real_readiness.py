@@ -1,6 +1,7 @@
 """Evidence-only checks use JSON fixtures, never image inputs or network."""
 import json
 from pathlib import Path
+import re
 import subprocess
 import sys
 
@@ -89,6 +90,7 @@ def test_package_only_is_always_blocked(tmp_path, package, monkeypatch):
     assert result['execution_enabled'] is False
     assert result['source_bytes_checked'] is False
     assert result['receipts_checked'] == {}
+    assert result['status'] == 'PACKAGE_SCHEMA_CHECKED_EXECUTION_BLOCKED'
     assert result['formal_r1'] == {'HOLD': 150}
     assert set(tmp_path.iterdir()) == before | {tmp_path / 'package.json'}
 
@@ -97,6 +99,7 @@ def test_synthetic_receipts_check_without_approval(tmp_path, package):
     root = write_receipts(tmp_path, package, receipts(package))
     result = check(tmp_path, package, evidence_root=root)
     assert len(result['receipts_checked']) == 5
+    assert result['status'] == 'EVIDENCE_PACKAGE_CHECKED_EXECUTION_BLOCKED'
     assert result['g3_g4_approval'] == 'PENDING'
     assert not result['execution_enabled']
 
@@ -176,6 +179,7 @@ def test_cli_cannot_execute_and_returns_stop(tmp_path, package):
     result = subprocess.run(command, capture_output=True, text=True)
     assert result.returncode == 0
     assert json.loads(result.stdout)['execution_enabled'] is False
+    assert json.loads(result.stdout)['status'] == 'PACKAGE_SCHEMA_CHECKED_EXECUTION_BLOCKED'
     assert subprocess.run(command + ['--execute'], capture_output=True).returncode == 2
     command[command.index(sha)] = '0'*64
     result = subprocess.run(command, capture_output=True, text=True)
@@ -218,3 +222,99 @@ def test_finite_evidence_contradictions_stop(tmp_path, package, kind):
     root = write_receipts(tmp_path, package, values)
     with pytest.raises(readiness.Stop):
         check(tmp_path, package, evidence_root=root)
+
+
+@pytest.mark.parametrize('sample_index', range(4))
+@pytest.mark.parametrize('field', ['image_id', 'validation_fold', 'height', 'width'])
+def test_float_equal_to_expected_integer_rejected(tmp_path, package, sample_index, field):
+    sample = package['samples'][sample_index]
+    if field in ('height', 'width'):
+        coordinate = 0 if field == 'height' else 1
+        sample['expected_shape'][coordinate] = float(sample['expected_shape'][coordinate])
+    else:
+        sample[field] = float(sample[field])
+    # seal() supplies a matching new file hash, so type validation must reject it.
+    with pytest.raises(readiness.Stop, match='integer|Integer'):
+        check(tmp_path, package)
+
+
+@pytest.mark.parametrize('value', [False, True, '0', None])
+def test_noninteger_fold_rejected(tmp_path, package, value):
+    package['samples'][2]['validation_fold'] = value
+    with pytest.raises(readiness.Stop, match='Integer'):
+        check(tmp_path, package)
+
+
+@pytest.mark.parametrize('field', ['image_id', 'height', 'width'])
+@pytest.mark.parametrize('value', [True, '717', None])
+def test_noninteger_identity_or_shape_rejected(tmp_path, package, field, value):
+    if field == 'image_id':
+        package['samples'][0][field] = value
+    else:
+        package['samples'][0]['expected_shape'][0 if field == 'height' else 1] = value
+    with pytest.raises(readiness.Stop, match='integer|Integer'):
+        check(tmp_path, package)
+
+
+def test_float_catalog_byte_count_rejected(tmp_path, package):
+    package['catalog']['canonical_bytes'] = float(package['catalog']['canonical_bytes'])
+    with pytest.raises(readiness.Stop, match='Integer catalog'):
+        check(tmp_path, package)
+
+
+@pytest.mark.parametrize('field', ['oam_groups', 'rows', 'reviewed_subject_ids'])
+@pytest.mark.parametrize('value_type', [float, bool])
+def test_catalog_numerical_types_rejected(tmp_path, package, monkeypatch, field, value_type):
+    catalog = json.loads((DOCS / 'R1D1B6_CATALOG_INDEX.json').read_text(encoding='utf-8'))
+    if field == 'rows':
+        catalog['metadata'][0]['rows'] = value_type(catalog['metadata'][0]['rows'])
+    elif field == 'reviewed_subject_ids':
+        catalog[field][0] = value_type(catalog[field][0])
+    else:
+        catalog[field] = value_type(catalog[field])
+    data = json.dumps(catalog, ensure_ascii=False, sort_keys=True,
+                      separators=(',', ':')).encode('utf-8')
+    catalog_path = tmp_path / 'synthetic-catalog.json'
+    catalog_path.write_bytes(data)
+    sha = readiness.digest(data)
+    # A synthetic catalog pin exercises type checks beyond the production hash gate.
+    monkeypatch.setattr(readiness, 'CATALOG_SHA', sha)
+    package['catalog'].update(sha256=sha, canonical_bytes=len(data))
+    path, package_sha = seal(tmp_path, package)
+    with pytest.raises(readiness.Stop, match='Integer catalog'):
+        readiness.check_readiness(path, package_sha, catalog_path)
+
+
+@pytest.mark.parametrize('kind', ['rights', 'independence', 'coverage', 'fold'])
+def test_receipt_integer_identity_required(tmp_path, package, kind):
+    values = receipts(package)
+    if kind == 'fold':
+        values['independence']['results'][2]['fold'] = 0.0
+    else:
+        key = 'results' if kind == 'independence' else 'images'
+        values[kind][key][0]['image_id'] = 717.0
+    root = write_receipts(tmp_path, package, values)
+    with pytest.raises(readiness.Stop):
+        check(tmp_path, package, evidence_root=root)
+
+
+def test_cli_full_receipt_status(tmp_path, package):
+    root = write_receipts(tmp_path, package, receipts(package))
+    path, sha = seal(tmp_path, package)
+    result = subprocess.run([sys.executable, '-B', str(Path(readiness.__file__)),
+        '--package', str(path), '--package-sha256', sha,
+        '--catalog-index', str(DOCS / 'R1D1B6_CATALOG_INDEX.json'),
+        '--evidence-root', str(root)], capture_output=True, text=True)
+    assert result.returncode == 0
+    report = json.loads(result.stdout)
+    assert report['status'] == 'EVIDENCE_PACKAGE_CHECKED_EXECUTION_BLOCKED'
+    assert len(report['receipts_checked']) == 5
+    assert report['execution_enabled'] is False
+
+
+def test_documented_expected_package_hash_is_independently_pinned():
+    document = (DOCS / 'R1D1B6_REAL_READINESS.md').read_text(encoding='utf-8')
+    expected = re.search(r"\$ExpectedPackageSHA = '([0-9a-f]{64})'", document).group(1)
+    assert expected == readiness.digest((DOCS / 'R1D1B6_DECISION_PACKAGE.json').read_bytes())
+    assert '--package-sha256 $ExpectedPackageSHA' in document
+    assert 'if ($MeasuredPackageSHA -ne $ExpectedPackageSHA)' in document
