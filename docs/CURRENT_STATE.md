@@ -1,7 +1,17 @@
 # OUEM Canopy Segmentation — Current State
 
-**As of:** 2026-11-07 (evidence snapshot)  
+**As of:** 2026-11-14 policy/status proposal; preserved 2026-11-07 evidence below  
 **Status:** Draft for review. **Technical pipeline PASS / useful model and M1 completion NOT YET ESTABLISHED**.
+
+## 2026-11-14 checkpoint (newer than the 2026-11-07 reference below)
+
+- **Scientific outcome:** The Satlas-first backbone/FPN + two-class SEGMENT route remains preferred. The old T4 20-step training and restore/inference pipeline worked; its three fixed Val crops gave Tree IoU/F1 = 0 with all-background predictions. M1 model quality and GSI suitability remain **NOT MET / NOT VERIFIED**, respectively.
+- **Data:** Fixed OAM-TCD candidate pool 150 (Train 120 / Val 30) has Technical PASS **55** (Train 49 / Val 6), HOLD **94**, FAIL **1** (4508 grayscale TIFF). **Formal R1 accepted = 0**; Technical PASS is not training admission. Existing Zenodo10 are smoke-only.
+- **Pilot:** Train 717/1054 and Val 1241/461 are fixed for the R1d four-image workflow. PR [#61](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/pull/61) added bounded synthetic preparation, and PR [#63](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/pull/63) merged G3/G4 proposals plus evidence-only readiness (main `c8e6eac2a6b6e20dc166c15d8f2e9d4b8573b538`). The four real GeoTIFF sets were **NOT generated**. G3/G4 and human execution approval are **PENDING**, all formal candidates remain HOLD, and the existing real-mode gate is `REAL_EXECUTION_DISABLED`.
+- **Sandbox:** User-observed Windows Sandbox feature enabled, disabled-network guest startup succeeded; no guest Python/GDAL/Job/output smoke has been run. Issue [#64](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/64) remains open but can be **paused**, as an optional environment experiment rather than a prerequisite for ordinary coding, synthetic tests, data planning or Trainer development.
+- **Proposed risk-proportionate policy:** [Design Principles](DESIGN_PRINCIPLES.md#risk-proportionate-execution-policy-2026-11-14-proposal) and [Next Roadmap](ROADMAP_NEXT.md#2026-11-14-priority-reset--focus-on-useful-training-not-compulsory-isolation). Focus on data supply, a generalized Trainer and meaningful model assessment. Sandbox and mandatory zero-byte network proofs should not be blanket requirements; any real-data execution route remains subject to a separate explicitly approved, source-bound contract and applicable code-gate changes. No license, G3/G4, `ALL_VALID`, R1 or real execution permission is conferred by this proposed note.
+
+**Historical reference:** Sections 1–6 below retain the 2026-11-07 evidence and pinned artifacts. They are not silently rewritten into the 2026-11-14 execution outcome.
 
 ## 1. Active direction
 

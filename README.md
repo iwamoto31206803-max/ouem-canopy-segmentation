@@ -4,6 +4,16 @@ Engineering repository for a practical **RGB tree-canopy semantic-segmentation c
 
 **Goal:** Use Japanese GSI aerial RGB imagery at approximately 0.5–0.6 m/ground pixel to produce usable 2D tree-canopy masks for OUEM's simplified 3D canopy, shade/heat and landscape workflows. The priority is a maintainable, reproducible implementation with documented rights and limitations—not a state-of-the-art benchmark or individual-tree delineation.
 
+## Current direction (2026-11-14 proposed policy update)
+
+**Priority: obtain a usable canopy model, not complete ever more elaborate audit or isolation infrastructure.** The fixed 150-image expansion has Technical PASS **55** / HOLD **94** / FAIL **1**; **0** have formal R1 acceptance. The original 20-step T4 pipeline is proven to run, but its model did not detect canopy on three fixed Val crops. The next productive work is proportionate data qualification/selection plus a generalized Trainer and meaningful evaluation.
+
+**Windows Sandbox is optional for this project**, not a prerequisite for ordinary host-based VS Code/Codex/Python development, synthetic testing or Trainer implementation. The OS-level zero-network requirement arose as a conservative safeguard for a specific four-image R1d execution proposal; it is **not a general OAM-TCD license condition or a project-wide gate**. The user has demonstrated a disabled-network Sandbox guest start, but guest Python/GDAL processing remains untested and Issue [#64](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/64) may remain paused.
+
+**No blanket permission to process previously blocked real inputs:** G3/G4 decisions and all 150 Formal R1 outcomes remain pending/HOLD, and the four-image real execution path is still `REAL_EXECUTION_DISABLED`. Any simpler non-Sandbox real-data experiment requires an explicit, bounded replacement run approval and the corresponding reviewed code/contract changes; do not circumvent an existing gate or treat Technical PASS as Formal R1 PASS.
+
+See [2026-11-14 Current State](docs/CURRENT_STATE.md), [risk-proportionate Design Principles](docs/DESIGN_PRINCIPLES.md#risk-proportionate-execution-policy-2026-11-14-proposal), and [updated Roadmap](docs/ROADMAP_NEXT.md#2026-11-14-priority-reset--focus-on-useful-training-not-compulsory-isolation). Earlier implementation and review notes below remain dated evidence, not new execution authorization.
+
 ## Active route and current status (review snapshot: 2026-11-07)
 
 **Active engineering route:** Ai2 SatlasPretrain `Aerial_SwinB_SI` official backbone/FPN + newly initialized 2-class SEGMENT head; fine-tune using verified CC BY 4.0 OAM-TCD RGB/Tree–Canopy labels at approximately **0.50 m/local ground pixel**, then visually assess actual Japanese GSI aerial imagery.

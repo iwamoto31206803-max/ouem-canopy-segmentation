@@ -1,7 +1,24 @@
 # OUEM Canopy Segmentation — Next Roadmap
 
-**Revision:** proposed 2026-11-07, documentation review draft  
+**Revision:** 2026-11-14 priority update proposed for review; underlying R0–R5 plan originated 2026-11-07  
 **Authority:** subordinate to [Project Charter](PROJECT_CHARTER.md) and [Design Principles](DESIGN_PRINCIPLES.md). The existing M1/M2/D0–D5 scope is unchanged. R0–R5 below describe the next engineering **work packages**, not new, overriding scientific acceptance standards.
+
+## 2026-11-14 priority reset — focus on useful training, not compulsory isolation
+
+This is the **proposed current work-order update** to the original 2026-11-07 R0–R5 roadmap below; the older phase descriptions remain for traceability. It follows the [risk-proportionate execution policy](DESIGN_PRINCIPLES.md#risk-proportionate-execution-policy-2026-11-14-proposal) and the 2026-11-11 [milestone review](PROJECT_REVIEW_20261111.md). The next outcome remains **a useful OAM-trained canopy model and early GSI visual inspection**, not a completed sandbox.
+
+**Observed baseline:** Fixed 150 candidates (Train 120 / Val 30) have Technical PASS 55 (Train 49 / Val 6), HOLD 94 and FAIL 1. **Formal R1 accepted: 0**. The archived Zenodo10 are smoke-only. The 20-step GPU run demonstrated the training pipeline but predicted no canopy in the three fixed Val crops. The four-image R1d pilot (Train 717/1054; Val 1241/461) has synthetic conversion and evidence-only readiness tooling; G3/G4 remain PENDING and actual real products have not been made.
+
+**Smallest productive next work, without GEEKOM-A6 access:**
+
+1. **Decide the proportionate real-data path:** separate data/license/split/label/coverage requirements from self-imposed OS isolation and cumulative safety controls. Draft one narrow, reviewable host-based research execution contract if justified; keep source inputs immutable and outputs isolated. Existing `REAL_EXECUTION_DISABLED` and R1a constraints are not automatically lifted by this document.
+2. **Increase usable data supply:** reuse 150-image QA; prioritize clean, diverse Train and especially Val scenes; exclude uncertain black/white coverage images and replenish candidates instead of adding mask-aware loss now. Do not promote Technical PASS to Formal R1 PASS or alter holdout/GT54.
+3. **Build a generalized, resumable Trainer and synthetic/CPU tests** in ordinary development environments in parallel with data qualification. Existing G0–G3 checkpoints remain frozen.
+4. **Run a bounded real training/evaluation experiment** only after input rights, split, scope, runtime and applicable execution approval are established; inspect nontrivial canopy prediction and source-domain performance, then sample GSI imagery.
+
+**Not project-wide prerequisites:** Windows Sandbox setup/guest Python packaging, an absolute zero-byte network proof, exhaustive checks of every unknown source extent, or proving every pixel physically valid. Escalate these measures only against an identified risk. Issue [#64](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/64) is paused as an optional offline-isolation investigation, not a dependency for unrelated research/Trainer work. Its prior execution limits still apply wherever the existing R1d path explicitly enforces them, until a separately reviewed replacement is adopted.
+
+**Scope/authority boundary:** This roadmap update is not a new license clearance, G3/G4 or `ALL_VALID` authorization, real G5/G6 permission, R1 dataset acceptance or software-execution change. Document any revised execution gate explicitly before acting on it.
 
 ## A. Outcome and priorities
 
