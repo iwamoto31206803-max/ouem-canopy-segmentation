@@ -24,6 +24,7 @@ class R1Data:
         if value.get('dataset_id') != dataset_id:
             raise ValueError('Dataset ID mismatch')
         self.verified = r1.preflight(Path(root), value)
+        self.root = self.verified.root
         r1.require_hash(manifest, manifest_sha256)
         self.samples = {s['image_id']: s for s in json.loads(self.verified.manifest_bytes)['samples']}
         self.identity = dict(dataset_id=dataset_id, manifest_sha256=manifest_sha256,
@@ -133,7 +134,7 @@ def train(data, plan, model_factory, output, *, stop_after=None, resume=None, re
                for group in state['optimizer']['param_groups']):
             raise ValueError('Checkpoint optimizer/config mismatch')
     output = Path(output).resolve()
-    root = data.verified.root
+    root = data.root
     if output == root or root in output.parents or output in root.parents:
         raise ValueError('Output overlaps dataset')
     if resume is not None and Path(resume).resolve().parent in [output.resolve(), *output.resolve().parents]:
