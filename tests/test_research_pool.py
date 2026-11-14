@@ -145,7 +145,8 @@ def test_pool_rejects_inconsistent_manifest(pilot,tmp_path,case):
     with pytest.raises(ValueError): open_pool(built)
 
 
-def test_generator_variable_targets_and_resample_once(inputs,tmp_path,monkeypatch):
+@pytest.mark.parametrize('seeds,expected_patches',[([0,1],3),(list(range(6)),7)])
+def test_generator_variable_targets_and_resample_once(inputs,tmp_path,monkeypatch,seeds,expected_patches):
     root,diagnosis,evidence = inputs
     rows = [json.loads(line) for line in (root/'archives/train_meta.json').read_text().splitlines()]
     ids = [rows[0]['image_id'],rows[-1]['image_id']]
@@ -174,13 +175,24 @@ def test_generator_variable_targets_and_resample_once(inputs,tmp_path,monkeypatc
     candidates.write_text(json.dumps(manifest))
     calls = []
     original = patches.area_grid
+    original_preview = patches.write_preview_page
+    page_sizes = []
     def counted(*args):
         calls.append(1)
         return original(*args)
     monkeypatch.setattr(patches,'area_grid',counted)
+    def checked_preview(output, previews, size, page):
+        assert len(previews) <= 6
+        page_sizes.append(len(previews))
+        return original_preview(output, previews, size, page)
+    monkeypatch.setattr(patches,'write_preview_page',checked_preview)
     result = patches.prepare(root,diagnosis,patches.sha(diagnosis),evidence,tmp_path/'generated',
-        candidates_path=candidates,candidates_sha256=patches.sha(candidates),ids=ids,train_seeds=[0,1])
-    assert len(calls)==2 and len(result['samples'])==3
+        candidates_path=candidates,candidates_sha256=patches.sha(candidates),ids=ids,train_seeds=seeds)
+    assert len(calls)==2 and len(result['samples'])==expected_patches
+    assert page_sizes == ([3] if expected_patches == 3 else [6,1])
+    assert sum(p['rows'] for p in result['preview_pages']) == expected_patches
+    for page in result['preview_pages']:
+        assert patches.sha(tmp_path/'generated'/page['path']) == page['sha256']
     assert all(s['selected_black_support_cells']==0 for s in result['samples'])
     assert result['schema']=='ouem-exploratory-crops-v2'
     assert {p:patches.sha(p) for p in before} == before
