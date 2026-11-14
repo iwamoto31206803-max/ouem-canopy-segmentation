@@ -101,6 +101,19 @@ def write_products(folder, arrays, crs, transform):
     return hashes
 
 
+def write_preview_page(output, previews, size, page):
+    """Write one bounded contact sheet, retaining only this page's pixels."""
+    sheet = Image.new('RGB', (size*3, (size+30)*len(previews)), 'white')
+    draw = ImageDraw.Draw(sheet)
+    for i, (label, split, image, mask, overlay) in enumerate(previews):
+        draw.text((4, i*(size+30)+5), f'{label} {split} | RGB / canopy=green / overlay', fill='black')
+        for j, array in enumerate((image, mask, overlay)):
+            sheet.paste(Image.fromarray(array), (j*size, i*(size+30)+30))
+    name = 'preview.png' if page == 0 else f'preview_{page+1:03d}.png'
+    sheet.save(output/name)
+    return dict(path=name, sha256=sha(output/name), rows=len(previews))
+
+
 def candidate_manifest(root, diagnosis, diagnosis_sha256):
     """Metadata-only projection of Phase B; no original pixel reads."""
     require_hash(Path(diagnosis), diagnosis_sha256)
@@ -224,6 +237,7 @@ def prepare(root, diagnosis, diagnosis_sha256, evidence, output, seed=0, size=22
                       candidate_manifest_sha256=candidates_sha256, target_ids=list(targets),
                       train_seeds=list(train_seeds or [seed]), fixed_val_seed=seed)
     previews = []
+    preview_pages = []
     try:
         for row, proof, paths in selected:
             rid = row['image_id']
@@ -272,20 +286,22 @@ def prepare(root, diagnosis, diagnosis_sha256, evidence, output, seed=0, size=22
                 if expanded:
                     entry['crop_seed'] = crop_seed
                 result['samples'].append(entry)
-                image = arrays['rgb.tif'].transpose(1,2,0)
+                image = arrays['rgb.tif'].transpose(1,2,0).copy()
                 mask = arrays['canopy_mask.tif'][0].astype(bool)
                 colored = np.zeros_like(image); colored[mask] = [0,210,0]
                 overlay = image.copy(); overlay[mask] = ((image[mask].astype(np.uint16)+colored[mask])/2).astype(np.uint8)
-                previews.append((rid, split, image, colored, overlay))
+                label = f'{rid} seed={crop_seed} xy={xy}' if expanded else rid
+                previews.append((label, split, image, colored, overlay))
+                if expanded and len(previews) == 6:
+                    preview_pages.append(write_preview_page(output, previews, size, len(preview_pages)))
+                    previews.clear()
         for path, expected in pins.items(): require_hash(path, expected)
-        sheet = Image.new('RGB', (size*3, (size+30)*len(previews)), 'white')
-        draw = ImageDraw.Draw(sheet)
-        for i, (rid, split, image, mask, overlay) in enumerate(previews):
-            draw.text((4, i*(size+30)+5), f'{rid} {split} | RGB / canopy=green / overlay', fill='black')
-            for j, a in enumerate((image, mask, overlay)):
-                sheet.paste(Image.fromarray(a), (j*size, i*(size+30)+30))
-        sheet.save(output/'preview.png')
-        result['preview_sha256'] = sha(output/'preview.png')
+        if previews:
+            preview_pages.append(write_preview_page(output, previews, size, len(preview_pages)))
+            previews.clear()
+        result['preview_sha256'] = preview_pages[0]['sha256']
+        if expanded:
+            result['preview_pages'] = preview_pages
         result['status'] = 'EXPLORATORY_PILOT_PRODUCTS_COMPLETE'
     except Exception as exc:
         result['error'] = dict(type=type(exc).__name__, message=str(exc))
