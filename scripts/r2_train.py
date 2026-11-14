@@ -63,6 +63,9 @@ def make_plan(data, *, seed=0, patch_hw=(224, 224), steps=20, val_ids=None,
             type(i) is not int or i not in data.samples or data.samples[i]['split'] != 'val' for i in val_ids):
         raise ValueError('Train samples and distinct Val-only IDs required')
     ph, pw = patch_hw
+    positions = getattr(data, 'crop_positions', None)
+    if positions is not None and (list(patch_hw) != [224,224] or list(val_origin) != [0,0]):
+        raise ValueError('Research pool uses stored 224 windows and fixed Val positions')
     for rid in train_ids + val_ids:
         h, w = data.samples[rid]['grid']['shape']
         x, y = val_origin if rid in val_ids else (0, 0)
@@ -77,11 +80,13 @@ def make_plan(data, *, seed=0, patch_hw=(224, 224), steps=20, val_ids=None,
         rng.shuffle(cycle)
         for rid in cycle[:steps-len(schedule)]:
             h, w = data.samples[rid]['grid']['shape']
-            schedule.append(dict(step=len(schedule)+1, **entry(rid, rng.randint(0, w-pw), rng.randint(0, h-ph))))
+            x, y = (positions[rid][rng.randrange(len(positions[rid]))] if positions is not None
+                    else (rng.randint(0, w-pw), rng.randint(0, h-ph)))
+            schedule.append(dict(step=len(schedule)+1, **entry(rid, x, y)))
     config = dict(seed=seed, patch_hw=list(patch_hw), steps=steps, val_ids=val_ids,
                   val_origin=list(val_origin), lr=lr, weight_decay=weight_decay)
     return dict(inputs=dict(data.identity), config=config, train=schedule,
-                val=[entry(rid, *val_origin) for rid in val_ids])
+                val=[entry(rid, *(positions[rid][0] if positions is not None else val_origin)) for rid in val_ids])
 
 
 def _rng_state():
