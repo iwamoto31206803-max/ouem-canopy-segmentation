@@ -61,12 +61,16 @@ def choose_window(rgb, teacher, shape, image_id, seed=0, size=224):
                 selected_white_support_cells=int(white_cells[y:y+size, x:x+size].sum()))
 
 
-def crop_arrays(rgb, teacher, shape, grid, crop):
+def area_grid(rgb, teacher, shape):
+    return (np.floor(np.clip(reduce_area(rgb, shape), 0, 255)+.5).astype(np.uint8),
+            np.clip(reduce_area(teacher, shape), 0, 1).astype(np.float32))
+
+
+def crop_arrays(rgb, teacher, shape, grid, crop, grids=None):
     x, y, width, height = crop
     if min(x, y) < 0 or min(width, height) <= 0 or x+width > shape[1] or y+height > shape[0]:
         raise ValueError('Crop outside output grid')
-    rgb_grid = np.floor(np.clip(reduce_area(rgb, shape), 0, 255)+.5).astype(np.uint8)
-    fraction_grid = np.clip(reduce_area(teacher, shape), 0, 1).astype(np.float32)
+    rgb_grid, fraction_grid = area_grid(rgb, teacher, shape) if grids is None else grids
     fraction = fraction_grid[y:y+height, x:x+width]
     arrays = {'rgb.tif': rgb_grid[y:y+height, x:x+width].transpose(2, 0, 1),
               'canopy_fraction.tif': fraction[None], 'canopy_mask.tif': binary(fraction)[None]}
@@ -97,7 +101,69 @@ def write_products(folder, arrays, crs, transform):
     return hashes
 
 
-def prepare(root, diagnosis, diagnosis_sha256, evidence, output, seed=0, size=224):
+def candidate_manifest(root, diagnosis, diagnosis_sha256):
+    """Metadata-only projection of Phase B; no original pixel reads."""
+    require_hash(Path(diagnosis), diagnosis_sha256)
+    previous = json.loads(Path(diagnosis).read_text(encoding='utf-8'))
+    indexed = {row['image_id']: row for row in local_index(Path(root))}
+    samples = []
+    excluded = []
+    seen = set()
+    for item in previous['images']:
+        rid = item['image_id']
+        if type(rid) is not int or rid in seen:
+            raise ValueError('Duplicate/invalid Phase B image ID')
+        seen.add(rid)
+        count = item.get('scenarios', {}).get('edge_black_only', {}).get('patches', {}).get('224', {}).get('placement_count', 0)
+        if count <= 0:
+            excluded.append(dict(image_id=rid, status=item['status']))
+            continue
+        row = indexed[rid]
+        split = 'val' if row['validation_fold'] == 0 else 'train'
+        if row['official_split'] != 'train' or split != item['split'] or row['oam_id'] != item['oam_id']:
+            raise ValueError('Phase B source/fold mismatch')
+        samples.append(dict(image_id=rid, oam_id=row['oam_id'], split=split,
+            validation_fold=row['validation_fold'], source_hashes=item['input_sha256'],
+            source_metadata=row['meta'], placement_count=count, output_shape=item['geometry']['output_shape'],
+            technical=item['technical'], global_teacher_fraction=item['global_teacher_fraction'],
+            rights_review='NOT_VERIFIED', patch_review='REVIEW_REQUIRED'))
+    if len({s['oam_id'] for s in samples}) != len(samples):
+        raise ValueError('Repeated source group')
+    return dict(schema='ouem-research-candidates-v1', source_generation=GENERATION,
+                phase_b_sha256=diagnosis_sha256, policy=POLICY, candidates=samples, excluded=excluded,
+                metadata_sha256={n: sha(Path(root)/'archives'/n) for n in ('train_meta.json','test_meta.json')})
+
+
+def read_candidates(path, expected_sha256):
+    from r1_dataset import read_manifest, digest
+    require_hash(Path(path), expected_sha256)
+    value = read_manifest(path)
+    if (value.get('schema') != 'ouem-research-candidates-v1' or value.get('source_generation') != GENERATION
+            or value.get('policy') != POLICY or not digest(value.get('phase_b_sha256'))
+            or not value.get('candidates')
+            or set(value.get('metadata_sha256', {})) != {'train_meta.json','test_meta.json'}
+            or not all(digest(h) for h in value['metadata_sha256'].values())):
+        raise ValueError('Candidate schema/generation mismatch')
+    records = {}
+    groups = set()
+    for sample in value['candidates']:
+        rid, fold = sample['image_id'], sample['validation_fold']
+        if (type(rid) is not int or rid in records or type(fold) is not int or fold not in range(5)
+                or sample['split'] != ('val' if fold == 0 else 'train')
+                or not sample['oam_id'] or sample['oam_id'] in groups
+                or type(sample['placement_count']) is not int or sample['placement_count'] <= 0
+                or len(sample['output_shape']) != 2
+                or any(type(v) is not int or v < 224 for v in sample['output_shape'])
+                or set(sample['source_hashes']) != {'rgb','annotation'}
+                or not all(digest(h) for h in sample['source_hashes'].values())):
+            raise ValueError('Candidate identity/source/split mismatch')
+        records[rid] = sample
+        groups.add(sample['oam_id'])
+    return value, records
+
+
+def prepare(root, diagnosis, diagnosis_sha256, evidence, output, seed=0, size=224,
+            *, candidates_path=None, candidates_sha256=None, ids=None, train_seeds=None):
     """Explicit research route. No R1a receipts or legacy real-mode invocation."""
     root, evidence, output = Path(root).resolve(), Path(evidence).resolve(), Path(output).resolve()
     repo = Path(__file__).resolve().parents[1]
@@ -107,9 +173,29 @@ def prepare(root, diagnosis, diagnosis_sha256, evidence, output, seed=0, size=22
     previous = json.loads(Path(diagnosis).read_text(encoding='utf-8'))
     prior = {r['image_id']: r for r in previous['images']}
     indexed = {r['image_id']: r for r in local_index(root)}
+    targets = TARGETS
+    expanded = candidates_path is not None
+    if expanded:
+        if size != 224:
+            raise ValueError('Expanded research windows must be 224px')
+        candidates, records = read_candidates(candidates_path, candidates_sha256)
+        if (candidates['phase_b_sha256'] != diagnosis_sha256 or not ids or len(set(ids)) != len(ids)
+                or any(type(rid) is not int or rid not in records for rid in ids)
+                or candidates['metadata_sha256'] != {n: sha(root/'archives'/n) for n in ('train_meta.json','test_meta.json')}):
+            raise ValueError('Candidate selection/input pins mismatch')
+        targets = {rid: records[rid]['split'] for rid in ids}
+        for rid in targets:
+            row, candidate = indexed[rid], records[rid]
+            if (row['oam_id'] != candidate['oam_id'] or row['validation_fold'] != candidate['validation_fold']
+                    or row['meta'] != candidate['source_metadata'] or prior[rid]['input_sha256'] != candidate['source_hashes']):
+                raise ValueError('Candidate/source mismatch')
+    elif ids is not None or train_seeds is not None:
+        raise ValueError('Expanded selection requires pinned candidates')
+    if train_seeds is not None and (not train_seeds or any(type(s) is not int or not 0 <= s < 2**32 for s in train_seeds)):
+        raise ValueError('Explicit integer training seeds required')
     selected = []
     pins = {}
-    for rid, split in TARGETS.items():
+    for rid, split in targets.items():
         row = dict(indexed[rid])
         role = 'val' if row['validation_fold'] == 0 else 'train'
         if row['official_split'] != 'train' or role != split or prior[rid]['split'] != split:
@@ -133,6 +219,10 @@ def prepare(root, diagnosis, diagnosis_sha256, evidence, output, seed=0, size=22
         selection='row-major candidates; random.Random(str(seed)+":"+str(image_id)).randrange(count)',
         diagnosis_sha256=diagnosis_sha256, r1_acceptance='UNCHANGED_HOLD', samples=[])
     result['metadata_sha256'] = {name: sha(root/'archives'/name) for name in ('train_meta.json','test_meta.json')}
+    if expanded:
+        result.update(schema='ouem-exploratory-crops-v2', purpose='PHASE_C3_RESEARCH_ONLY',
+                      candidate_manifest_sha256=candidates_sha256, target_ids=list(targets),
+                      train_seeds=list(train_seeds or [seed]), fixed_val_seed=seed)
     previews = []
     try:
         for row, proof, paths in selected:
@@ -152,28 +242,41 @@ def prepare(root, diagnosis, diagnosis_sha256, evidence, output, seed=0, size=22
                 if im.mode != 'RGB': raise ValueError('Annotation RGB required')
                 annotation = np.asarray(im)
             teacher = semantic_binary(rgb, annotation, [1, 2])
-            chosen = choose_window(rgb, teacher, shape, rid, seed, size)
-            if (list(shape) != prior[rid]['geometry']['output_shape'] or chosen['placement_count'] !=
-                    prior[rid]['scenarios']['edge_black_only']['patches'][str(size)]['placement_count']):
-                raise ValueError('Phase B grid/candidate count mismatch')
-            arrays, transform = crop_arrays(rgb, teacher, shape, grid, chosen['crop_xywh'])
-            split = TARGETS[rid]
-            hashes = write_products(output/split/str(rid), arrays, row['crs'], transform)
-            entry = dict(image_id=rid, oam_id=row['oam_id'], split=split, validation_fold=row['validation_fold'],
-                source_hashes={k: pins[p] for k, p in paths.items()}, source_metadata=row['meta'], rights=proof,
-                source_grid=source_grid, full_grid=dict(shape=list(shape), affine=list(grid)[:6], ground_gsd=gsd),
-                patch_grid=dict(shape=[size,size], crs=row['crs'], affine=list(transform)[:6],
-                    bounds=list(array_bounds(size,size,transform))), **chosen,
-                products={n: dict(path=f'{split}/{rid}/{n}',sha256=h) for n,h in hashes.items()},
-                canopy_fraction_mean=float(arrays['canopy_fraction.tif'].mean()),
-                canopy_mask_fraction=float(arrays['canopy_mask.tif'].mean()), product_readback='MATCHED',
-                coverage_review='PENDING_VISUAL_REVIEW', per_segment_category_crosswalk='NOT_VERIFIED')
-            result['samples'].append(entry)
-            image = arrays['rgb.tif'].transpose(1,2,0)
-            mask = arrays['canopy_mask.tif'][0].astype(bool)
-            colored = np.zeros_like(image); colored[mask] = [0,210,0]
-            overlay = image.copy(); overlay[mask] = ((image[mask].astype(np.uint16)+colored[mask])/2).astype(np.uint8)
-            previews.append((rid, split, image, colored, overlay))
+            grids = area_grid(rgb, teacher, shape)
+            split = targets[rid]
+            seeds = train_seeds if expanded and split == 'train' and train_seeds else [seed]
+            coordinates = set()
+            for crop_seed in seeds:
+                chosen = choose_window(rgb, teacher, shape, rid, crop_seed, size)
+                if (list(shape) != prior[rid]['geometry']['output_shape'] or chosen['placement_count'] !=
+                        prior[rid]['scenarios']['edge_black_only']['patches'][str(size)]['placement_count']):
+                    raise ValueError('Phase B grid/candidate count mismatch')
+                xy = tuple(chosen['crop_xywh'][:2])
+                if xy in coordinates:
+                    continue
+                coordinates.add(xy)
+                arrays, transform = crop_arrays(rgb, teacher, shape, grid, chosen['crop_xywh'], grids)
+                relative = f'{split}/{rid}'
+                if expanded:
+                    relative += f'/crop-{xy[0]}-{xy[1]}'
+                hashes = write_products(output/relative, arrays, row['crs'], transform)
+                entry = dict(image_id=rid, oam_id=row['oam_id'], split=split, validation_fold=row['validation_fold'],
+                    source_hashes={k: pins[p] for k, p in paths.items()}, source_metadata=row['meta'], rights=proof,
+                    source_grid=source_grid, full_grid=dict(shape=list(shape), affine=list(grid)[:6], ground_gsd=gsd),
+                    patch_grid=dict(shape=[size,size], crs=row['crs'], affine=list(transform)[:6],
+                        bounds=list(array_bounds(size,size,transform))), **chosen,
+                    products={n: dict(path=f'{relative}/{n}',sha256=h) for n,h in hashes.items()},
+                    canopy_fraction_mean=float(arrays['canopy_fraction.tif'].mean()),
+                    canopy_mask_fraction=float(arrays['canopy_mask.tif'].mean()), product_readback='MATCHED',
+                    coverage_review='PENDING_VISUAL_REVIEW', per_segment_category_crosswalk='NOT_VERIFIED')
+                if expanded:
+                    entry['crop_seed'] = crop_seed
+                result['samples'].append(entry)
+                image = arrays['rgb.tif'].transpose(1,2,0)
+                mask = arrays['canopy_mask.tif'][0].astype(bool)
+                colored = np.zeros_like(image); colored[mask] = [0,210,0]
+                overlay = image.copy(); overlay[mask] = ((image[mask].astype(np.uint16)+colored[mask])/2).astype(np.uint8)
+                previews.append((rid, split, image, colored, overlay))
         for path, expected in pins.items(): require_hash(path, expected)
         sheet = Image.new('RGB', (size*3, (size+30)*len(previews)), 'white')
         draw = ImageDraw.Draw(sheet)
@@ -198,9 +301,25 @@ def prepare(root, diagnosis, diagnosis_sha256, evidence, output, seed=0, size=22
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    for name in ('root','diagnosis','evidence','output'): parser.add_argument('--'+name,type=Path,required=True)
+    for name in ('root','diagnosis','output'): parser.add_argument('--'+name,type=Path,required=True)
+    parser.add_argument('--evidence',type=Path)
     parser.add_argument('--diagnosis-sha256',required=True)
     parser.add_argument('--seed',type=int,default=0)
+    parser.add_argument('--build-candidates',action='store_true')
+    parser.add_argument('--candidates',type=Path)
+    parser.add_argument('--candidates-sha256')
+    parser.add_argument('--ids',type=int,nargs='+')
+    parser.add_argument('--train-seeds',type=int,nargs='+')
     args=parser.parse_args()
-    report=prepare(args.root,args.diagnosis,args.diagnosis_sha256,args.evidence,args.output,args.seed)
-    print(json.dumps(dict(status=report['status'],pairs=len(report['samples']))))
+    if args.build_candidates:
+        report = candidate_manifest(args.root,args.diagnosis,args.diagnosis_sha256)
+        with args.output.open('x',encoding='utf-8') as stream:
+            json.dump(report,stream,indent=2,allow_nan=False)
+        print(json.dumps(dict(candidates=len(report['candidates']),sha256=sha(args.output))))
+    else:
+        if args.evidence is None:
+            parser.error('--evidence required for product generation')
+        report=prepare(args.root,args.diagnosis,args.diagnosis_sha256,args.evidence,args.output,args.seed,
+                       candidates_path=args.candidates,candidates_sha256=args.candidates_sha256,
+                       ids=args.ids,train_seeds=args.train_seeds)
+        print(json.dumps(dict(status=report['status'],pairs=len(report['samples']))))
