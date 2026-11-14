@@ -37,6 +37,20 @@
 8. **Compute and environment transparency.** Verify official load paths/heads and local CPU tests before GPU work. Benchmark patch size/VRAM and appropriate fine-tuning freeze strategy rather than assuming an RTX A2000-class GPU can handle full-res training.
 9. **Stable model handoff.** Lock input RGB range/order/GSD/normalization, valid-area behavior, output probabilities, threshold and tiling/padding/overlap. Version weights with checksum and config; OUEM verifies geospatial seams, CHM coupling and polygon output separately.
 10. **Small and reversible.** Keep implementation isolated, preserve old research and Git history, prefer bounded/offline-friendly tests and small reviewed PRs. Do not merge unfinished technical work into `main`.
+11. **Proportionate controls, with a stop rule.** A new gate, audit or isolation mechanism needs a named risk, the least expensive credible check, a completion criterion and a reason simpler existing safeguards are insufficient. Do not make obtaining absolute certainty a prerequisite for a bounded research experiment; do not mistake a completed audit for model progress. Reassess recurring gates when their cost delays M1/M2 outcomes.
+
+## Risk-proportionate execution policy (2026-11-14 proposal)
+
+**Default:** Use the established host Python/VS Code/Codex/GitHub workflow for ordinary code development, metadata analysis, synthetic tests and non-destructive research processing. **Windows Sandbox is optional, not a project-wide prerequisite.** An OS-enforced zero-network requirement is likewise **not a blanket condition** imposed by CC BY 4.0 or by this repository's research mission. Choose network isolation when a concrete threat, restricted data, organizational policy or untrusted executable actually warrants it; then test the selected control.
+
+**Two evidence levels, not two licenses:**
+
+- **Bounded exploratory research:** A small, expressly scoped real-data experiment may be approved with proportionate evidence: permitted source/revision and attribution, Train/Val/test separation, defensible image/label/coverage limitations, read-only inputs, fresh outputs and a reproducible run record. Uncertain scenes may stay excluded rather than trigger indefinite forensic investigation. Record uncertainty and disallow unverified commercial or public claims. **This does not automatically admit data to R1.**
+- **Formal R1 dataset / production-facing artifacts:** Preserve the adopted R1a verifier, genuine source-bound rights and review assertions, data integrity and QA, and independent acceptance before declaring R1 PASS. An exploratory run does not waive these requirements or make a HOLD sample PASS.
+
+**Transition safety:** Historical R1d-1B-5/6 decision records and Issue #64 retain their provenance. The four-image real execution route is currently `REAL_EXECUTION_DISABLED`; G3/G4 human decisions remain PENDING and all 150 formal R1 candidates remain HOLD. **This documentation-only policy does not grant real-data execution, change existing code gates, retroactively approve `ALL_VALID` or authorize processing under a new mode.** Before using a simpler host-based real-data path, review and expressly approve a bounded replacement execution contract and its minimal code/test changes. Do not silently bypass an existing enforced prohibition.
+
+**Review budget:** Reuse already verified receipts and tests; do not restart completed QA or create a new framework for a single pilot. Require additional diagnostics only when they can change a concrete data-selection, model-training, safety or rights decision. When the direct next experiment is blocked by unavailable hardware, continue independent software/data-planning tasks rather than expanding the blocker into project-wide restrictions.
 
 ## Change / acceptance discipline
 
