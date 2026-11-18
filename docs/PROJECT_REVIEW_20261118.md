@@ -1,6 +1,6 @@
 # OUEM project review — 2026-11-18 Phase C closure
 
-This documentation checkpoint completes [Issue #82](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/82). The scoped scientific inventory in Issue #81 is complete and independently reviewed PASS. Its recommendation for bounded research learning is **CONDITIONAL GO**, with execution approval and targeted human image review pending. Useful canopy performance remains **NOT MET**. [Independent disposition](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/81#issuecomment-6971582740), [closure checkpoint](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/81#issuecomment-6971780623)
+This documentation checkpoint is prepared under [Issue #82](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/82). The scoped scientific inventory in Issue #81 is complete and independently reviewed PASS. Its recommendation for bounded research learning is **CONDITIONAL GO**, with execution approval and targeted human image review pending. Useful canopy performance remains **NOT MET**. [Independent disposition](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/81#issuecomment-6971582740), [closure checkpoint](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/81#issuecomment-6971780623)
 
 ## Purpose and authority
 
