@@ -1,7 +1,55 @@
 # OUEM Canopy Segmentation — Current State
 
-**As of:** 2026-11-14 policy/status proposal; preserved 2026-11-07 evidence below  
-**Status:** Draft for review. **Technical pipeline PASS / useful model and M1 completion NOT YET ESTABLISHED**.
+As of **2026-11-18**, this is the Phase C closure and experiment-preparation checkpoint for [Issue #82](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/82). Documentation records evidence and decision gates. Execution and acceptance require their own approvals.
+
+## 2026-11-18 current checkpoint — Phase C complete
+
+The Phase C1–C8 research-data engineering and the bounded scientific inventory are complete. Issue #81 was independently reviewed PASS for the inventory scope and closed. Targeted human image confirmation and a new v5 GPU experiment remain pending. The local evidence summarized here is **CODEX_LOCAL_REPORT**. The independent review checked the published report, repository and official documentation without independently opening or hashing private pixels. Evidence classes are defined in the [2026-11-18 Project Review](PROJECT_REVIEW_20261118.md). [Scientific review disposition](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/81#issuecomment-6971582740)
+
+| Track | Current evidence / status |
+| --- | --- |
+| Historical Satlas GPU execution | G1-B T4 step, G2 Train7 / 20 steps with Step10 continuation and Step20 restore, G3-A Val3 inference demonstrated |
+| Useful canopy model quality | **NOT MET**. Historical Step20 argmax predicted all background, Tree IoU/F1 zero |
+| Fixed 150-image technical QA | PASS 55 / HOLD 94 / FAIL 1 |
+| Formal R1 | **0/150 accepted, all 150 HOLD** |
+| Phase B geometry pool | Train 91 / Val 19, totaling 110 potentially placeable original images |
+| Research v5 | **Train 70 originals / 139 windows + Val 18 originals / 18 fixed windows**, totaling 88 originals / 157 windows / 471 TIFFs |
+| v5 research review | `FROZEN_RESEARCH_CANDIDATE_PENDING_INDEPENDENT_REVIEW`. CLEAR records AI screening, with human image confirmation pending |
+| v5 training | **GPU run unperformed**. Existing reader/sampler CPU validation is reported, a v5 CUDA entrypoint remains to be implemented |
+| Japan/GSI and commercial use | Suitability **NOT VERIFIED**, commercial/production use unapproved |
+
+### v5 identity and scientific limits
+
+These pins are transcribed from the completed C8/scientific reports. This documentation task performed no fresh local artifact hash validation. Locate the external audit root on GEEKOM and reconcile it before reuse. The reported directory identifier is `phase-c8-expansion-20261116-01/dataset-v5`. [Phase C8 report](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/80)
+
+| Reference | Reported SHA-256 |
+| --- | --- |
+| `dataset-v5/crop_plan.json` | `b6711c33eafed51dd8d42040abf13e3a52601d5be54b08479217ac7e043c8692` |
+| `research_review.json` | `ccda53e9dac2c40fda6be718b9fc8a57dc35e6210fcc271a5a5533e390456dbc` |
+| `dataset_freeze_v5.json` | `d7a72bdf1c792678cee0030c72dded18d3cdd6639a800c12ebafc63ba3fa1978` |
+| Complete dataset identity digest | `a645e831c4214cab913506e01fe9160f5272cf8aed1a6b00bbbf35964cd3b6d7` |
+
+- Individual tree and tree-canopy positives are intended to be merged. The reported eight-source RGB-nonzero / Pillow-L-positive comparison differed by zero pixels. Full segment/category correspondence remains unverified and is not a prerequisite for the bounded exploratory experiment. Annotation-quality questions about shrubs, crops and nursery crowns remain for targeted review. [Official-policy clarification](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/81#issuecomment-6916261686)
+- Sixty-nine Train sources have two windows, with median pair IoU 0.590062, 18 pairs above 0.8 and 6 above 0.9. Their union across 139 windows is about 89.68 single-window-area equivalents. This quantity measures geometric area. Statistical effective sample size remains unverified.
+- Val18 has 15 positive and 3 all-background windows. Japanese Val461 is a background shoreline window, leaving Japanese positive-tree validation absent. Keep Val18 IDs, locations and products immutable.
+- The 110-source pool partitions into 88 research candidates, 16 fully held cases and 6 unexamined sources, IDs 544, 965, 2299, 3062, 3100, 3195. Source614 additionally has one held window. Their processing requires a later scoped decision.
+- Source-byte and individual CC BY 4.0/STAC checks are Codex-reported documentary evidence. Physical all-pixel validity, independent human imagery sign-off and final commercial rights remain unresolved. The research route has RGB/fraction/mask products. The [Formal R1a contract](implementation/R1A_DATASET_CONTRACT.md) additionally requires validity fraction and source-bound formal review objects.
+
+These scientific quantities and limitations come from the [Issue #81 report](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/81#issuecomment-6918370260). Earlier v1–v4 hashes, source lineage, held windows and the G0–G3 experiments remain preserved. The [C4 v1 / Val7 procedure](implementation/PHASE_C4_RESEARCH_DATASET.md) retains its historical scope.
+
+### Immediate handoff
+
+On GEEKOM, perform the read-only local evidence/SHA preflight and human review of the pinned 24 CLEAR + 9 held contact-sheet windows. Prioritize the CLEAR/held nursery and planting-row contrasts, linear teacher edges and known coverage margin. Then prepare a bounded research experiment plan with fixed Val18 and a small reviewed CUDA bridge. Follow the gates in the [current Roadmap](ROADMAP_NEXT.md).
+
+`ResearchData` and `r2_train.make_plan` provide the research input/source-balanced schedule. `r2_train.train` enforces CPU FP32. The historical G2 CUDA entrypoint is fixed to Zenodo10 / 20 steps, and G3-A uses historical Val3. A new v5 GPU integration and its execution remain pending. Confirm CUDA capacity on the chosen T4 or other runtime. GEEKOM's role as the image-review host does not establish CUDA availability.
+
+The source history is [Phase B #68](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/68), [C4 #75](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/75), [C5 #77](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/77), [C6 #78](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/78), [C7 #79](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/79), [C8 #80](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/80), and [scientific review #81](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/81).
+
+## Historical checkpoint — 2026-11-14
+
+The following checkpoint and the 2026-11-07 sections preserve their dated content. Documentation PRs #41 and #65 were merged. Earlier draft/proposal wording records its decision-stage provenance, while run-specific approvals remain separate.
+
+Original as-of statement was 2026-11-14 policy/status proposal, preserving 2026-11-07 evidence. Original status was Draft for review, with technical pipeline PASS and useful model/M1 completion not yet established.
 
 ## 2026-11-14 checkpoint (newer than the 2026-11-07 reference below)
 
