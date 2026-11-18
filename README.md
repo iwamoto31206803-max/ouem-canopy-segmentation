@@ -4,17 +4,17 @@ Engineering repository for a practical **RGB tree-canopy semantic-segmentation c
 
 **Goal:** Use Japanese GSI aerial RGB imagery at approximately 0.5–0.6 m/ground pixel to produce usable 2D tree-canopy masks for OUEM's simplified 3D canopy, shade/heat and landscape workflows. The priority is a maintainable, reproducible implementation with documented rights and limitations—not a state-of-the-art benchmark or individual-tree delineation.
 
-## Current direction (2026-11-14 proposed policy update)
+## Current state — 2026-11-18 Phase C closure
 
-**Priority: obtain a usable canopy model, not complete ever more elaborate audit or isolation infrastructure.** The fixed 150-image expansion has Technical PASS **55** / HOLD **94** / FAIL **1**; **0** have formal R1 acceptance. The original 20-step T4 pipeline is proven to run, but its model did not detect canopy on three fixed Val crops. The next productive work is proportionate data qualification/selection plus a generalized Trainer and meaningful evaluation.
+**Phase C1–C8 research-data expansion and the scoped scientific review are complete.** Research candidate **v5 contains Train 70 original images / 139 windows and Val 18 original images / 18 fixed windows**, totaling 88 originals, 157 windows and 471 GeoTIFFs. Research CLEAR records Codex AI screening. **Formal R1 remains HOLD for all 150 candidates, with 0 accepted.** Source rights, bytes and private image-review findings remain Codex-local reports awaiting the targeted human handoff. [Phase C8](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/80), [scientific review disposition](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/81#issuecomment-6971582740)
 
-**Windows Sandbox is optional for this project**, not a prerequisite for ordinary host-based VS Code/Codex/Python development, synthetic testing or Trainer implementation. The OS-level zero-network requirement arose as a conservative safeguard for a specific four-image R1d execution proposal; it is **not a general OAM-TCD license condition or a project-wide gate**. The user has demonstrated a disabled-network Sandbox guest start, but guest Python/GDAL processing remains untested and Issue [#64](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/64) may remain paused.
+Historical SatlasPretrain T4 learning, Step10 continuation, Step20 restoration and Val3 inference have succeeded. The Step20 model predicted all background, with Tree IoU/F1 zero. **Useful canopy quality remains NOT MET. New GPU training with v5 is unperformed**, and v5 CUDA integration still needs a small reviewed change. GSI suitability is NOT VERIFIED and commercial use remains unapproved.
 
-**No blanket permission to process previously blocked real inputs:** G3/G4 decisions and all 150 Formal R1 outcomes remain pending/HOLD, and the four-image real execution path is still `REAL_EXECUTION_DISABLED`. Any simpler non-Sandbox real-data experiment requires an explicit, bounded replacement run approval and the corresponding reviewed code/contract changes; do not circumvent an existing gate or treat Technical PASS as Formal R1 PASS.
+**Next work is GEEKOM image confirmation and experiment preparation.** Reconcile local v5 evidence and hashes, inspect the pinned 33-window contact sheets with targeted human judgments, then specify the fixed-Val18 exploratory experiment. Reuse the existing Satlas GPU primitives in a narrow research CUDA bridge before separately approved execution on an available, measured CUDA runtime. The existing `ResearchData` input and source-balanced sampler are CPU-validated, while `r2_train.train` enforces CPU FP32.
 
-See [2026-11-14 Current State](docs/CURRENT_STATE.md), [risk-proportionate Design Principles](docs/DESIGN_PRINCIPLES.md#risk-proportionate-execution-policy-2026-11-14-proposal), and [updated Roadmap](docs/ROADMAP_NEXT.md#2026-11-14-priority-reset--focus-on-useful-training-not-compulsory-isolation). Earlier implementation and review notes below remain dated evidence, not new execution authorization.
+Read [Current State](docs/CURRENT_STATE.md) for current facts and pins, [2026-11-18 Project Review](docs/PROJECT_REVIEW_20261118.md) for evidence and limits, and [Next Roadmap](docs/ROADMAP_NEXT.md) for decision gates. The [Project Charter](docs/PROJECT_CHARTER.md), [Design Principles](docs/DESIGN_PRINCIPLES.md), and [Satlas-first ADR](docs/decisions/ADR_20261101_SATLAS_FIRST.md) retain design precedence. Earlier snapshots and GPU recipes below preserve their dated scope. The [C4 dataset / Val7 plan](docs/implementation/PHASE_C4_RESEARCH_DATASET.md) is an archived v1 snapshot.
 
-## Active route and current status (review snapshot: 2026-11-07)
+## Historical route and review snapshot — 2026-11-07
 
 **Active engineering route:** Ai2 SatlasPretrain `Aerial_SwinB_SI` official backbone/FPN + newly initialized 2-class SEGMENT head; fine-tune using verified CC BY 4.0 OAM-TCD RGB/Tree–Canopy labels at approximately **0.50 m/local ground pixel**, then visually assess actual Japanese GSI aerial imagery.
 
@@ -22,7 +22,7 @@ See [2026-11-14 Current State](docs/CURRENT_STATE.md), [risk-proportionate Desig
 
 The 2026-11-07 review keeps the Satlas-first direction, preserves prior G0–G3 artifacts as an immutable small-run reference, and proposes **~100 total QA-accepted images (provisionally Train 80 / Val 20, with existing Zenodo10 eligible after new R1 QA)** for the first expansion. Exact folds/source separation and evidence-based QA take precedence over a numeric target. Build a generalized dataset/Trainer independently of frozen smoke tooling; perform early qualitative GSI review once a trained candidate yields nontrivial source-domain masks.
 
-**Review and handoff documents:** [Project Review](docs/PROJECT_REVIEW_20261107.md) · [Current State](docs/CURRENT_STATE.md) · [Next Roadmap](docs/ROADMAP_NEXT.md). These documents are proposed until the documentation PR is accepted; the [Project Charter](docs/PROJECT_CHARTER.md), [Design Principles](docs/DESIGN_PRINCIPLES.md), and [ADR](docs/decisions/ADR_20261101_SATLAS_FIRST.md) remain higher-priority design sources.
+The [2026-11-07 Project Review](docs/PROJECT_REVIEW_20261107.md) preserves this earlier proposal and its evidence. Documentation PRs #41 and #65 were subsequently merged. Their checked-in status gives no run-specific execution, licensing or acceptance approval. Use the latest [Current State](docs/CURRENT_STATE.md) and [Roadmap](docs/ROADMAP_NEXT.md) for the present handoff.
 
 | Stage | Actual status as of this snapshot | Evidence |
 | --- | --- | --- |
@@ -50,8 +50,12 @@ The charter and design documents retain their original decision-stage wording as
 
 The core work is **already scripted**, but there is **not yet one general end-to-end download/prepare/train command**. Earlier scripts deliberately target bounded inputs; avoid treating them as unrestricted pipelines for all 4,608 images.
 
+The M1-6 recipe below preserves its legacy 661/1972 input scope. Linked G1-B/G2/G3-A stage procedures preserve their Zenodo10 Train7/Val3 lineage. Fresh research v5 CUDA execution requires the separately reviewed bridge described in the current Roadmap.
+
 | Operation | Existing implementation | Notes |
 | --- | --- | --- |
+| Research patch supply | `scripts/research_patches.py`, `scripts/research_data.py` | Reported v5 CPU validation, pinned research review and immutable Val18 |
+| Source-balanced research schedule / CPU training core | `scripts/r2_train.py` | `make_plan` supports research supply, `train` enforces CPU FP32 |
 | Bounded original-data acquisition and label QA | `scripts/m1_2a_data_qa.py`, `scripts/m1_2b_overlay_qa.py` | Initial two records; enforce rights and label checks |
 | Geospatial geometry and ~0.50 m data-pair generation | `scripts/m1_2d_geometry_audit.py`, `scripts/m1_2d_prepare_pairs.py` | Current pair preparation is limited to approved IDs 661/1972 |
 | Verified training-patch loading | `scripts/m1_3a_loader.py` | Uses exact relative paths, hashes and grid/validity checks |

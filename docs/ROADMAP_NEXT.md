@@ -1,7 +1,28 @@
 # OUEM Canopy Segmentation — Next Roadmap
 
-**Revision:** 2026-11-14 priority update proposed for review; underlying R0–R5 plan originated 2026-11-07  
-**Authority:** subordinate to [Project Charter](PROJECT_CHARTER.md) and [Design Principles](DESIGN_PRINCIPLES.md). The existing M1/M2/D0–D5 scope is unchanged. R0–R5 below describe the next engineering **work packages**, not new, overriding scientific acceptance standards.
+Revision **2026-11-18**, Phase C closure and research experiment-preparation handoff. This roadmap is subordinate to the [Project Charter](PROJECT_CHARTER.md), [Design Principles](DESIGN_PRINCIPLES.md) and [Satlas-first ADR](decisions/ADR_20261101_SATLAS_FIRST.md). The M1/M2/D0–D5 scope remains in force.
+
+## 2026-11-18 research-only path after Phase C
+
+Phase C1–C8 data expansion and the Issue #81 scoped scientific review are complete. The current baseline is research v5, Train 70 originals / 139 windows and Val 18 originals / 18 fixed windows. Formal R1 remains 0/150 accepted, all HOLD. Bounded exploratory learning received a **CONDITIONAL GO recommendation**, with execution approval pending. [Current State](CURRENT_STATE.md), [closure review](PROJECT_REVIEW_20261118.md), [independent scientific disposition](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/81#issuecomment-6971582740)
+
+| Step | Smallest next work | Decision gate |
+| --- | --- | --- |
+| 1. GEEKOM evidence and image confirmation | Locate external v5 and private scientific-review receipts, compare reviewed pins with measured hashes, and review the 24 CLEAR + 9 held contact-sheet windows. Prioritize 3380/4066 nursery crowns, 802/727 planting rows, 2006/614/4139 linear positives, 2991 and 4315. Record human decisions and limits while preserving v5/Val18. | Local evidence reconciled and targeted human image judgments recorded. A discrepancy becomes a scoped follow-up before execution. |
+| 2. Explicit v5 experiment plan | Pin dataset/plan/review identity, official initializer and rights evidence, fixed Val18, source-balanced schedule, seed, finite steps/resources, CUDA runtime, new output/Drive paths, checkpoint cadence, backup/restore and stop/failure policy. Define evaluation before training. | User reviews the bounded plan and intended research scope. Dataset changes, if justified, need a separately versioned decision. |
+| 3. Narrow research CUDA bridge | Reuse Satlas construction, CUDA timing/memory, gradients, checkpoint/RNG/backup and evaluation primitives from G1-B/G2/G3-A. Connect the existing research reader/sampler with a small reviewed entrypoint and synthetic tests. Preserve historical Zenodo10 behavior. | Small implementation PR reviewed and merged, with input/restore safeguards and unverified GPU items explicit. |
+| 4. Approved CUDA smoke and run | Confirm dependencies, weights, fresh outputs and measured CUDA memory/throughput on an available T4 or other CUDA runtime. Execute the approved finite experiment and preserve failures/checkpoints. | Separate explicit execution approval and accessible runtime. Settings changes after OOM/nonfinite failure need a new decision. |
+| 5. OAM evaluation, then GSI qualitative review | Keep Val18 fixed. Report per-source confusion counts, macro/micro IoU/F1, precision/recall, CE, canopy-area bias and RGB/FP/FN/probability views. Preserve undefined-denominator reasons. Once a candidate produces useful source-domain masks, inspect predefined GSI scenes. | Evidence-based model-quality and later GSI proceed/adapt/defer decisions, with commercial clearance handled separately. |
+
+`ResearchData` and `r2_train.make_plan` are CPU-validated research supply components. `r2_train.train` enforces CPU FP32. Historical G2 CUDA is bound to Zenodo10 / 20 steps and G3-A to Val3. **The fresh v5 CUDA integration and v5 GPU experiment remain unperformed.** GEEKOM image-review access, including its Radeon graphics, provides no evidence of a usable CUDA runtime. Reuse the successful GPU primitives on a measured runtime.
+
+This sequence has no 100-original-image quota. The six unexamined sources and 16 fully held cases stay deferred unless a documented scene/teacher gap justifies another bounded task. A complete 88-source segment crosswalk and mass Japanese reference-label collection are not entry requirements for the exploratory experiment. Research v5 and formal R1a retain distinct product/review contracts. The formal R1a/R1b acceptance road below remains applicable to production-facing acceptance.
+
+Administrative Issues [#50](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/50) and [#56](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/56), and paused Sandbox [#64](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/64), belong to separate triage. Their disposition requires an explicit decision. They are not dependencies of the research GPU bridge.
+
+## Historical roadmap context — 2026-11-07 and 2026-11-14
+
+The preserved roadmap below originated with the 2026-11-07 R0–R5 plan and its 2026-11-14 priority proposal. Documentation PRs #41 and #65 were merged. Original proposal/gate language remains historical context. The dated research-only sequence above is the current next-work handoff, with separate execution and acceptance approvals.
 
 ## 2026-11-14 priority reset — focus on useful training, not compulsory isolation
 
