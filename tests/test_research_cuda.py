@@ -45,6 +45,16 @@ def test_schedule():
         cuda.make_schedule(data)
 
 
+def test_smoke_has_one_update_with_evaluation_and_backup():
+    schedule = cuda.make_schedule(synthetic_pool())
+    assert list(cuda.training_events(schedule, 0, {'mode': 'smoke'})) == [
+        (schedule['train'][0], True, True)]
+    assert not list(cuda.training_events(schedule, 1, {'mode': 'smoke'}))
+    main = list(cuda.training_events(schedule, 0, {'mode': 'main'}))
+    assert len(main) == 280
+    assert [item['step'] for item, evaluate, _ in main if evaluate] == [70, 140, 210, 280]
+
+
 class ToyModel(nn.Module):
     def __init__(self):
         super().__init__()
@@ -97,23 +107,28 @@ def test_eval_restores_modes_gradients_and_next_update(fail):
     assert not torch.equal(before, model.head.layers.weight)
 
 
-def test_checkpoint_copy_restore_and_claim(tmp_path, monkeypatch):
+@pytest.mark.parametrize('mode', ['main', 'smoke'])
+def test_checkpoint_copy_restore_and_claim(tmp_path, monkeypatch, mode):
     monkeypatch.setattr(torch.cuda, 'get_rng_state_all', lambda: [])
     monkeypatch.setattr(torch.cuda, 'set_rng_state_all', lambda _state: None)
     monkeypatch.setattr(torch.cuda, 'device_count', lambda: 0)
     schedule = cuda.make_schedule(synthetic_pool())
-    binding = dict(schedule_sha256=cuda.digest(schedule))
+    binding = dict(schedule_sha256=cuda.digest(schedule), mode=mode,
+                   run_id='main-test', lineage_id='test-lineage', config={'seconds': 100})
     model = ToyModel()
     optimizer = torch.optim.AdamW(model.parameters())
     x = torch.ones(1, 3, 224, 224)
     y = torch.zeros(1, 224, 224, dtype=torch.long)
     cuda.update(model, optimizer, x, y)
+    completed = 1 if mode == 'smoke' else 70
+    next_item = None if mode == 'smoke' else schedule['train'][completed]
     backup = tmp_path/'backup'
     origin = tmp_path/'checkpoint.pth'
     checkpoint = backup/origin.name
-    state = dict(kind=cuda.KIND, binding=binding, schedule=schedule, completed_steps=70,
-                 next_item=schedule['train'][70], backup_checkpoint=str(checkpoint),
-                 model=model.state_dict(), optimizer=optimizer.state_dict(), deadline=100,
+    state = dict(kind=cuda.KIND, binding=binding, schedule=schedule, completed_steps=completed,
+                 next_item=next_item, backup_checkpoint=str(checkpoint),
+                 model=model.state_dict(), optimizer=optimizer.state_dict(),
+                 segment_id='first', parent=None, active_seconds=20,
                  cpu_rng=torch.get_rng_state(), python_rng=random.getstate(), cuda_rng=[],
                  fingerprints=cuda.fingerprints(model, optimizer, torch))
     sha = cuda._checkpoint(origin, state)
@@ -121,8 +136,18 @@ def test_checkpoint_copy_restore_and_claim(tmp_path, monkeypatch):
     with pytest.raises(ValueError):
         safe_load(checkpoint, '0'*64)
     loaded = safe_load(checkpoint, sha)
-    assert cuda.validate_checkpoint(loaded, binding, schedule) == 70
-    assert loaded['next_item']['step'] == 71
+    assert cuda.validate_checkpoint(loaded, binding, schedule) == completed
+    for alternate in [dict(binding, run_id='another'), dict(binding, lineage_id='another'),
+                      dict(binding, mode='smoke' if mode == 'main' else 'main')]:
+        with pytest.raises(ValueError, match='contract'):
+            cuda.validate_checkpoint(loaded, alternate, schedule)
+    with pytest.raises(FileNotFoundError):
+        cuda.resumed_seconds(loaded, checkpoint, sha, 100)
+    cuda.write_new(backup/'runtime.json', dict(checkpoint_sha256=sha, segment_id='first', active_seconds=25))
+    assert cuda.resumed_seconds(loaded, checkpoint, sha, 100) == 25
+    with pytest.raises(ValueError, match='exhausted'):
+        cuda.resumed_seconds(loaded, checkpoint, sha, 25)
+    assert loaded['next_item'] == next_item
     for change in [dict(kind='legacy'), dict(binding={}), dict(next_item=schedule['train'][71]),
                    dict(schedule=dict(schedule, seed=1))]:
         with pytest.raises(ValueError):

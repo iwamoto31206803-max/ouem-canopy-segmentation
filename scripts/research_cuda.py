@@ -2,8 +2,11 @@
 
 Default mode checks the runtime and pinned inputs. --execute starts or resumes
 training. --verify-restore checks a checkpoint in a separate process.
+Use --smoke with --execute for one update and Val18 before and after it.
+Resume and restore verification require the recorded --lineage-id.
 Schedule SHA uses G2's canonical JSON encoding. Time and reserved VRAM are
-checked between operations. Resume keeps the original wall-clock deadline.
+checked between operations. Resume charges completed work through the last
+verified backup receipt, plus active time in the new process.
 """
 import argparse
 from collections import Counter
@@ -11,8 +14,10 @@ import math
 from pathlib import Path
 import platform
 import random
+import re
 import subprocess
 import time
+from uuid import uuid4
 
 import numpy as np
 from PIL import Image
@@ -28,7 +33,7 @@ from r2_train import _checkpoint
 from research_data import ResearchData
 
 
-KIND = 'OUEM_RESEARCH_V5_CUDA_V1'
+KIND = 'OUEM_RESEARCH_V5_CUDA_V2'
 PLAN = 'b6711c33eafed51dd8d42040abf13e3a52601d5be54b08479217ac7e043c8692'
 REVIEW = 'ccda53e9dac2c40fda6be718b9fc8a57dc35e6210fcc271a5a5533e390456dbc'
 FREEZE = 'd7a72bdf1c792678cee0030c72dded18d3cdd6639a800c12ebafc63ba3fa1978'
@@ -126,17 +131,30 @@ def update(model, optimizer, x, y):
     return float(loss.detach())
 
 
+def step_limit(binding):
+    return 1 if binding['mode'] == 'smoke' else 280
+
+
+def training_events(schedule, completed, binding):
+    for item in schedule['train'][completed:step_limit(binding)]:
+        step = item['step']
+        yield item, step in EVAL or binding['mode'] == 'smoke', step in SAVE
+
+
 def validate_checkpoint(state, binding, schedule):
     completed = state.get('completed_steps')
     if (state.get('kind') != KIND or state.get('binding') != binding
-            or type(completed) is not int or completed not in SAVE
+            or type(completed) is not int or completed not in SAVE or completed > step_limit(binding)
             or state.get('schedule') != schedule or digest(state['schedule']) != binding['schedule_sha256']):
         raise ValueError('Checkpoint contract mismatch')
-    next_item = schedule['train'][completed] if completed < 280 else None
+    next_item = schedule['train'][completed] if completed < step_limit(binding) else None
     if state.get('next_item') != next_item:
         raise ValueError('Checkpoint next window mismatch')
-    if not isinstance(state.get('backup_checkpoint'), str) or type(state.get('deadline')) not in (int, float) or not math.isfinite(state['deadline']):
-        raise ValueError('Checkpoint backup/deadline mismatch')
+    if not isinstance(state.get('backup_checkpoint'), str) or not isinstance(state.get('segment_id'), str) or 'parent' not in state:
+        raise ValueError('Checkpoint backup/segment mismatch')
+    elapsed = state.get('active_seconds')
+    if type(elapsed) not in (int, float) or not 0 < elapsed < binding['config']['seconds']:
+        raise ValueError('Invalid checkpoint runtime')
     if not {'model', 'optimizer', 'python_rng', 'cpu_rng', 'cuda_rng', 'fingerprints'} <= state.keys():
         raise ValueError('Incomplete checkpoint state')
     return completed
@@ -146,7 +164,20 @@ def continuation_claim(state, checkpoint, sha):
     if checkpoint.resolve() != Path(state['backup_checkpoint']).resolve():
         raise ValueError('Resume requires the checkpoint in its original verified backup directory')
     write_new(checkpoint.parent/'continuation.json',
-              dict(checkpoint_sha256=sha, next_item=state['next_item']))
+              dict(checkpoint_sha256=sha, next_item=state['next_item'],
+                   run_id=state['binding']['run_id'], lineage_id=state['binding']['lineage_id'],
+                   segment_id=state['segment_id']))
+
+
+def resumed_seconds(state, checkpoint, sha, ceiling):
+    if checkpoint.resolve() != Path(state['backup_checkpoint']).resolve():
+        raise ValueError('Resume requires the original verified backup')
+    receipt = read_manifest(checkpoint.parent/'runtime.json')
+    seconds = receipt.get('active_seconds')
+    if (receipt.get('checkpoint_sha256') != sha or receipt.get('segment_id') != state['segment_id']
+            or type(seconds) not in (int, float) or not state['active_seconds'] <= seconds < ceiling):
+        raise ValueError('Invalid backup runtime receipt or exhausted time budget')
+    return seconds
 
 
 def reserve(output, backup, protected):
@@ -178,6 +209,12 @@ def run(args):
         raise RuntimeError('CUDA runtime required')
     if not math.isfinite(args.seconds) or args.seconds <= 0 or args.vram_bytes <= 0:
         raise ValueError('Explicit positive time and VRAM ceilings required')
+    started = time.monotonic()
+    previous_seconds = 0
+
+    def active_seconds():
+        return previous_seconds + time.monotonic()-started
+
     import importlib.metadata
     import satlaspretrain_models as satlas
     import torchvision
@@ -193,11 +230,10 @@ def run(args):
                        torchvision=str(torchvision.__version__), cuda=torch.version.cuda,
                        cudnn=torch.backends.cudnn.version(), satlas=version, gpu=gpu.name,
                        total_vram=gpu.total_memory, devices=torch.cuda.device_count())
-    deadline = time.time()+args.seconds
     torch.cuda.reset_peak_memory_stats()
 
     def budget():
-        if time.time() >= deadline or torch.cuda.max_memory_reserved() > args.vram_bytes:
+        if active_seconds() >= args.seconds or torch.cuda.max_memory_reserved() > args.vram_bytes:
             raise RuntimeError('Time or reserved VRAM ceiling exceeded')
 
     require_hash(args.freeze, FREEZE)
@@ -212,7 +248,9 @@ def run(args):
     commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=repo, text=True).strip()
     if subprocess.check_output(['git', 'status', '--porcelain'], cwd=repo, text=True).strip():
         raise ValueError('Clean checkout required to bind execution to a Git commit')
-    binding = dict(inputs=data.identity, freeze_sha256=FREEZE, initializer_sha256=INITIALIZER,
+    binding = dict(run_id=args.run_id, lineage_id=args.lineage_id or uuid4().hex,
+                   mode='smoke' if args.smoke else 'main',
+                   inputs=data.identity, freeze_sha256=FREEZE, initializer_sha256=INITIALIZER,
                    schedule_sha256=digest(schedule), config=dict(seed=0, batch=1, precision='FP32',
                    scheduler=None, adamw=ADAMW, seconds=args.seconds, vram_bytes=args.vram_bytes),
                    environment=environment, commit=commit)
@@ -221,9 +259,9 @@ def run(args):
     if args.verify_restore and not state:
         raise ValueError('Restore verification requires a checkpoint')
     if state and not args.verify_restore:
-        if completed == 280 or not args.execute:
+        if completed == step_limit(binding) or not args.execute:
             raise ValueError('Continuation requires an unfinished checkpoint and --execute')
-        deadline = state['deadline']
+        previous_seconds = resumed_seconds(state, args.resume, args.resume_sha256, args.seconds)
     budget()
     if not args.execute and not args.verify_restore:
         print(dict(status='PREFLIGHT_PASS', binding=binding))
@@ -233,7 +271,11 @@ def run(args):
         protected.append(args.resume.parent)
     if not args.verify_restore:
         reserve(args.output, args.backup, protected)
-    record = dict(status='PARTIAL', completed_steps=completed, binding=binding)
+    segment_id = uuid4().hex
+    parent = (dict(segment_id=state['segment_id'], checkpoint_sha256=args.resume_sha256,
+                   completed_steps=completed) if state else None)
+    record = dict(status='PARTIAL', completed_steps=completed, binding=binding,
+                  segment_id=segment_id, parent=parent)
     try:
         if state:
             schedule = state['schedule']
@@ -252,7 +294,8 @@ def run(args):
             restored = restore(model, optimizer, state, torch)
             budget()
             if args.verify_restore:
-                print(dict(status='RESTORE_PASS', fingerprints=restored, next_item=state['next_item']))
+                print(dict(status='RESTORE_PASS', binding=binding, segment_id=state['segment_id'],
+                           parent=state['parent'], fingerprints=restored, next_item=state['next_item']))
                 return
             continuation_claim(state, args.resume, args.resume_sha256)
 
@@ -272,7 +315,7 @@ def run(args):
         budget()
         if not completed:
             assess(0)
-        for item in schedule['train'][completed:]:
+        for item, should_evaluate, should_save in training_events(schedule, completed, binding):
             budget()
             x, y, _ = data.patch(item, 'train')
             x, y = x.cuda(), y.cuda()
@@ -283,20 +326,25 @@ def run(args):
             write_new(args.output/f'step_{step:03d}.json',
                       dict(item, loss=loss, seconds=seconds, memory=cuda_memory(torch)))
             budget()
-            if step in EVAL:
+            if should_evaluate:
                 assess(step)
-            if step in SAVE:
+            if should_save:
                 path = args.output/f'checkpoint_{step:03d}.pth'
                 destination = args.backup.resolve()/f'step_{step:03d}'
                 payload = dict(kind=KIND, binding=binding, schedule=schedule, completed_steps=step,
-                               next_item=schedule['train'][step] if step < 280 else None,
-                               backup_checkpoint=str(destination/path.name), deadline=deadline,
+                               next_item=schedule['train'][step] if step < step_limit(binding) else None,
+                               backup_checkpoint=str(destination/path.name), segment_id=segment_id, parent=parent,
                                model=model.state_dict(), optimizer=optimizer.state_dict(),
                                python_rng=random.getstate(), cpu_rng=torch.get_rng_state(),
                                cuda_rng=torch.cuda.get_rng_state_all(),
                                fingerprints=fingerprints(model, optimizer, torch))
+                budget()
+                payload['active_seconds'] = active_seconds()
                 sha = _checkpoint(path, payload)
                 write_new(args.output/f'backup_{step:03d}.json', copy_backup(path, sha, destination))
+                budget()
+                write_new(destination/'runtime.json', dict(checkpoint_sha256=sha, segment_id=segment_id,
+                                                           active_seconds=active_seconds()))
                 budget()
         record['status'] = 'COMPLETE'
     except BaseException as exc:
@@ -304,6 +352,7 @@ def run(args):
         raise
     finally:
         if not args.verify_restore:
+            record['active_seconds'] = active_seconds()
             write_new(args.output/'result.json', record)
 
 
@@ -315,12 +364,19 @@ def main():
     parser.add_argument('--vram-bytes', type=int, required=True)
     parser.add_argument('--resume', type=Path)
     parser.add_argument('--resume-sha256')
+    parser.add_argument('--run-id', required=True)
+    parser.add_argument('--lineage-id')
+    parser.add_argument('--smoke', action='store_true')
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument('--execute', action='store_true')
     mode.add_argument('--verify-restore', action='store_true')
     args = parser.parse_args()
     if bool(args.resume) != bool(args.resume_sha256):
         parser.error('--resume and --resume-sha256 must be supplied together')
+    if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_-]{0,63}', args.run_id):
+        parser.error('Use a run ID of 1–64 letters, digits, underscores or hyphens')
+    if bool(args.resume) != bool(args.lineage_id) or (args.lineage_id and not re.fullmatch('[0-9a-f]{32}', args.lineage_id)):
+        parser.error('Use the recorded --lineage-id only with --resume')
     run(args)
 
 
