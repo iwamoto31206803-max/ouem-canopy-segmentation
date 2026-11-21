@@ -19,6 +19,8 @@ The D5 exploratory research run `d5-v5-main280-01` completed **280 training upda
 
 **Owner clarification (2026-11-21):** "reproducible across PCs" primarily means **the same predefined rules select/process the same class of eligible inputs without per-image human/Codex visual judgement**, not a rigorous byte-identical Windows/Linux TIFF reproducibility project. **Top priority: machine-actionable QA/admission and high-throughput, bounded preprocessing**. For the actual old-rule inventory, per-image visual-dependency risks, proposed decision statuses and first design scope, see [D6-A objective QA audit](implementation/D6A_OBJECTIVE_QA_POLICY_AUDIT.md). This is a *proposal*, not new automatic acceptance already implemented.
 
+**Research label-trust policy (owner decision 2026-11-21):** use official published OAM-TCD annotation as-is as the working teacher for exploratory training. **Minimize automatic exclusions to explicit technical, source-policy, source-split or geometric/crop conditions**; do not ask a person or Codex to visually certify each normal image. Label noise is expected and should be assessed in aggregate/with optional sampled audits, not endlessly corrected image-by-image. License/attribution declarations must still be checked mechanically, and research eligibility remains distinct from Formal R1 or commercial release. [D6-A1 implementation backlog](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/103).
+
 ### Existing foundation
 
 - `scripts/research_patches.py`: deterministic per-ID/seed crop positions, geometric black-support exclusions, area resampling, fraction/binary mask, product readback/hashes. It currently creates `coverage_review=PENDING_VISUAL_REVIEW`.
