@@ -1,9 +1,12 @@
 """Offline, research-only OAM-TCD eligibility and crop recipes."""
 import argparse
 from collections import Counter, defaultdict
+from importlib.metadata import version
 import json
 from pathlib import Path
+import platform
 import re
+import subprocess
 
 import numpy as np
 from PIL import Image
@@ -33,6 +36,7 @@ LABEL_POLICY = [
 ]
 STAC_PREFIX = 'https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/'
 MAX_PIXELS = 2048**2
+REPO = Path(__file__).resolve().parents[1]
 
 
 class Decision(Exception):
@@ -47,6 +51,29 @@ def check(condition, status, reason, observed=None):
 
 def digest(value):
     return isinstance(value, str) and re.fullmatch('[0-9a-f]{64}', value) is not None
+
+
+def environment():
+    def git(*args):
+        return subprocess.check_output(['git', *args], cwd=REPO, text=True,
+                                       stderr=subprocess.DEVNULL, timeout=5).strip()
+
+    try:
+        commit, dirty = git('rev-parse', 'HEAD'), bool(git('status', '--porcelain'))
+    except (OSError, subprocess.SubprocessError):
+        commit, dirty = 'NOT_AVAILABLE', None
+    return dict(git_commit=commit, git_dirty=dirty, script_sha256_raw=sha(Path(__file__)),
+                python=platform.python_version(), os=platform.system(),
+                dependencies={name: version(name) for name in ('numpy', 'Pillow', 'rasterio', 'pyproj')},
+                gdal=rasterio.__gdal_version__)
+
+
+def final_decision(source, window):
+    if source['status'] != ELIGIBLE:
+        return source
+    if window is None:
+        return dict(status=FAIL, reason='WINDOW_DECISION_MISSING', observed=None)
+    return window
 
 
 def local_file(root, name):
@@ -181,7 +208,8 @@ def decode(row, paths, categories):
 
 def inspect(candidate, row, groups, object_folds, duplicates, categories, root, evidence, seed):
     result = dict(image_id=candidate['image_id'], oam_id=candidate['oam_id'],
-                  validation_fold=candidate['validation_fold'], window_decision=None)
+                  validation_fold=candidate['validation_fold'], window_decision=None,
+                  source_hash_verification='NOT_CHECKED')
     try:
         check(row is not None, EXCLUDE, 'OUTSIDE_PINNED_CATALOG')
         result.update(split=row['split'], official_split=row['official_split'])
@@ -192,7 +220,12 @@ def inspect(candidate, row, groups, object_folds, duplicates, categories, root, 
         check(all(p.is_file() for p in paths.values()), HOLD, 'LOCAL_SOURCE_FILE_MISSING')
         hashes = {k: sha(p) for k, p in paths.items()}
         pins = candidate.get('source_hashes')
-        result.update(source_hashes=hashes, source_hash_basis='EXTERNAL_PINS' if pins else 'LOCAL_OBSERVED')
+        result['source_hashes'] = hashes
+        if pins is not None:
+            result['expected_source_hashes'] = pins
+        result['source_hash_verification'] = (
+            'SOURCE_AUTHENTICITY_NOT_EXTERNALLY_VERIFIED' if pins is None else
+            'MATCHED_EXTERNAL_EXPECTED_SHA256' if hashes == pins else 'EXTERNAL_EXPECTED_SHA256_MISMATCH')
         check(pins is None or hashes == pins, FAIL, 'SOURCE_HASH_MISMATCH')
         rgb, teacher, shape, grid, gsd = decode(row, paths, categories)
         check(hashes == {k: sha(p) for k, p in paths.items()}, FAIL, 'SOURCE_BYTES_CHANGED')
@@ -268,6 +301,12 @@ def assess(root, evidence, contract, contract_sha256):
     annotations = coco_annotation_summary(paths['coco'], [r['image_id'] for r in targets])
     results = [inspect(c, rows.get(i), groups, object_folds, duplicates, annotations.get(i, {}).get('categories', []),
                        root, evidence, policy['seed']) for i, c in sorted(candidates.items())]
+    eligible_ids = {'train': [], 'val': []}
+    for result in results:
+        adoption = final_decision(result['source_decision'], result['window_decision'])
+        result['final_decision'] = adoption
+        if adoption['status'] == ELIGIBLE:
+            eligible_ids[result['split']].append(result['image_id'])
     require_hash(contract, contract_sha256)
     for key, path in paths.items():
         require_hash(path, policy['catalog_sha256'][key])
@@ -278,8 +317,8 @@ def assess(root, evidence, contract, contract_sha256):
                 catalog_sha256=policy['catalog_sha256'], catalog_rows=len(rows),
                 catalog_scope='Pinned official Train and Test metadata; Test pixels excluded',
                 external_independence='UNLISTED_SOURCES_NOT_VERIFIED',
-                counts=dict(Counter((r['window_decision'] or r['source_decision'])['status'] for r in results)),
-                results=results)
+                counts=dict(Counter(r['final_decision']['status'] for r in results)),
+                eligible_ids=eligible_ids, environment=environment(), results=results)
 
 
 def main(argv=None):
@@ -291,7 +330,7 @@ def main(argv=None):
     try:
         output = args.output.resolve()
         protected = (args.root.resolve(), args.evidence.resolve(), args.contract.resolve(),
-                     Path(__file__).resolve().parents[1])
+                     REPO)
         if (args.output.is_symlink() or output.exists() or output.suffix != '.json'
                 or not output.parent.is_dir() or any(output.is_relative_to(p) for p in protected)
                 or not digest(args.contract_sha256)):

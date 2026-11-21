@@ -79,7 +79,7 @@ def fixture(tmp_path):
 
 
 def decision(item):
-    result = item['window_decision'] or item['source_decision']
+    result = item['final_decision']
     return result['status'], result['reason']
 
 
@@ -98,6 +98,8 @@ def test_upstream_unmodified_labels_and_black_geometry(fixture):
     assert edge['crop_xywh'][0] >= 20 and edge['selected_black_support_cells'] == 0
     assert decision(blocked) == (qa.HOLD, 'NO_CLEAN_224_WINDOW')
     assert blocked['source_decision']['status'] == qa.ELIGIBLE
+    assert report['eligible_ids'] == {'train': [1, 2], 'val': []}
+    assert report['counts'] == {qa.ELIGIBLE: 2, qa.HOLD: 1}
     assert report['labels'] == qa.LABEL_POLICY and report['formal_r1'] == 'UNCHANGED'
     assert run(reverse=True)['results'] == run()['results'] == report['results']
 
@@ -168,6 +170,38 @@ def test_cross_split_original_metadata_alias(fixture):
     val = add(2, fold=0)
     val['meta'] = train['meta'].replace('example.org', 'other.example')
     assert {decision(entry) for entry in run()['results']} == {(qa.HOLD, 'CROSS_SPLIT_SOURCE_IDENTITY')}
+
+
+def test_observed_and_expected_source_hashes_have_distinct_assurance(fixture):
+    add, candidates, _, run, *_ = fixture
+    add(1)
+    pinned = run()['results'][0]
+    assert pinned['source_hash_verification'] == 'MATCHED_EXTERNAL_EXPECTED_SHA256'
+    assert pinned['expected_source_hashes'] == pinned['source_hashes']
+    expected = candidates[0].pop('source_hashes')
+    observed = run()['results'][0]
+    assert observed['source_hashes'] == expected
+    assert observed['source_hash_verification'] == 'SOURCE_AUTHENTICITY_NOT_EXTERNALLY_VERIFIED'
+    assert 'expected_source_hashes' not in observed
+    assert observed['final_decision']['status'] == qa.ELIGIBLE
+    candidates[0]['source_hashes'] = dict(expected, rgb='0'*64)
+    mismatch = run()['results'][0]
+    assert mismatch['source_hash_verification'] == 'EXTERNAL_EXPECTED_SHA256_MISMATCH'
+    assert decision(mismatch) == (qa.FAIL, 'SOURCE_HASH_MISMATCH')
+
+
+def test_missing_window_fails_closed():
+    assert qa.final_decision({'status': qa.ELIGIBLE}, None)['status'] == qa.FAIL
+
+
+def test_report_environment(fixture):
+    add, _, _, run, *_ = fixture
+    add(1)
+    env = run()['environment']
+    assert qa.digest(env['script_sha256_raw'])
+    assert len(env['git_commit']) == 40 and isinstance(env['git_dirty'], bool)
+    assert set(env['dependencies']) == {'numpy', 'Pillow', 'rasterio', 'pyproj'}
+    assert all(env[k] for k in ('python', 'os', 'gdal'))
 
 
 def test_manifest_pin_and_exclusive_cli_output(fixture, tmp_path):
