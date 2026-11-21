@@ -9,6 +9,18 @@ The primary goal is **automated high-volume source -> preprocessed patch -> rule
 
 The human owner approves the **policy and evidence boundaries once** and may evaluate a separate stratified audit sample to assess errors or revise the next *versioned* policy. Human/Codex inspection cannot silently promote individual images, alter recorded teacher labels or become a required gate for each candidate. A rule whose only implementation is "looks acceptable" is **not an automatic QA rule**.
 
+## 1A. Owner decision: trust the published OAM-TCD labels as research input
+
+**Approved scope principle (2026-11-21):** OAM-TCD is an officially produced, published annotated dataset. For **exploratory training**, treat its upstream tree/canopy annotations as the **default source of teacher truth**, accepting that quality and interpretation are not fully uniform. **Do not make human/Codex visual review, per-image label-completeness checks, or nursery/shrub/tree boundary adjudication prerequisites for ordinary research admission.** This does not assert that every annotation is correct.
+
+**Keep the automatic rejection surface minimal and defensible:** source/dataset identity and license declarations, allowed official fold and source-group separation, malformed input/mismatched dimensions/CRS, corrupt hashes, declared invalid pixels or clearly calculable unusable crop support. Use the existing deterministic black-support crop avoidance as a **geometric heuristic**; do not infer that all dark/white pixels or black-adjacent crowns are wrong. Preserve original source imagery/annotation and all-zero/all-one masks, with no automated label correction.
+
+**Metadata and rights are independent of visual trust:** record and verify the documented licensing/attribution evidence under a reviewed source policy. Missing or contradictory required evidence causes machine-reasoned HOLD, not per-image discretionary visual approval or a claim of commercial legal clearance.
+
+**Scientifically transparent limitation:** record at the *dataset/run level* `UPSTREAM_OAM_TCD_LABELS_ACCEPTED_AS_IS_FOR_EXPLORATORY_RESEARCH` and `ANNOTATION_SEMANTIC_ACCURACY_NOT_INDEPENDENTLY_VERIFIED`. A **separate optional stratified sample audit**, or downstream controlled model assessment, may identify systematic teacher issues and motivate a new version of the policy; it must not become mandatory manual clearance of every image.
+
+**Next implementation:** [D6-A1 Issue #103](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/103). Its initial code/test scope is deliberately narrow: no new real-data batch, no GPU training, no source repair, no Formal R1 status change.
+
 ## 2. Evidence-based inventory of existing behavior
 
 | Existing condition / actual code | Machine-determinable? | Existing limitation / D6 disposition |
