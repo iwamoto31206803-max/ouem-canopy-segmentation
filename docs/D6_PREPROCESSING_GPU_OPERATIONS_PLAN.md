@@ -15,33 +15,34 @@ The D5 exploratory research run `d5-v5-main280-01` completed **280 training upda
 
 **Owner-approved research direction:** pause detailed fixed-Val18 FP/FN root-cause and threshold analysis; prioritize planning for more data, stronger preprocessing reproducibility and feasible larger GPU training. Do **not** infer that increasing data or updates must improve quality.
 
-## 2. D6-A — machine-independent, scalable data preprocessing
+## 2. D6-A — objective, scalable preprocessing and research admission
 
-**Objective:** given the **same pinned source bytes + same reviewed recipe**, processing on two authorized PCs produces **semantically identical RGB, canopy-fraction/mask pixels and spatial metadata**, without an operator manually choosing crops or intervening per image. File-byte identity is a desirable secondary objective, not silently assumed.
+**Owner clarification (2026-11-21):** "reproducible across PCs" primarily means **the same predefined rules select/process the same class of eligible inputs without per-image human/Codex visual judgement**, not a rigorous byte-identical Windows/Linux TIFF reproducibility project. **Top priority: machine-actionable QA/admission and high-throughput, bounded preprocessing**. For the actual old-rule inventory, per-image visual-dependency risks, proposed decision statuses and first design scope, see [D6-A objective QA audit](implementation/D6A_OBJECTIVE_QA_POLICY_AUDIT.md). This is a *proposal*, not new automatic acceptance already implemented.
 
-### Existing reusable foundation
+### Existing foundation
 
-- `scripts/research_patches.py`: explicit source grid, integer support checks, `random.Random(f'{seed}:{image_id}')` deterministic window choice, area downsampling, fractional canopy and binary threshold, TIFF readback, per-product hashes and reviewed plan output. Existing source choices are still bounded and require accepted/reviewed inputs.
-- `scripts/research_data.py`: source/crop/review/rights checks, frozen immutable hashes and source/fold consistency; rehashes and validates products on use. `scripts/r1_dataset.py` provides a separate **Formal R1** contract—research CLEAR does not equal formal PASS.
-- `scripts/r1b3_batch.py` and QA modules already show bounded offline batches and ledger checks. **Reuse principles, not unreviewed promotion or a parallel unchecked pipeline.**
+- `scripts/research_patches.py`: deterministic per-ID/seed crop positions, geometric black-support exclusions, area resampling, fraction/binary mask, product readback/hashes. It currently creates `coverage_review=PENDING_VISUAL_REVIEW`.
+- `scripts/research_data.py`: immutable input/crop/review identifiers, grid and SHA-256 checks, source-balanced reader. **Its legacy admission requires explicit `CLEAR_FOR_EXPLORATION` reviewer decisions**; preserve the historical contract, build a **separate versioned D6 research pathway** for objective automatic eligibility.
+- `scripts/m1_5d_zenodo_prepare.py`, `scripts/m1_5b_pilot.py`, `scripts/r1b_qa_runner.py` and `scripts/m1_5b2_border_audit.py`: already calculate machine-based rights/metadata consistency, source format/grid/validity, source-group independence and exact-black components. **They do not certify all photographed coverage, complete tree truth or Formal R1 admission.**
+- `scripts/r1_dataset.py` is the **Formal R1** contract with separate source-bound review/acceptance assertions; **do not rewrite or automatically promote R1 HOLD**.
 
-### Design requirements (to validate, not yet implemented)
+### Primary requirements
 
-1. **Pin the full recipe and input contract:** source revision/row ID/`oam_id`, license/attribution, source RGB and annotation SHA-256, category mapping (Individual tree + Tree canopy; void/background semantics), spatial reference, target GSD/grid alignment, resampler, RGB rounding, fractional aggregation, mask threshold, crop policy, seed and split/group identity.
-2. **Enforce source-level independence:** original `oam_id` and overlapping/near-duplicate scenes must not leak between Train and Val/test. Keep official OAM-TCD holdout and GT54 out of model/threshold tuning. Preserve original fixed Val18 as an **unchanged historical comparison set**; plan a truly independent, quality-reviewed validation set including **Japanese positive-tree scenes** before a claim about Japan.
-3. **Bound memory and labor:** chunk/batch source imagery without loading the whole pool, report source-level PASS/HOLD/FAIL and reasons, generate bounded preview contact sheets for **targeted human review**, and never auto-accept ambiguous borders, nursery/planting rows, grayscale TIFFs, labels or rights.
-4. **Make selection independent of execution order:** fixed per-source/per-crop keys and deterministic stable sorting; avoid shared/global RNG, time/random file naming or filesystem iteration order for data identity. Resume/idempotent skip decisions must verify existing products against a declared manifest, not silently overwrite.
-5. **Lock/record the environment:** Python, NumPy, Pillow, Rasterio/GDAL/PROJ, compression driver/options, CPU feature/OS where relevant, algorithm code commit and any container/image digest. Do not claim hardware independence before exercising two actually different environments.
-6. **Write immutable output in two stages:** fresh staging area; product readback; canonical manifest, content hashes, summary and signed-off QA; only then distinct versioned **dataset freeze**. No in-place mutation of v5. Stop on discrepancies rather than best-effort correction of teacher labels.
-7. **Use two reproducibility tiers:**
-   - **Required (content):** pixel array values, shapes, dtype, mask semantics, CRS, affine, bounds, target GSD, selected `crop_xywh`, split assignments and ordered canonical manifests match on both PCs. Compute independent array-content SHA-256 on a clearly documented canonical serialization when TIFF container bytes differ.
-   - **Desired (container):** byte-identical GeoTIFF and artifact SHA-256. GDAL/TIFF metadata, library versions and DEFLATE implementation can change container bytes; report a difference explicitly, never call it a content mismatch or quietly waive it. If contractual byte identity becomes necessary, use a locked containerized writer and test it.
+1. **Predeclare a versioned research-only policy:** source generation, license/attribution metadata requirements, permitted official folds, source-group independence, upstream Tree+Canopy union semantics and known category-crosswalk limitations, RGB/mask/CRS/grid rules, crop/black-support policy, seed, target GSD and thresholds. The policy is approved before batch selection/training, **not tuned from model predictions**.
+2. **Replace per-image visual-gated CLEAR/HOLD selection with objective, reasoned decisions:** `AUTO_ELIGIBLE_RESEARCH`, `AUTO_HOLD`, `AUTO_EXCLUDE`/`TECHNICAL_FAIL` plus orthogonal `UNASSESSED_SEMANTIC_RISK`. For each status log a rule ID, measured value, expected value/threshold, input/algorithm/policy identity and limitations. Do not allow arbitrary `looks good`, `AI visual confidence` or silent user/Codex overrides. A machine-pass is **not** a claim of semantically correct tree truth or complete photographic coverage.
+3. **Treat ambiguous coverage honestly:** use published valid-data/footprint evidence when available; otherwise use prespecified numeric/geometric rules to **exclude candidate windows intersecting hypothesized border-connected black support**, or return a rule-based HOLD. The historical >=1% border-black flag is a heuristic, **not guaranteed nodata detection**; white roofs, internal shadows, zero/all-one teachers are not automatically rejected solely for their colors/label prevalence. Don't auto-edit labels or fabricate valid fractions.
+4. **Automate source-level batches and durable receipts:** bounded I/O/memory/time, stable source/crop keys independent of processing order, per-source PASS/HOLD/FAIL reasons, integrity checks, idempotent restart from verified products, immutable dataset/manifest identities and source-wise counts. Control repeated/overlapping crops and source diversity; many patches are not many independent source images.
+5. **Keep people at policy/audit level, not per-image gate level:** owners review the policy and dataset/source rights scope; independent **stratified sample audits** examine teacher noise and how frequently automated checks fail. Material systematic problems lead to a **new versioned policy** and rerun, not undocumented per-image exceptions. Formal R1 review remains separate.
+6. **Keep routine computational reproducibility:** fixed seeds/code/config, retained output hashes, array/grid integrity and package versions. An optional small cross-PC smoke check can validate ordinary portability; **neither TIFF byte identity nor exact floating-point bit equality across OS/BLAS is a primary D6-A entry gate**.
 
-### D6-A acceptance experiment
+### Work sequence and evidence
 
-Take a small **rights-reviewed, diverse fixed subset** of sources (e.g., dense and sparse crowns, borders, all-background, distinct source resolutions, grayscale HOLD as an expected reject). Run the **same immutable source bundle and exact recipe on GEEKOM-A6 and a second authorized PC/runtime**; compare canonical array and spatial metadata hashes, window choices, manifest contents, reproducibility under shuffled processing order, and expected fail-closed cases. Record versions, resource usage, discrepancies, byte-vs-content verdict, and independent readback. **No large production run until the differential test is reviewed.**
+- **A0, now — inventory/policy review:** [D6-A audit](implementation/D6A_OBJECTIVE_QA_POLICY_AUDIT.md) lists existing automatic vs visual conditions, missing semantic guarantees and proposed objective research-only statuses. Review policy risks; don't call them accepted before approval.
+- **A1, later reviewed code PR — objective decision engine:** synthetic fixtures cover edge/internal black, exact-white features, official holdout, duplicate/near-source, missing STAC, grayscale/invalid TIFF, source hash/CRS failures, no eligible crop, all-zero/all-one masks and reordered processing. No real mass data processing.
+- **A2, separately approved bounded real-data pilot:** evaluate automated eligibility counts, HOLD/EXCLUDE reason distribution, source diversity, overlap, peak RAM, throughput and restart/idempotence. Compare with old Phase C human/Codex assessments as an **independent diagnostic**, not manual approval overrides.
+- **A3, after review — expand mechanically eligible dataset** with stable source-level selection and frozen Train/Val separation; preserve original research v5/Val18 and Formal R1 artifacts unchanged. Coordinate final artifact format and transfer with deferred D6-B.
 
-**Gate D6-A:** `PREPROCESS_CONTENT_REPRODUCIBLE_ON_TWO_ENVIRONMENTS` and `FAIL_CLOSED_QA_VERIFIED` (names proposed; not yet PASS), with any non-identical GeoTIFF bytes explicitly documented. D6-A is not a license or Formal R1 gate.
+**Proposed D6-A gate (not yet PASS):** `OBJECTIVE_RESEARCH_ADMISSION_POLICY_REVIEWED` + `NO_PER_IMAGE_VISUAL_GATE_TESTED` + `RULE_REASON_AND_FAIL_CLOSED_TESTS_PASS` + `BATCH_YIELD_AND_IDEMPOTENCE_MEASURED`. No acceptance claim is made by this document.
 
 ## 3. D6-B — free-tier-aware, durable and resumable GPU workflow
 
@@ -71,13 +72,13 @@ Take a small **rights-reviewed, diverse fixed subset** of sources (e.g., dense a
 
 ## 4. Execution decision, evidence hierarchy and stop rules
 
-**Order selected (2026-11-21): D6-A first.** Begin with deterministic large-batch preprocessing and cross-PC equivalence. **Implement D6-B only as part of preparation for the next approved training experiment**, preferably with the smallest cold-resume/Drive-transfer functions needed. D6-B's checklist is preserved in Issue #100, rather than initiating a separate implementation campaign now. The data-processing scale decision depends on reviewed D6-A evidence; substantive training still depends on verified D6-B operational safety and an explicitly frozen dataset. A small GPU pilot may inform hardware sizing only after separate approval.
+**Order selected (2026-11-21): D6-A first.** Begin with objective rule-based automatic eligibility and scalable preprocessing without image-by-image visual gates; an ordinary cross-PC smoke check is secondary. **Implement D6-B only as part of preparation for the next approved training experiment**, preferably with the smallest cold-resume/Drive-transfer functions needed. D6-B's checklist is preserved in Issue #100, rather than initiating a separate implementation campaign now. The data-processing scale decision depends on reviewed D6-A evidence; substantive training still depends on verified D6-B operational safety and an explicitly frozen dataset. A small GPU pilot may inform hardware sizing only after separate approval.
 
 | Decision | Current disposition |
 | --- | --- |
 | D5 Step280 initial-learning feasibility | Achieved in the bounded exploratory sense; not practical accuracy |
 | D5 Step280 full Val18 evidence and remote preservation | **PASS**, frozen [archival record](implementation/D5B2B_STEP280_VAL18_RECOVERY_RECORD.md) |
-| D6-A two-runtime preprocessing equivalence | **NOT STARTED** |
+| D6-A objective auto-QA rule and scalable preprocessing | **A0 INVENTORY PROPOSED; no code or real data execution yet**, [rule-dependency audit](implementation/D6A_OBJECTIVE_QA_POLICY_AUDIT.md) |
 | D6-B interruption/resume + resource budget trial | **DEFERRED: implement/test when next approved training experiment is prepared** ([Issue #100](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/100)) |
 | New dataset/source rights/label acceptance | **PENDING**, no automatic promotion |
 | Enlarged GPU training campaign | **NOT AUTHORIZED** |
@@ -88,7 +89,7 @@ Engineering gates (execute/load/restore/evidence), research gates (controlled he
 
 ## 5. Planning deliverables before implementation
 
-- **D6-A design review:** deterministic crop/label/grid specification, dependency lock, cross-machine differential test fixture and expected PASS/HOLD/FAIL cases, resource/IO bounds and exact canonical-hash contract.
+- **D6-A policy review:** [rule-based objective QA audit](implementation/D6A_OBJECTIVE_QA_POLICY_AUDIT.md), research-only eligible/HOLD/EXCLUDE reason schema, decisions independent of per-image visual judgements, separate semantic-risk flags, synthetic cases, resource/IO budgets, idempotent resume and dataset-yield measurements. Cross-PC TIFF byte identity is not a required gate.
 - **D6-B deferred training-coupled review:** refer to [Issue #100](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/100) at the next training design stage. Prefer free Notebook GPU + Google Drive short-term relay + GEEKOM long-term archival; measure limits, staging/shard capacity, checkpoint-retention/remote verification, cold-resume test and a potential *optional* paid-compute ceiling before owner authorization.
 - **Joint decision:** select data volume and diversity target *after* sources/rights/labels and resource budget are known; establish independent Japan-positive evaluation set; keep Step280/v5 outputs an immutable baseline.
 - **Review workflow:** separate small implementation PRs and explicit owner execution gate; no automatic data download, remote upload, GPU use, model retraining or Formal R1 promotion from this document.
