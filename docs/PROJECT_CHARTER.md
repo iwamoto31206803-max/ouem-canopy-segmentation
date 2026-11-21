@@ -1,6 +1,6 @@
 # Project Charter — OUEM Canopy Segmentation
 
-**Status:** Proposed v0.2 design baseline (2026-11-01); becomes the active project charter when the corresponding design PR is reviewed and merged. **Not** a statement that a model, accuracy benchmark, or commercial deployment has been approved.
+**Status:** 2026-11-01 **decision-stage v0.2 charter baseline**, retained as the project's scope, authority and engineering/OUEM acceptance principles. The original D0–D5 and M1/M2 gate descriptions below are **not a current execution ledger**; for what has actually been demonstrated see [Current State](CURRENT_STATE.md) and the [2026-11-21 D5-B2 record](implementation/D5B2B_STEP280_VAL18_RECOVERY_RECORD.md). The next D6-A/B workstreams are [planning proposals only](D6_PREPROCESSING_GPU_OPERATIONS_PLAN.md), not a change to charter acceptance gates. Initial canopy-associated learning has been observed but **practical accuracy, formal R1 and commercial deployment have not been approved**.
 
 ## 1. Why this project exists
 
