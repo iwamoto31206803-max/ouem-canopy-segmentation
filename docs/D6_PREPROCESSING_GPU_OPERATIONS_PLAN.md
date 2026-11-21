@@ -1,7 +1,7 @@
 # D6 planning baseline — deterministic preprocessing and restartable GPU operations
 
 **Date:** 2026-11-21 (JST)  
-**State:** **DRAFT FOR REVIEW / PLANNING ONLY**; **D6-A versus D6-B order is not decided**. This document is not approval to acquire more data, train, spend money, modify labels, use a new external service, or promote Formal R1.  
+**State:** **PLANNING BASELINE (reviewed decision update 2026-11-21)**. **D6-A preprocessing is the next implementation/design focus; D6-B implementation is deferred to the next separately approved training experiment, after D6-A.** D6-B tasks are captured in [Issue #100](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/100). This document does not approve new data acquisition/processing, GPU training, expenditure, model/label changes or Formal R1 promotion.  
 **Authority:** [Project Charter](PROJECT_CHARTER.md), [Design Principles](DESIGN_PRINCIPLES.md), [Satlas-first ADR](decisions/ADR_20261101_SATLAS_FIRST.md); for actual execution status use [Current State](CURRENT_STATE.md). D6-A/B are **research workstream names**, not changes to the Charter's D0–D5 acceptance gates.
 
 ## 1. Motivation and immutable starting point
@@ -45,7 +45,7 @@ Take a small **rights-reviewed, diverse fixed subset** of sources (e.g., dense a
 
 ## 3. D6-B — free-tier-aware, durable and resumable GPU workflow
 
-**Objective:** run larger training while treating a free Notebook GPU and its local filesystem as **ephemeral**, without making free GPU-hours, a fixed GPU model, a persistent session or free cloud capacity an assumption.
+**Objective (deferred implementation):** run larger training while treating a free Notebook GPU and its local filesystem as **ephemeral**, without making free GPU-hours, a fixed GPU model, a persistent session or free cloud capacity an assumption. **Owner's preferred policy:** exhaust practical, permitted free GPU sessions first, pausing at verified checkpoints and resuming whenever quota permits; evaluate a paid GPU only if measured waiting/overhead is excessive, under a new owner-approved budget. **Google Drive is the intended relay/short-term recovery store (not Google Cloud Storage); GEEKOM-A6/external storage is the long-term archive.** No D6-B code is needed until the next training campaign is designed. See [deferred implementation checklist, Issue #100](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/100).
 
 ### Separation of responsibilities
 
@@ -71,14 +71,14 @@ Take a small **rights-reviewed, diverse fixed subset** of sources (e.g., dense a
 
 ## 4. Execution decision, evidence hierarchy and stop rules
 
-**No order has been selected between D6-A and D6-B.** The two can be designed independently. A data-processing scale decision depends on reviewed D6-A evidence; a substantive training run depends on verified D6-B operational safety and an explicitly frozen dataset. A small run may inform hardware sizing only after separate approval.
+**Order selected (2026-11-21): D6-A first.** Begin with deterministic large-batch preprocessing and cross-PC equivalence. **Implement D6-B only as part of preparation for the next approved training experiment**, preferably with the smallest cold-resume/Drive-transfer functions needed. D6-B's checklist is preserved in Issue #100, rather than initiating a separate implementation campaign now. The data-processing scale decision depends on reviewed D6-A evidence; substantive training still depends on verified D6-B operational safety and an explicitly frozen dataset. A small GPU pilot may inform hardware sizing only after separate approval.
 
 | Decision | Current disposition |
 | --- | --- |
 | D5 Step280 initial-learning feasibility | Achieved in the bounded exploratory sense; not practical accuracy |
 | D5 Step280 full Val18 evidence and remote preservation | **PASS**, frozen [archival record](implementation/D5B2B_STEP280_VAL18_RECOVERY_RECORD.md) |
 | D6-A two-runtime preprocessing equivalence | **NOT STARTED** |
-| D6-B interruption/resume + resource budget trial | **NOT STARTED** |
+| D6-B interruption/resume + resource budget trial | **DEFERRED: implement/test when next approved training experiment is prepared** ([Issue #100](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/100)) |
 | New dataset/source rights/label acceptance | **PENDING**, no automatic promotion |
 | Enlarged GPU training campaign | **NOT AUTHORIZED** |
 | Japanese positive-tree independent validation | **PENDING** |
@@ -89,7 +89,7 @@ Engineering gates (execute/load/restore/evidence), research gates (controlled he
 ## 5. Planning deliverables before implementation
 
 - **D6-A design review:** deterministic crop/label/grid specification, dependency lock, cross-machine differential test fixture and expected PASS/HOLD/FAIL cases, resource/IO bounds and exact canonical-hash contract.
-- **D6-B design review:** candidate provider and dynamic quota check, staging/shard plan, peak storage/VRAM/throughput measurements, checkpoint-retention and remote verification, cold-resume failure-injection protocol and cost ceiling.
+- **D6-B deferred training-coupled review:** refer to [Issue #100](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/100) at the next training design stage. Prefer free Notebook GPU + Google Drive short-term relay + GEEKOM long-term archival; measure limits, staging/shard capacity, checkpoint-retention/remote verification, cold-resume test and a potential *optional* paid-compute ceiling before owner authorization.
 - **Joint decision:** select data volume and diversity target *after* sources/rights/labels and resource budget are known; establish independent Japan-positive evaluation set; keep Step280/v5 outputs an immutable baseline.
 - **Review workflow:** separate small implementation PRs and explicit owner execution gate; no automatic data download, remote upload, GPU use, model retraining or Formal R1 promotion from this document.
 
