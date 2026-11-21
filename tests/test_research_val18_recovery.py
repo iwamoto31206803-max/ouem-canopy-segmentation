@@ -63,7 +63,11 @@ def test_frozen_source_file_content(tmp_path, monkeypatch):
         return {'status': b'', 'ls-tree': '\n'.join(names).encode(),
                 'show': b'pass\n', 'rev-parse': b'tool\n'}[args[0]]
     monkeypatch.setattr(recovery, 'git', git)
-    assert len(recovery.sources()['historical_python_sha256_lf']) == 3
+    expected = {name: hashlib.sha256(b'pass\n').hexdigest() for name in names}
+    assert recovery.sources()['historical_python_sha256_lf'] == expected
+    for name in names:
+        (tmp_path / name).write_bytes(b'pass\n')
+    assert recovery.sources()['historical_python_sha256_lf'] == expected
     (tmp_path / names[1]).write_bytes(b'# changed\n')
     with pytest.raises(ValueError, match='drift'):
         recovery.sources()
@@ -234,13 +238,13 @@ def test_private_destinations_and_copy_receipt_last(tmp_path, monkeypatch):
     with pytest.raises(ValueError):
         recovery.protected_destination(output, [])
     order = []
-    write = recovery.write_json
-    def record(path, value):
-        order.append(path.name)
-        return write(path, value)
-    monkeypatch.setattr(recovery, 'write_json', record)
+    write = recovery.publish_receipt
+    def record(root, value):
+        order.append(root.name)
+        return write(root, value)
+    monkeypatch.setattr(recovery, 'publish_receipt', record)
     recovery.publish(output, copy_path, names)
-    assert order == ['sha256.json', 'completion.json', 'completion.json']
+    assert order == ['output', 'copy']
     receipt = json.loads((copy_path / 'completion.json').read_bytes())
     assert receipt['local_copy'] == 'LOCAL_COPY_READBACK_PASS'
     assert receipt['cloud'] == 'CLOUD_DURABILITY_UNVERIFIED'
@@ -260,6 +264,45 @@ def test_partial_copy_has_no_completion_receipt(tmp_path, monkeypatch):
         recovery.publish(output, copy_path, {'metrics.json'})
     assert not (output / 'completion.json').exists()
     assert not (copy_path / 'completion.json').exists()
+
+
+@pytest.mark.parametrize('failed_root', ['source', 'copy'])
+@pytest.mark.parametrize('failure', ['short_write', 'interruption', 'existing'])
+def test_receipt_failure_exit_and_publication_order(tmp_path, monkeypatch, failed_root, failure):
+    output, copy_path = tmp_path / 'source', tmp_path / 'copy'
+    output.mkdir()
+    (output / 'metrics.json').write_bytes(b'{}')
+    original_dump = json.dump
+    original_link = recovery.os.link
+    def dump(value, stream, **kwargs):
+        if Path(stream.name).parent.name == failed_root and Path(stream.name).name == 'completion.json.partial':
+            if failure == 'short_write':
+                stream.write('{')
+                raise OSError('injected write failure')
+        return original_dump(value, stream, **kwargs)
+    def link(src, dst):
+        if dst.parent.name == failed_root:
+            if failure == 'interruption':
+                raise KeyboardInterrupt()
+            if failure == 'existing':
+                dst.write_bytes(b'existing sentinel')
+        return original_link(src, dst)
+    monkeypatch.setattr(recovery.json, 'dump', dump)
+    monkeypatch.setattr(recovery.os, 'link', link)
+    monkeypatch.setattr(recovery, 'parse', lambda: None)
+    monkeypatch.setattr(recovery, 'execute', lambda _: recovery.publish(output, copy_path, {'metrics.json'}))
+    assert recovery.main() == 1
+    for root in (output, copy_path):
+        receipt = root / 'completion.json'
+        if root.name == failed_root:
+            if failure == 'existing':
+                assert receipt.read_bytes() == b'existing sentinel'
+            else:
+                assert not receipt.exists()
+        elif root == output:
+            assert json.loads(receipt.read_bytes())['local_copy'] == 'LOCAL_COPY_READBACK_PASS'
+        else:
+            assert not receipt.exists()
 
 
 @pytest.mark.parametrize('problem', ['wrong_hash', 'malformed', 'missing'])

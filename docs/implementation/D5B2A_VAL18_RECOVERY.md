@@ -2,6 +2,8 @@
 
 This procedure requires a separate owner decision after code review. First authorize one Step 280 / Val 1241 CPU pilot. Review its memory use and latency before authorizing any full assessment.
 
+The prior GEEKOM-A6 verification covered the Step 280 checkpoint and receipt. Confirm local offline availability of the frozen raster products, crop plan and companion JSONs, and the official initializer before attempting the pilot.
+
 ## Prepare offline on Windows
 
 - Use a clean checkout that contains Git object `30c3d9a63543550bfe7321f5a7dad11e646e3b94`, Python 3.11 or later, CPU-compatible PyTorch/torchvision, Rasterio, Pillow and SatlasPretrain 0.3.1. The tool verifies historical Python source contents against the pinned Git tree, with LF/CRLF normalization. It does not install packages or download inputs.
@@ -41,7 +43,7 @@ Pilot output is `PILOT_ONLY` and `non_acceptance: true`. Review the provenance, 
 
 ## Preserve a completed step
 
-Require exit 0 and a complete `completion.json`. A full assessment contains 18 canonical 1120×224 PNGs, `metrics.json`, provenance, and a relative-name SHA index. The receipt pins the index SHA. Partial directories are preserved without completion and require a fresh approved attempt path.
+Require exit 0 and a complete `completion.json`. A full assessment contains 18 canonical 1120×224 PNGs, `metrics.json`, provenance, and a relative-name SHA index. The receipt pins the index SHA. The tool flushes and publishes the source receipt before publishing the copy receipt. If the copy receipt fails, the verified source receipt can remain, the copy is incomplete and the command fails. A partial receipt never qualifies as complete. Use fresh approved paths for a follow-up. Destinations must support exclusive hardlink publication (for example local NTFS).
 
 Optional `--local-copy <fresh separate path>` verifies copied bytes and records `LOCAL_COPY_READBACK_PASS`. A synced or mounted path still reports `CLOUD_DURABILITY_UNVERIFIED`. Before the next full step, have the owner independently inspect the non-shared Drive destination and its access settings, list all objects, and download each object through authenticated Drive access into a fresh directory independent of the sync cache. Compare exact inventory and per-file SHA to the local index, and compare index and completion-receipt bytes to the local originals. Record the remote folder identity, verification UTC, observed byte hashes and sharing check in a separate private remote receipt. Use `REMOTE_DRIVE_DURABILITY_CONFIRMED` only after these checks. Publish no private output or links to GitHub.
 

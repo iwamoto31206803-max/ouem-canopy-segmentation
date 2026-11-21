@@ -52,14 +52,16 @@ def sources():
     for name in paths:
         if not name.endswith('.py'):
             continue
-        historical = git('show', f'{TRAINER}:{name}').replace(b'\r\n', b'\n')
-        current = (REPO / name).read_bytes().replace(b'\r\n', b'\n')
-        require(historical == current, 'Historical source drift')
-        pins[name] = hashlib.sha256(current).hexdigest()
+        historical_lf = git('show', f'{TRAINER}:{name}').replace(b'\r\n', b'\n')
+        checkout_lf = (REPO / name).read_bytes().replace(b'\r\n', b'\n')
+        require(historical_lf == checkout_lf, 'Historical source drift')
+        pins[name] = hashlib.sha256(historical_lf).hexdigest()
     require({'scripts/research_cuda.py', 'scripts/research_data.py',
              'scripts/m1_7_g3a_eval.py'} <= pins.keys(), 'Missing historical sources')
     return dict(trainer_commit=TRAINER, tool_commit=git('rev-parse', 'HEAD').decode().strip(),
-                tool_sha256=sha(Path(__file__)), historical_python_sha256_lf=pins)
+                tool_sha256=sha(Path(__file__)), historical_python_sha256_lf=pins,
+                historical_python_hash_policy='CRLF converted to LF before comparison and hashing',
+                tool_hash_policy='SHA-256 of raw checkout bytes')
 
 
 def entries_for(schedule, pilot, digest):
@@ -216,6 +218,20 @@ def write_json(path, value):
         stream.write('\n')
 
 
+def publish_receipt(root, receipt):
+    # A short write or interruption must not expose a partial final receipt.
+    partial = root / 'completion.json.partial'
+    with partial.open('x', encoding='utf-8') as stream:
+        json.dump(receipt, stream, indent=2, allow_nan=False)
+        stream.write('\n')
+        stream.flush()
+        os.fsync(stream.fileno())
+    require(json.loads(partial.read_bytes()) == receipt, 'Receipt staging readback mismatch')
+    os.link(partial, root / 'completion.json')
+    partial.unlink()
+    require(json.loads((root / 'completion.json').read_bytes()) == receipt, 'Receipt readback mismatch')
+
+
 def worker(args, output, source):
     started = utc()
     try:
@@ -309,10 +325,12 @@ def publish(output, copy, expected_names, pilot=False):
             with (output / name).open('rb') as source, (copy / name).open('xb') as dest:
                 shutil.copyfileobj(source, dest)
             require(sha(copy / name) == pin, 'Local copy SHA mismatch')
+        require({p.name for p in copy.iterdir()} == {*expected_names, 'sha256.json'},
+                'Local copy inventory mismatch')
         receipt['local_copy'] = 'LOCAL_COPY_READBACK_PASS'
-        write_json(copy / 'completion.json', receipt)
-        require(json.loads((copy / 'completion.json').read_bytes()) == receipt, 'Copy receipt mismatch')
-    write_json(output / 'completion.json', receipt)
+    publish_receipt(output, receipt)
+    if copy:
+        publish_receipt(copy, receipt)
 
 
 def execute(args):
