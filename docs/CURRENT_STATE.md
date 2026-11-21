@@ -1,8 +1,26 @@
 # OUEM Canopy Segmentation — Current State
 
-As of **2026-11-18**, this is the Phase C closure and experiment-preparation checkpoint for [Issue #82](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/82). Documentation records evidence and decision gates. Execution and acceptance require their own approvals.
+As of **2026-11-21**, this file first records the latest D5 research-learning and evidence-durability milestone and the D6 planning handoff. The dated 2026-11-18 and earlier sections below are retained **as historical snapshots**, not current execution instructions. Every new data change, GPU training campaign and formal gate still requires a distinct decision.
 
-## 2026-11-18 current checkpoint — Phase C complete
+## 2026-11-21 current checkpoint — D5 Step280 recovered, D6-A/B planning
+
+| Track | Latest verified or reported result | Status boundary |
+| --- | --- | --- |
+| Original v5 exploratory research GPU | `d5-v5-main280-01`, 280 updates, Step280 original checkpoint and runtime receipt pinned; SatlasPretrain `Aerial_SwinB_SI` SwinB + FPN + two-class SEGMENT head | Completed exploratory learning; executed GPU lineage independence remains `UNVERIFIED` |
+| Frozen v5 dataset | **Train 70 originals / 139 windows; Val 18 originals / 18 fixed windows**; 88 originals / 157 windows / 471 TIFFs | Research-only freeze; not formal R1 acceptance |
+| GEEKOM-A6 CPU restore | Step280/Val1241 pilot PASS followed by full fixed Val18 `--assess --step 280` | CPU FP32, 4 threads; actual 18 windows / **903,168 pixels** |
+| Step280 fixed Val18 metrics (new CPU recomputation) | Micro tree IoU **0.615659**; Macro tree IoU **0.406824** (16 defined windows); micro F1 **0.762115**; per-image performance strongly variable | Exploratory reference, not practical or Japanese accuracy |
+| Evidence identity and durability | **22 files** (18 five-panel PNG + 4 JSON); independent remote Drive readback **20/20 evidence SHA matches** and original GEEKOM SHA anchors for index/completion match | `D5_B2_STEP280_FIXED_VAL18_LOCAL_EVIDENCE_COMPLETE` + `REMOTE_DRIVE_DURABILITY_CONFIRMED` for this scope only |
+| D6 next stage | **D6-A** cross-PC deterministic preprocessing, automation, data QA; **D6-B** free-tier GPU/storage budgeting, resilient checkpoints and cold resume | Planning only; A/B order undecided; no broad data processing or new GPU run approved |
+| Formal R1 and target-domain validity | **Formal R1 0/150 accepted / HOLD**; no Japanese positive-tree fixed Val18; original historical GPU-Val18 outputs/CPU equivalence not available | No formal R1, real-GSI, commercial or OUEM production acceptance |
+
+**Scientific milestone:** the Step280 model produces visually coherent canopy-associated predictions in some source-domain cases; compared with the earlier historical 20-step all-background smoke behavior this is an important qualitative advance. It does **not** establish a quantitative apples-to-apples improvement or a fully trained model. Owner paused detailed Val18 FP/FN causal and threshold analysis until larger diverse data and training are designed.
+
+**Trace and governance:** [merged D5-B2 recovery/archival record](implementation/D5B2B_STEP280_VAL18_RECOVERY_RECORD.md), [PR #98](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/pull/98), [Issue #95](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/95), [private evidence folder](https://drive.google.com/drive/folders/1BTf3Oap9OrwtWVwT_DgeHMnTTP3F7QWV), [D6-A/B planning baseline](D6_PREPROCESSING_GPU_OPERATIONS_PLAN.md), [current Roadmap](ROADMAP_NEXT.md). The raw `completion.json` correctly keeps `CLOUD_DURABILITY_UNVERIFIED` from creation time; the later independent remote attestation is separate and does not rewrite it.
+
+**Immediate handoff:** specify D6-A's pinned preprocessing/canonical pixel+grid-digest differential test on two authorized environments and D6-B's measured free-quota/storage/VRAM and interruption+independent checkpoint readback drill. Protect frozen v5 and Step280 outputs; do not select new Train/Val data, thresholds, GPU provider, spend or launch full training solely from these planning documents.
+
+## Historical checkpoint — 2026-11-18 Phase C complete
 
 The Phase C1–C8 research-data engineering and the bounded scientific inventory are complete. Issue #81 was independently reviewed PASS for the inventory scope and closed. Targeted human image confirmation and a new v5 GPU experiment remain pending. The local evidence summarized here is **CODEX_LOCAL_REPORT**. The independent review checked the published report, repository and official documentation without independently opening or hashing private pixels. Evidence classes are defined in the [2026-11-18 Project Review](PROJECT_REVIEW_20261118.md). [Scientific review disposition](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/81#issuecomment-6971582740)
 
@@ -37,7 +55,7 @@ These pins are transcribed from the completed C8/scientific reports. This docume
 
 These scientific quantities and limitations come from the [Issue #81 report](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/81#issuecomment-6918370260). Earlier v1–v4 hashes, source lineage, held windows and the G0–G3 experiments remain preserved. The [C4 v1 / Val7 procedure](implementation/PHASE_C4_RESEARCH_DATASET.md) retains its historical scope.
 
-### Immediate handoff
+### Historical immediate handoff (superseded on 2026-11-21)
 
 On GEEKOM, perform the read-only local evidence/SHA preflight and human review of the pinned 24 CLEAR + 9 held contact-sheet windows. Prioritize the CLEAR/held nursery and planting-row contrasts, linear teacher edges and known coverage margin. Then prepare a bounded research experiment plan with fixed Val18 and a small reviewed CUDA bridge. Follow the gates in the [current Roadmap](ROADMAP_NEXT.md).
 

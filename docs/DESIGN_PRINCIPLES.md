@@ -1,6 +1,6 @@
 # Design Principles — OUEM Canopy Segmentation
 
-**Status:** Proposed v0.2 baseline, 2026-11-01, subject to design PR review/merge.  
+**Status:** 2026-11-01 design-principles baseline; the original decision-stage wording is preserved below. For the present D5 Step280 initial-learning milestone, completed fixed-Val18 archive and unchanged Formal R1 HOLD, read [Current State](CURRENT_STATE.md). D6-A/B proposals in the [D6 plan](D6_PREPROCESSING_GPU_OPERATIONS_PLAN.md) extend reproducibility and bounded GPU operational practice **without approving a new experiment or changing acceptance gates**.  
 **Authority:** [Project Charter](PROJECT_CHARTER.md) defines purpose, scope, success and phases; [ADR: Satlas-first](decisions/ADR_20261101_SATLAS_FIRST.md) records the new engineering direction. Historical `EXPERIMENT_PLAN.md` and earlier research records cannot override this approved direction once merged.
 
 ## Mission and boundaries
@@ -38,6 +38,8 @@
 9. **Stable model handoff.** Lock input RGB range/order/GSD/normalization, valid-area behavior, output probabilities, threshold and tiling/padding/overlap. Version weights with checksum and config; OUEM verifies geospatial seams, CHM coupling and polygon output separately.
 10. **Small and reversible.** Keep implementation isolated, preserve old research and Git history, prefer bounded/offline-friendly tests and small reviewed PRs. Do not merge unfinished technical work into `main`.
 11. **Proportionate controls, with a stop rule.** A new gate, audit or isolation mechanism needs a named risk, the least expensive credible check, a completion criterion and a reason simpler existing safeguards are insufficient. Do not make obtaining absolute certainty a prerequisite for a bounded research experiment; do not mistake a completed audit for model progress. Reassess recurring gates when their cost delays M1/M2 outcomes.
+12. **Cross-environment reproducibility is an explicit scaling objective (2026-11-21).** Hold raw bytes, source/group split, label semantics, deterministic sampling, raster-grid calculations and manifests fixed, then test output *pixel/spatial* equality on two authorized PCs; do not claim GeoTIFF byte identity across GDAL/compression versions without a separate test.
+13. **Treat free GPU and Notebook scratch as interruptible (2026-11-21).** Stage immutable verified training bundles, separate scratch from durable stores, preserve optimizer/RNG/sampler state in new checkpoints, independently read back uploaded checkpoints and measure dynamic GPU/storage quotas before a larger run. No full training, cost or provider decision is implied by these principles.
 
 ## Risk-proportionate execution policy (2026-11-14 proposal)
 

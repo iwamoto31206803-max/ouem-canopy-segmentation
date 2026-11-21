@@ -1,8 +1,10 @@
-# Active Experiment Plan — Zenodo-first canopy fine-tuning (M1-7)
+# Historical Experiment Plan — Zenodo-first canopy fine-tuning (M1-7)
 
-**Status: PROPOSED design for review (2026-11-06). No new training, model accuracy, acceptance or license sign-off is claimed.**
+**Status: HISTORICAL 2026-11-06 proposal; superseded as an active execution plan.** This document preserves the initial Zenodo10 G0–G3 intended steps and their original decision-stage language. Its historical statements about unperformed GPU steps, pending G0/Zenodo work and next PRs **must not be treated as current work instructions**. For completed original v5 280-update GPU learning and the recovered Step280 fixed-Val18 evidence, see [Current State](CURRENT_STATE.md) and [D5-B2 execution/archival record](implementation/D5B2B_STEP280_VAL18_RECOVERY_RECORD.md). For the **next planning-only** workstreams—D6-A cross-PC deterministic preprocessing and D6-B resilient free-tier GPU/storage use, with no sequencing or training approval—see [D6 plan](D6_PREPROCESSING_GPU_OPERATIONS_PLAN.md).
 
-**Authority:** [Project Charter](PROJECT_CHARTER.md) > [Design Principles](DESIGN_PRINCIPLES.md) > [Satlas-first ADR](decisions/ADR_20261101_SATLAS_FIRST.md). This is the **active execution plan** anticipated by the charter; [EXPERIMENT_PLAN.md](EXPERIMENT_PLAN.md) is a historical, superseded Restor-checkpoint A/B/C study, **not** the current execution instruction. Detailed Zenodo decisions/evidence remain in [M1-5A inventory and M1-5D notes](implementation/M1_5A_DATASET_INVENTORY.md) and [M1-5B pilot/result ledger](implementation/M1_5B_PILOT_RESULT.json).
+**Original status at writing:** PROPOSED design for review (2026-11-06), with no new training/acceptance then claimed.
+
+**Original authority and historical context:** [Project Charter](PROJECT_CHARTER.md) > [Design Principles](DESIGN_PRINCIPLES.md) > [Satlas-first ADR](decisions/ADR_20261101_SATLAS_FIRST.md). This **was the proposed active plan when written in 2026-11-06**; it is no longer the live execution instruction. [EXPERIMENT_PLAN.md](EXPERIMENT_PLAN.md) is an even older, superseded Restor-checkpoint A/B/C study. Detailed Zenodo decisions/evidence remain in [M1-5A inventory and M1-5D notes](implementation/M1_5A_DATASET_INVENTORY.md) and [M1-5B pilot/result ledger](implementation/M1_5B_PILOT_RESULT.json).
 
 ## 1. Purpose and non-goals
 

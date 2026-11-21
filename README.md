@@ -4,7 +4,17 @@ Engineering repository for a practical **RGB tree-canopy semantic-segmentation c
 
 **Goal:** Use Japanese GSI aerial RGB imagery at approximately 0.5–0.6 m/ground pixel to produce usable 2D tree-canopy masks for OUEM's simplified 3D canopy, shade/heat and landscape workflows. The priority is a maintainable, reproducible implementation with documented rights and limitations—not a state-of-the-art benchmark or individual-tree delineation.
 
-## Current state — 2026-11-18 Phase C closure
+## Current state — 2026-11-21 D5 research learning milestone and D6 planning
+
+**A major exploratory milestone has been reached:** the frozen v5 SatlasPretrain SwinB + FPN + 2-class SEGMENT run `d5-v5-main280-01` completed **280 GPU updates**, and its Step280 checkpoint was subsequently hash-pinned and recovered on GEEKOM-A6 **CPU**. Some original-source validation images show spatially meaningful tree-canopy extraction rather than the all-background historical Step20 behavior. This establishes **initial learning feasibility**, not practical model accuracy or a numerically controlled improvement over the previous experiment.
+
+Research v5 remains **Train 70 originals / 139 windows; Val 18 originals / 18 fixed windows** (88 originals / 157 windows / 471 TIFFs). Step280 fixed Val18 was recomputed on CPU across **18 windows / 903,168 pixels**: micro tree IoU **0.615659**, macro tree IoU **0.406824** (16 defined windows). The full evaluation (18 PNG + metrics/provenance/SHA/completion = **22 private evidence files**) passed local-copy validation and **independent Google Drive remote SHA readback**, anchored against local original hashes. Evidence: [D5-B2 formal execution/archival record](docs/implementation/D5B2B_STEP280_VAL18_RECOVERY_RECORD.md), [PR #98](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/pull/98), [Issue #95](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/95). The original GPU Val18 outputs were not recovered, and CPU/GPU numerical equality and executed lineage independence are unverified.
+
+**Research decision:** pause detailed Val18 failure-cause/threshold analysis; retain the current SwinB/FPN/SEGMENT2 baseline and plan for *larger, more diverse and quality-reviewed training data* plus a *bounded restartable GPU workflow*. The two **D6 planning workstreams** are **D6-A deterministic, cross-PC preprocessing/QA** and **D6-B free-tier-aware GPU/temporary-storage/checkpoint/recovery operations**. **Their order has not been chosen, and a new dataset or GPU campaign is not authorized.** See [D6 design baseline](docs/D6_PREPROCESSING_GPU_OPERATIONS_PLAN.md) and [Next Roadmap](docs/ROADMAP_NEXT.md).
+
+**Formal R1 remains HOLD (0/150 accepted);** Japanese positive-tree validation, real-GSI accuracy, commercial sign-off and OUEM production suitability are **NOT VERIFIED**. The research CLEAR/frozen status is not an R1 acceptance. [Current State](docs/CURRENT_STATE.md) is the operational status reference; dated stage snapshots below are historical.
+
+## Historical checkpoint — 2026-11-18 Phase C closure
 
 **Phase C1–C8 research-data expansion and the scoped scientific review are complete.** Research candidate **v5 contains Train 70 original images / 139 windows and Val 18 original images / 18 fixed windows**, totaling 88 originals, 157 windows and 471 GeoTIFFs. Research CLEAR records Codex AI screening. **Formal R1 remains HOLD for all 150 candidates, with 0 accepted.** Source rights, bytes and private image-review findings remain Codex-local reports awaiting the targeted human handoff. [Phase C8](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/80), [scientific review disposition](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/81#issuecomment-6971582740)
 
@@ -50,11 +60,12 @@ The charter and design documents retain their original decision-stage wording as
 
 The core work is **already scripted**, but there is **not yet one general end-to-end download/prepare/train command**. Earlier scripts deliberately target bounded inputs; avoid treating them as unrestricted pipelines for all 4,608 images.
 
-The M1-6 recipe below preserves its legacy 661/1972 input scope. Linked G1-B/G2/G3-A stage procedures preserve their Zenodo10 Train7/Val3 lineage. Fresh research v5 CUDA execution requires the separately reviewed bridge described in the current Roadmap.
+The M1-6 recipe below preserves its legacy 661/1972 input scope. Linked G1-B/G2/G3-A stage procedures preserve their Zenodo10 Train7/Val3 lineage. The historical v5 GPU bridge was implemented and executed in D5; its original-source run, restored Step280 assessment and archival evidence are recorded in the D5-B2 record. D6 scaling is separately proposed, not yet implemented.
 
 | Operation | Existing implementation | Notes |
 | --- | --- | --- |
-| Research patch supply | `scripts/research_patches.py`, `scripts/research_data.py` | Reported v5 CPU validation, pinned research review and immutable Val18 |
+| Research patch supply | `scripts/research_patches.py`, `scripts/research_data.py` | Frozen v5 source/label processing; exact output hashes and research-only reviews; D6-A cross-PC equivalence not yet tested |
+| Research v5 bounded GPU training / CPU reconstruction | `scripts/research_cuda.py`, `scripts/research_val18_recovery.py` | Original D5 280-update T4 training; Step280 CPU fixed-Val18 reconstruction and private remote evidence readback PASS; see D5-B2 record |
 | Source-balanced research schedule / CPU training core | `scripts/r2_train.py` | `make_plan` supports research supply, `train` enforces CPU FP32 |
 | Bounded original-data acquisition and label QA | `scripts/m1_2a_data_qa.py`, `scripts/m1_2b_overlay_qa.py` | Initial two records; enforce rights and label checks |
 | Geospatial geometry and ~0.50 m data-pair generation | `scripts/m1_2d_geometry_audit.py`, `scripts/m1_2d_prepare_pairs.py` | Current pair preparation is limited to approved IDs 661/1972 |
