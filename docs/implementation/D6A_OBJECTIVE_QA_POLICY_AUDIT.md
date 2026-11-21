@@ -9,6 +9,8 @@ The primary goal is **automated high-volume source -> preprocessed patch -> rule
 
 The human owner approves the **policy and evidence boundaries once** and may evaluate a separate stratified audit sample to assess errors or revise the next *versioned* policy. Human/Codex inspection cannot silently promote individual images, alter recorded teacher labels or become a required gate for each candidate. A rule whose only implementation is "looks acceptable" is **not an automatic QA rule**.
 
+**Historical policy audit and design record. Status update 2026-11-21:** [D6-A1 implementation PR #105](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/pull/105) has been merged; the separate [A2 local real-data pilot plan](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/106) is open and **not yet executed**. Below, references to A1 as a future proposal describe the prior design stage rather than the current implementation status.
+
 ## 1A. Owner decision: trust the published OAM-TCD labels as research input
 
 **Approved scope principle (2026-11-21):** OAM-TCD is an officially produced, published annotated dataset. For **exploratory training**, treat its upstream tree/canopy annotations as the **default source of teacher truth**, accepting that quality and interpretation are not fully uniform. **Do not make human/Codex visual review, per-image label-completeness checks, or nursery/shrub/tree boundary adjudication prerequisites for ordinary research admission.** This does not assert that every annotation is correct.
