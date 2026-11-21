@@ -21,6 +21,8 @@ The D5 exploratory research run `d5-v5-main280-01` completed **280 training upda
 
 **Research label-trust policy (owner decision 2026-11-21):** use official published OAM-TCD annotation as-is as the working teacher for exploratory training. **Minimize automatic exclusions to explicit technical, source-policy, source-split or geometric/crop conditions**; do not ask a person or Codex to visually certify each normal image. Label noise is expected and should be assessed in aggregate/with optional sampled audits, not endlessly corrected image-by-image. License/attribution declarations must still be checked mechanically, and research eligibility remains distinct from Formal R1 or commercial release. [D6-A1 implementation backlog](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/103).
 
+**Latest implementation status (2026-11-21):** [D6-A1 PR #105](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/pull/105) is **merged**, adding [`scripts/d6a_research_qa.py`](../scripts/d6a_research_qa.py), [runbook](implementation/D6A1_RESEARCH_AUTO_QA.md), and synthetic tests. It only generates source/window eligibility decisions and crop recipes; **no real OAM-TCD QA pilot, new training products, or GPU training has been run**. The next stage is the **unexecuted, separately gated** [D6-A2 pilot, Issue #106](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/106). The earlier inventory below remains useful as the design history.
+
 ### Existing foundation
 
 - `scripts/research_patches.py`: deterministic per-ID/seed crop positions, geometric black-support exclusions, area resampling, fraction/binary mask, product readback/hashes. It currently creates `coverage_review=PENDING_VISUAL_REVIEW`.
@@ -40,7 +42,7 @@ The D5 exploratory research run `d5-v5-main280-01` completed **280 training upda
 ### Work sequence and evidence
 
 - **A0, now — inventory/policy review:** [D6-A audit](implementation/D6A_OBJECTIVE_QA_POLICY_AUDIT.md) lists existing automatic vs visual conditions, missing semantic guarantees and proposed objective research-only statuses. Review policy risks; don't call them accepted before approval.
-- **A1, later reviewed code PR — objective decision engine:** synthetic fixtures cover edge/internal black, exact-white features, official holdout, duplicate/near-source, missing STAC, grayscale/invalid TIFF, source hash/CRS failures, no eligible crop, all-zero/all-one masks and reordered processing. No real mass data processing.
+- **A1, IMPLEMENTED/REVIEWED in PR #105 — objective decision engine:** synthetic fixtures cover edge/internal black, exact-white features, official holdout, duplicate/near-source, missing STAC, grayscale/invalid TIFF, source hash/CRS failures, no eligible crop, all-zero/all-one masks and reordered processing. No real mass data processing.
 - **A2, separately approved bounded real-data pilot:** evaluate automated eligibility counts, HOLD/EXCLUDE reason distribution, source diversity, overlap, peak RAM, throughput and restart/idempotence. Compare with old Phase C human/Codex assessments as an **independent diagnostic**, not manual approval overrides.
 - **A3, after review — expand mechanically eligible dataset** with stable source-level selection and frozen Train/Val separation; preserve original research v5/Val18 and Formal R1 artifacts unchanged. Coordinate final artifact format and transfer with deferred D6-B.
 
@@ -80,7 +82,7 @@ The D5 exploratory research run `d5-v5-main280-01` completed **280 training upda
 | --- | --- |
 | D5 Step280 initial-learning feasibility | Achieved in the bounded exploratory sense; not practical accuracy |
 | D5 Step280 full Val18 evidence and remote preservation | **PASS**, frozen [archival record](implementation/D5B2B_STEP280_VAL18_RECOVERY_RECORD.md) |
-| D6-A objective auto-QA rule and scalable preprocessing | **A0 INVENTORY PROPOSED; no code or real data execution yet**, [rule-dependency audit](implementation/D6A_OBJECTIVE_QA_POLICY_AUDIT.md) |
+| D6-A objective auto-QA rule and scalable preprocessing | **A1 code merged, A2 real-data pilot NOT STARTED**; [PR #105](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/pull/105), [A2 Issue #106](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/106); still no training product generation or real-data conversion |
 | D6-B interruption/resume + resource budget trial | **DEFERRED: implement/test when next approved training experiment is prepared** ([Issue #100](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/100)) |
 | New dataset/source rights/label acceptance | **PENDING**, no automatic promotion |
 | Enlarged GPU training campaign | **NOT AUTHORIZED** |
