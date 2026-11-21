@@ -4,7 +4,7 @@
 
 **Original status at writing:** PROPOSED design for review (2026-11-06), with no new training/acceptance then claimed.
 
-**Authority:** [Project Charter](PROJECT_CHARTER.md) > [Design Principles](DESIGN_PRINCIPLES.md) > [Satlas-first ADR](decisions/ADR_20261101_SATLAS_FIRST.md). This is the **active execution plan** anticipated by the charter; [EXPERIMENT_PLAN.md](EXPERIMENT_PLAN.md) is a historical, superseded Restor-checkpoint A/B/C study, **not** the current execution instruction. Detailed Zenodo decisions/evidence remain in [M1-5A inventory and M1-5D notes](implementation/M1_5A_DATASET_INVENTORY.md) and [M1-5B pilot/result ledger](implementation/M1_5B_PILOT_RESULT.json).
+**Original authority and historical context:** [Project Charter](PROJECT_CHARTER.md) > [Design Principles](DESIGN_PRINCIPLES.md) > [Satlas-first ADR](decisions/ADR_20261101_SATLAS_FIRST.md). This **was the proposed active plan when written in 2026-11-06**; it is no longer the live execution instruction. [EXPERIMENT_PLAN.md](EXPERIMENT_PLAN.md) is an even older, superseded Restor-checkpoint A/B/C study. Detailed Zenodo decisions/evidence remain in [M1-5A inventory and M1-5D notes](implementation/M1_5A_DATASET_INVENTORY.md) and [M1-5B pilot/result ledger](implementation/M1_5B_PILOT_RESULT.json).
 
 ## 1. Purpose and non-goals
 
