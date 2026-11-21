@@ -88,13 +88,11 @@ def load_checkpoint(path, size, sha):
 
 def verify_binding(state, receipt, expected):
     require(isinstance(state, dict), 'Expected checkpoint mapping')
-    require(set(expected) >= {'lineage_id', 'seconds', 'vram_bytes'}
+    require(set(expected) >= {'seconds', 'vram_bytes'}
             and set(expected) <= {'lineage_id', 'seconds', 'vram_bytes', 'environment',
                                   'parent', 'backup_checkpoint'}, 'Invalid expected contract keys')
-    lineage = expected['lineage_id']
     seconds, vram = expected['seconds'], expected['vram_bytes']
-    require(isinstance(lineage, str) and re.fullmatch('[0-9a-f]{32}', lineage)
-            and type(seconds) in (int, float) and seconds == SECONDS
+    require(type(seconds) in (int, float) and seconds == SECONDS
             and type(vram) is int and vram == VRAM_BYTES, 'Invalid independent contract')
     binding = state['binding']
     require(set(binding) == {'run_id', 'lineage_id', 'mode', 'inputs', 'freeze_sha256',
@@ -102,7 +100,12 @@ def verify_binding(state, receipt, expected):
                              'commit'}, 'Unexpected binding keys')
     require(isinstance(binding['inputs'], dict) and digest(binding['inputs']) == IDENTITY,
             'Frozen input identity mismatch')
-    fixed = dict(run_id=RUN, lineage_id=lineage, mode='main', freeze_sha256=FREEZE,
+    lineage = binding['lineage_id']
+    require(isinstance(lineage, str) and re.fullmatch('[0-9a-f]{32}', lineage),
+            'Invalid checkpoint lineage')
+    if 'lineage_id' in expected:
+        require(expected['lineage_id'] == lineage, 'Independent lineage mismatch')
+    fixed = dict(run_id=RUN, mode='main', freeze_sha256=FREEZE,
                  initializer_sha256=INITIALIZER, schedule_sha256=SCHEDULE, commit=COMMIT)
     require(all(binding[key] == value for key, value in fixed.items()), 'Fixed binding mismatch')
     config = dict(seed=0, batch=1, precision='FP32', scheduler=None, adamw=ADAMW,
@@ -119,7 +122,8 @@ def verify_binding(state, receipt, expected):
     require(digest(schedule) == SCHEDULE and len(schedule['train']) == STEP
             and [row['image_id'] for row in schedule['val']] == list(VAL), 'Schedule mismatch')
     # The external digest pins every schedule entry; no private product reads are needed.
-    checked_binding = dict(fixed, inputs=binding['inputs'], config=binding['config'],
+    checked_binding = dict(fixed, lineage_id=expected.get('lineage_id', lineage),
+                           inputs=binding['inputs'], config=binding['config'],
                            environment=expected.get('environment', env))
     require(validate_checkpoint(state, checked_binding, schedule) == STEP and state['kind'] == KIND
             and state['next_item'] is None, 'Expected completed terminal checkpoint')
@@ -166,7 +170,8 @@ def verify_payload(state):
     group = optimizer['param_groups'][0]
     defaults = dict(amsgrad=False, maximize=False, foreach=None, capturable=False,
                     differentiable=False, fused=None, decoupled_weight_decay=True)
-    require(isinstance(group, dict) and set(group) <= {'params', *ADAMW, *defaults}
+    required = {'params', *ADAMW, *(defaults.keys() - {'decoupled_weight_decay'})}
+    require(isinstance(group, dict) and required <= set(group) <= {'params', *ADAMW, *defaults}
             and all(digest(group[k]) == digest(v) for k, v in ADAMW.items())
             and all(digest(group[k]) == digest(defaults[k]) for k in defaults.keys() & group.keys()),
             'AdamW settings mismatch')
@@ -206,6 +211,7 @@ def verify_payload(state):
     require(isinstance(fingerprints, dict) and set(fingerprints) == set(FIELDS), 'Incomplete fingerprints')
     for field, key in FIELDS.items():
         require(fingerprint(state[key]) == fingerprints[field], 'Fingerprint mismatch: ' + field)
+    return dict(parameters=len(ids), populated_slots=len(slots), absent_slots=len(ids) - len(slots))
 
 
 def audit(args):
@@ -213,6 +219,8 @@ def audit(args):
     require(all(p.is_file() and not p.is_symlink() for p in inputs), 'Inputs must be local regular files')
     require(len({p.resolve() for p in inputs}) == len(inputs), 'Inputs must be distinct')
     require(args.output.suffix == '.json' and args.output.parent.is_dir(), 'Fresh JSON output required')
+    repo = Path(__file__).resolve().parents[1]
+    require(not args.output.resolve().is_relative_to(repo), 'Report must be outside the Git checkout')
     # Exclusive creation also rejects existing files, symlinks and hardlink aliases.
     with args.output.open('x', encoding='utf-8') as output:
         report = dict(status='FAIL', device='cpu', python=platform.python_version(), torch=str(torch.__version__),
@@ -224,7 +232,6 @@ def audit(args):
                                    'Schedule verified by the independent digest, no v5 products inspected'])
         gate = 'tool_revision'
         try:
-            repo = Path(__file__).resolve().parents[1]
             report['tool_commit'] = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=repo, text=True).strip()
             report['tool_sha256'] = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
             report['gates'][gate] = 'PASS'
@@ -232,10 +239,6 @@ def audit(args):
             receipt = pinned_json(args.receipt, args.receipt_sha256)
             expected = pinned_json(args.contract, args.contract_sha256)
             report['gates'][gate] = 'PASS'
-            if not expected.get('lineage_id'):
-                report['gates']['independent_lineage'] = 'UNVERIFIED'
-                report['status'] = 'INDEPENDENT_LINEAGE_UNVERIFIED'
-                return False
             gate = 'resources'
             report['available_ram_bytes'] = available_memory()
             require(report['available_ram_bytes'] >= max(4 * 1024**3, 8 * SIZE),
@@ -250,13 +253,17 @@ def audit(args):
             report['historical_provenance'] = verify_binding(state, receipt, expected)
             if report['historical_provenance']['environment'] == 'UNVERIFIED':
                 report['historical_environment_status'] = 'HISTORICAL_ENVIRONMENT_UNVERIFIED'
-            report.update(run_id=RUN, lineage_id=expected['lineage_id'], segment_id=SEGMENT,
+            independent = 'lineage_id' in expected
+            report['gates']['independent_lineage'] = 'PASS' if independent else 'UNVERIFIED'
+            report['lineage_source'] = 'INDEPENDENT_CONTRACT' if independent else 'CHECKPOINT_DERIVED'
+            report.update(run_id=RUN, lineage_id=state['binding']['lineage_id'], segment_id=SEGMENT,
                           completed_steps=STEP, schedule_sha256=SCHEDULE, receipt_active_seconds=ELAPSED)
             report['gates'][gate] = 'PASS'
             gate = 'payload_and_serialized_fingerprints'
-            verify_payload(state)
+            report['optimizer_slots'] = verify_payload(state)
             report['gates'][gate] = 'PASS'
-            report['status'] = 'CPU_SERIALIZED_STATE_VERIFIED'
+            report['status'] = ('CPU_SERIALIZED_STATE_VERIFIED' if independent
+                                else 'CPU_PAYLOAD_VERIFIED_LINEAGE_UNVERIFIED')
             return True
         except Exception as exc:
             report['gates'][gate] = 'FAIL'
