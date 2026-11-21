@@ -1,6 +1,26 @@
 # OUEM Canopy Segmentation — Next Roadmap
 
-Revision **2026-11-18**, Phase C closure and research experiment-preparation handoff. This roadmap is subordinate to the [Project Charter](PROJECT_CHARTER.md), [Design Principles](DESIGN_PRINCIPLES.md) and [Satlas-first ADR](decisions/ADR_20261101_SATLAS_FIRST.md). The M1/M2/D0–D5 scope remains in force.
+Revision **2026-11-21** — D5 exploratory learning milestone and D6 design handoff. This roadmap remains subordinate to the [Project Charter](PROJECT_CHARTER.md), [Design Principles](DESIGN_PRINCIPLES.md) and [Satlas-first ADR](decisions/ADR_20261101_SATLAS_FIRST.md). The Charter's M1/M2/D0–D5 scope remains in force; D6-A/B here name *research workstreams*, not new formal acceptance gates.
+
+## Current work order: D5 baseline achieved; D6-A/B planning (2026-11-21)
+
+**Achieved in the bounded exploratory sense:** v5 Train **70 originals / 139 windows**, Val **18 originals / 18 fixed windows**; original D5 **280-update GPU run** completed; original Step280 checkpoint pinned and recovered on GEEKOM-A6 CPU. Visually meaningful source-domain canopy predictions were generated. Full fixed Val18 recomputation covered **18 windows / 903,168 pixels**, reporting micro IoU **0.616** and macro IoU **0.407**; **22 evidence files** passed local-copy and independent private Drive remote readback checks. [D5-B2 record](implementation/D5B2B_STEP280_VAL18_RECOVERY_RECORD.md), [Issue #95](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/95).
+
+**Boundary:** this proves preliminary learning feasibility and the recovery/evidence process, **not** representative accuracy, original GPU-to-CPU output equivalence or Japanese target-domain suitability. **Formal R1 remains 0/150 accepted / HOLD.** The owner paused detailed fixed-Val18 FP/FN causal, threshold and architecture analysis until a larger, better-controlled experiment can inform it. Preserve Step280 and frozen v5 as immutable historical references.
+
+| Proposed workstream | Immediate planning deliverable | Gate before scaling |
+| --- | --- | --- |
+| **D6-A — portable deterministic preprocessing** | Pin source bytes/rights, Tree+Canopy label mapping, resampling/grid/rounding, crop selection, seed/ordering, dependencies and reproducible manifest; plan bounded automated batches with reviewed QA | Run the **same pinned sources and recipe on two authorized PC environments**; compare pixel arrays, label fractions/masks, CRS, affine, chosen windows, identities; fail closed on rejected inputs. Byte-identical TIFF is desirable, but distinct from required pixel/metadata equality |
+| **D6-B — bounded GPU and storage operations** | Check **current dynamic** Colab/Kaggle/Drive limits, VRAM and temporary/durable storage, transferred shard sizes, checkpoint size/cadence, retention and cost; specify cold-resume experiment | Small *separately authorized* GPU interruption test: stage and hash-check immutable data on scratch, checkpoint full training/sampler/RNG state, independently read back durable upload, lose runtime and resume. No fixed free-hour or free-storage guarantee |
+| **Joint data and experiment plan** | Determine target volume and diversity from measured availability and resource budget; preserve source-level Train/Val separation and official holdout; plan independent Japan-positive evaluation | Fresh approved dataset freeze, evaluation policy and owner decision before full GPU training; Formal R1 acceptance remains separate |
+
+**Ordering:** D6-A and D6-B may be designed in parallel; **which to implement first is still undecided**. Any change in data source, label/threshold, preprocessing contract, external service, paid resources or GPU execution needs a separate reviewed and owner-approved gate. Use existing Satlas SwinB + FPN + SEGMENT2 as the default model; don't assert a data/step increase must improve performance.
+
+Use [D6-A/B detailed baseline](D6_PREPROCESSING_GPU_OPERATIONS_PLAN.md) for the proposed differential-test and GPU/storage-resilience criteria. No D6 implementation or new training was performed by this documentation update.
+
+## Historical roadmap — 2026-11-18 Phase C closure
+
+The following Phase C execution plan and subsequent 2026-11-07/14 R0–R5 snapshot are preserved for decision provenance. References below to *next* GEEKOM preflight, new v5 CUDA bridge or a GPU run *pending* were accurate on 2026-11-18 but are **superseded by the D5 record above**.
 
 ## 2026-11-18 research-only path after Phase C
 
