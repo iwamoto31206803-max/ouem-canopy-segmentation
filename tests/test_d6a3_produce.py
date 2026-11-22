@@ -140,7 +140,74 @@ def test_interrupt_publication_and_resume(synthetic,where):
         assert len(D6Data(out,result['manifest_sha256']).samples)==2
 
 
-@pytest.mark.parametrize('mode',['corrupt','missing','orphan_claim','input','casefold'])
+def test_interrupt_after_manifest_link_before_unlink(synthetic, monkeypatch):
+    run, out, _, _, _ = synthetic
+    published = out / 'manifest.json'
+    partial = out / '.manifest.partial'
+    unlink = Path.unlink
+
+    def interrupt(path, *args, **kwargs):
+        if path == partial:
+            assert published.samefile(partial)
+            raise RuntimeError('interrupted after manifest hardlink')
+        return unlink(path, *args, **kwargs)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(Path, 'unlink', interrupt)
+        with pytest.raises(RuntimeError, match='after manifest hardlink'):
+            run()
+
+    def hashes():
+        return {path.relative_to(out): p.qa.sha(path) for path in out.rglob('*') if path.is_file()}
+
+    frozen = hashes()
+    pin = frozen[Path('manifest.json')]
+    assert frozen[Path('.manifest.partial')] == pin
+    with pytest.raises(ValueError, match='GENERATION_NOT_FROZEN'):
+        D6Data(out, pin)
+    with pytest.raises(ValueError, match='FROZEN_MANIFEST_MISMATCH'):
+        run(resume=True)
+    assert hashes() == frozen
+    assert published.samefile(partial)
+
+    # Simulate the separately authorized operator reconciliation.
+    partial.unlink()
+    assert len(D6Data(out, pin).samples) == 2
+    assert hashes() == {path: sha for path, sha in frozen.items() if path != Path('.manifest.partial')}
+
+
+@pytest.mark.parametrize('folder',['sources','commits'])
+def test_casefold_collision_blocks_producer_and_reader(synthetic, monkeypatch, folder):
+    run, out, _, _, _ = synthetic
+    result = run()
+    directory = out / folder
+    original = next(path for path in directory.iterdir() if path.name != path.name.upper())
+    alias = original.with_name(original.name.upper())
+    assert original.name != alias.name and original.name.casefold() == alias.name.casefold()
+    if alias.exists():
+        # Case-insensitive Windows cannot create both entries in this directory.
+        iterdir = Path.iterdir
+
+        def entries(path):
+            yield from iterdir(path)
+            if path == directory:
+                yield alias
+
+        monkeypatch.setattr(Path, 'iterdir', entries)
+    elif original.is_dir():
+        alias.mkdir()
+    else:
+        alias.write_bytes(original.read_bytes())
+    with pytest.raises(ValueError, match='CASEFOLD_COLLISION'):
+        p.inventory(directory)
+    with pytest.raises(ValueError, match='CASEFOLD_COLLISION'):
+        D6Data(out, result['manifest_sha256'])
+    with pytest.raises(ValueError, match='CASEFOLD_COLLISION'):
+        run(resume=True)
+    assert p.qa.sha(out/'manifest.json') == result['manifest_sha256']
+
+
+@pytest.mark.parametrize('mode',['corrupt','missing','orphan_claim','input','unexpected_inventory'])
 def test_fail_closed_without_repair(synthetic,mode):
     run,out,_,_,inputs=synthetic
     result=run()
