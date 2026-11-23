@@ -1,6 +1,6 @@
 # OUEM Canopy Segmentation — Next Roadmap
 
-Revision **2026-11-21** — D5 exploratory learning milestone and D6 design handoff. This roadmap remains subordinate to the [Project Charter](PROJECT_CHARTER.md), [Design Principles](DESIGN_PRINCIPLES.md) and [Satlas-first ADR](decisions/ADR_20261101_SATLAS_FIRST.md). The Charter's M1/M2/D0–D5 scope remains in force; D6-A/B here name *research workstreams*, not new formal acceptance gates.
+Revision **2026-11-23** — D5 milestone preserved; D6-A3-1 synthetic completion and A3-2-0 preflight handoff. This roadmap remains subordinate to the [Project Charter](PROJECT_CHARTER.md), [Design Principles](DESIGN_PRINCIPLES.md) and [Satlas-first ADR](decisions/ADR_20261101_SATLAS_FIRST.md). The Charter's M1/M2/D0–D5 scope remains in force; D6-A/B here name *research workstreams*, not new formal acceptance gates.
 
 ## Current work order: D6-A3-1 synthetic implementation complete; A3-2-0 preflight design next (2026-11-23)
 
