@@ -369,8 +369,17 @@ def main():
         parser.add_argument('--'+name,type=Path,required=True)
     parser.add_argument('--plan-sha256',required=True)
     parser.add_argument('--resume',action='store_true')
+    parser.add_argument('--real-approval',type=Path)
+    parser.add_argument('--real-approval-sha256')
     args=parser.parse_args()
     try:
+        if args.real_approval is not None or args.real_approval_sha256 is not None:
+            from d6a32_gate import gate
+            need(args.real_approval is not None and args.real_approval_sha256 and not args.resume,
+                 'REAL_APPROVAL_REQUIRED')
+            gate(args.plan,args.plan_sha256,args.real_approval,args.real_approval_sha256,
+                 args.root,args.evidence)
+            raise ValueError('REAL_OUTPUT_NOT_ENABLED')
         result=produce(args.plan,args.plan_sha256,args.root,args.evidence,args.output,resume=args.resume)
     except (ValueError,OSError,RuntimeError,KeyError,TypeError) as exc:
         parser.exit(1,f'D6 STOP: {type(exc).__name__}: {exc.args[0] if isinstance(exc,ValueError) else "inspect private stage"}\n')
