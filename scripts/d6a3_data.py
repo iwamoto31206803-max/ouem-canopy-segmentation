@@ -19,8 +19,16 @@ class D6Data:
         body = {k:v for k,v in manifest.items() if k != 'generation_id'}
         need(identifier(body) == manifest['generation_id'], 'GENERATION_ID_MISMATCH')
         plan = pinned(safe_path(self.root,'plan.json'), manifest['plan_sha256'])
-        need(plan['schema'] == PLAN and plan['mode'] == 'synthetic'
-             and plan['windows_per_source'] == {'train':1,'val':1}, 'D6_PLAN_BINDING')
+        from d6a32_gate import GT54, PLAN as REAL_PLAN, STORAGE_POLICY
+        real = plan['schema'] == REAL_PLAN
+        need(plan['windows_per_source'] == {'train':1,'val':1} and (
+             (not real and plan['schema'] == PLAN and plan['mode'] == 'synthetic' and 'mode' not in manifest)
+             or (real and manifest['mode']=='real-pilot'
+                 and manifest['source_generation']==plan['source_generation']==GENERATION
+                 and plan['storage_policy']==STORAGE_POLICY and plan['gt54']==GT54)), 'D6_PLAN_BINDING')
+        planned = {s['image_id']:s for s in plan['sources']} if real else {}
+        if real:
+            need(len(planned)==len(plan['sources']) and len(planned)<=4, 'D6_PLAN_SCOPE')
         self.identity = dict(dataset_id=manifest['generation_id'], manifest_sha256=manifest_sha256,
                              source_generation=GENERATION, purpose='EXPLORATORY_RESEARCH_ONLY')
         refs = manifest['source_receipts']
@@ -45,6 +53,14 @@ class D6Data:
                  and type(fold) is int and 0 <= fold <= 4 and split == ('val' if fold==0 else 'train')
                  and receipt['source_hash_verification'] in AUTH & set(plan['allow_authenticity'])
                  and key == identifier([GENERATION,rid,oid,alias]), 'D6_SOURCE_IDENTITY')
+            if real:
+                source = planned[rid]
+                need(type(source['image_id']) is int and all(receipt[k]==source[k] for k in (
+                     'image_id','oam_id','split','validation_fold','source_object_sha256','crop_xywh',
+                     'stac_sha256','source_hash_verification','historical_train_reuse'))
+                     and receipt['input_sha256']==source['source_hashes']
+                     and receipt['a1_output_shape']==source['output_shape']
+                     and receipt['a1_crop_transform']==source['crop_transform'], 'D6_REAL_SOURCE_BINDING')
             validate_source(path.parent, receipt, dict(schema=RECEIPT,source_key=key,
                             patch_id=identifier([manifest['plan_sha256'],key,crop]),
                             plan_sha256=manifest['plan_sha256'],final_decision=ELIGIBLE))
@@ -53,7 +69,7 @@ class D6Data:
             self.samples[rid] = dict(image_id=rid,oam_id=oid,split=split,grid=receipt['full_grid'])
             self.crop_positions[rid] = [tuple(crop[:2])]
             self._records[rid] = (receipt,ref['sha256'],path)
-        need(list(self.samples)==plan['source_ids'] and roles==manifest['eligible_ids']
+        need(list(self.samples)==(list(planned) if real else plan['source_ids']) and roles==manifest['eligible_ids']
              and roles['train'] and roles['val'], 'FROZEN_ALLOWLIST')
 
     def patch(self, item, split):

@@ -1,4 +1,4 @@
-"""Windows guarded worker for synthetic D6 product staging."""
+"""Windows Job supervision for D6 staging or a complete pilot attempt."""
 import ctypes
 from ctypes import wintypes
 import os
@@ -17,9 +17,10 @@ class Memory(ctypes.Structure):
                                            'nonpaged_peak', 'nonpaged', 'commit', 'commit_peak')]
 
 
-def watch(args, limits):
+def watch(args, limits, *, attempt=False):
     if sys.platform != 'win32' or available_memory() < limits['host_available_bytes']:
         raise RuntimeError('RESOURCE_STOP: Windows enforcement or host RAM unavailable')
+    deadline = limits['attempt_seconds' if attempt else 'seconds']
     read = ctypes.WinDLL('psapi', use_last_error=True).GetProcessMemoryInfo
     read.argtypes = [wintypes.HANDLE, ctypes.POINTER(Memory), wintypes.DWORD]
     read.restype = wintypes.BOOL
@@ -31,7 +32,8 @@ def watch(args, limits):
         bootstrap = (
             "import sys; assert sys.stdin.buffer.read(1)==b'1'; "
             "sys.path[:0]=sys.argv[1:3]; "
-            "from d6a3_produce import worker; worker(*sys.argv[3:])"
+            + ("from d6a32_gate import run_guarded; run_guarded(*sys.argv[3:])" if attempt
+               else "from d6a3_produce import worker; worker(*sys.argv[3:])")
         )
         site = Path(sys.prefix) / 'Lib' / 'site-packages'
         env = dict(os.environ, OPENBLAS_NUM_THREADS='1', OMP_NUM_THREADS='1', MKL_NUM_THREADS='1',
@@ -39,7 +41,8 @@ def watch(args, limits):
         process = subprocess.Popen(
             [sys._base_executable, '-I', '-B', '-S', '-c', bootstrap, str(site),
              str(Path(__file__).parent), *map(str, args)],
-            stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE if attempt else subprocess.DEVNULL,
+            stderr=None if attempt else subprocess.DEVNULL,
             env=env, creationflags=subprocess.CREATE_NO_WINDOW)
         job.assign(process)
         process.stdin.write(b'1')
@@ -52,17 +55,53 @@ def watch(args, limits):
                 raise RuntimeError('RESOURCE_STOP: peak working set unavailable')
             peak = max(peak, counters.peak)
             elapsed = time.monotonic() - start
-            if peak >= limits['rss_bytes'] or elapsed >= limits['seconds']:
+            if peak >= limits['rss_bytes'] or elapsed >= deadline:
                 raise RuntimeError('RESOURCE_STOP: peak working set or deadline exceeded')
             if code is not None:
+                if attempt and code == 124:
+                    raise RuntimeError('RESOURCE_STOP: source deadline exceeded')
                 if code:
-                    raise RuntimeError('WORKER_FAILED: incomplete stage retained')
-                return dict(elapsed_seconds=elapsed, peak_rss_bytes=peak,
-                            peak_commit_bytes=job.query().peak_job)
+                    raise RuntimeError('WORKER_FAILED: inspect private output for any retained stage')
+                stats = dict(elapsed_seconds=elapsed, peak_rss_bytes=peak,
+                             peak_commit_bytes=job.query().peak_job)
+                if attempt:
+                    from d6a_research_qa import strict_json
+                    return dict(strict_json(process.stdout.read(4096)), attempt_measurements=stats)
+                return stats
             time.sleep(.025)
     finally:
         job.close()
         if process is not None:
             if process.poll() is None:
                 process.kill()
-            process.wait()
+            process.wait(timeout=5)
+            if process.stdout is not None:
+                process.stdout.close()
+
+
+def allocated_bytes(path):
+    """AllocationSize for a regular output file on the local Windows filesystem."""
+    import msvcrt
+
+    class FileStandardInfo(ctypes.Structure):
+        _fields_ = [('allocation', ctypes.c_int64), ('eof', ctypes.c_int64),
+                    ('links', wintypes.DWORD), ('delete_pending', ctypes.c_ubyte),
+                    ('directory', ctypes.c_ubyte)]
+
+    info = FileStandardInfo()
+    query = ctypes.WinDLL('kernel32', use_last_error=True).GetFileInformationByHandleEx
+    query.argtypes = [wintypes.HANDLE, ctypes.c_int, ctypes.c_void_p, wintypes.DWORD]
+    query.restype = wintypes.BOOL
+    with path.open('rb') as stream:
+        if not query(msvcrt.get_osfhandle(stream.fileno()), 1, ctypes.byref(info), ctypes.sizeof(info)):
+            raise RuntimeError('RESOURCE_STOP: file allocation unavailable')
+    return info.allocation
+
+def require_local_fixed(*paths):
+    if sys.platform != 'win32':
+        raise RuntimeError('RESOURCE_STOP: Windows enforcement unavailable')
+    drive_type = ctypes.WinDLL('kernel32', use_last_error=True).GetDriveTypeW
+    drive_type.argtypes = [wintypes.LPCWSTR]
+    drive_type.restype = wintypes.UINT
+    if any(drive_type(path.absolute().anchor) != 3 for path in paths):
+        raise RuntimeError('RESOURCE_STOP: local fixed drives required')

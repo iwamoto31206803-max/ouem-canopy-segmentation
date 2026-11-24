@@ -17,7 +17,8 @@ from research_patches import crop_arrays
 
 
 @pytest.fixture
-def synthetic(tmp_path):
+def synthetic(tmp_path, request):
+    size = getattr(request, 'param', 320)
     inputs=tmp_path/'inputs'
     root,evidence=inputs/'cache',inputs/'stac'
     evidence.mkdir(parents=True)
@@ -27,21 +28,24 @@ def synthetic(tmp_path):
     folders={d:root/f'extracted/dataset/holdout/{d}' for d in ('images','masks')}
     for path in folders.values(): path.mkdir(parents=True)
     rows=[]; candidates=[]; results=[]; arrays={}
-    for rid,fold,x in ((1,1,1000),(2,0,20000),(3,-1,40000)):
+    cases = [(1,1,1000),(2,0,20000),(3,-1,40000)]
+    if size == 2048:
+        cases += [(4,2,60000),(5,0,80000)]
+    for rid,fold,x in cases:
         oid=f'fixture-{rid}'
         transform=from_origin(x,128,.47,.46)
-        rgb=np.broadcast_to((np.arange(320)%256)[None,:,None],(320,320,3)).astype(np.uint8).copy()
-        teacher=np.full((320,320),int(rid==2),np.uint8)
+        rgb=np.broadcast_to((np.arange(size)%256)[None,:,None],(size,size,3)).astype(np.uint8).copy()
+        teacher=np.full((size,size),int(rid==2),np.uint8)
         if rid==2:
             teacher[:,155:165]=0
         row=dict(image_id=rid,oam_id=oid,validation_fold=fold,license='CC-BY 4.0',
-                 width=320,height=320,crs='EPSG:3395',bounds=list(rasterio.transform.array_bounds(320,320,transform)),
+                 width=size,height=size,crs='EPSG:3395',bounds=list(rasterio.transform.array_bounds(size,size,transform)),
                  meta=f'https://metadata.example/{oid}.json')
         rows.append(row)
         if fold==-1:
             continue
         image,ann=folders['images']/f'{oid}_{rid}.tif',folders['masks']/f'{oid}_{rid}.png'
-        with rasterio.open(image,'w',driver='GTiff',height=320,width=320,count=3,dtype='uint8',
+        with rasterio.open(image,'w',driver='GTiff',height=size,width=size,count=3,dtype='uint8',
                            crs=row['crs'],transform=transform) as ds:
             ds.write(rgb.transpose(2,0,1))
         Image.fromarray(np.repeat(teacher[:,:,None],3,axis=2)).save(ann)
@@ -55,7 +59,7 @@ def synthetic(tmp_path):
         can=dict(image_id=rid,oam_id=oid,validation_fold=fold,stac_sha256=p.qa.sha(stac))
         if rid==1: can['source_hashes']=hashes
         candidates.append(can)
-        shape,grid,_=p.qa.output_grid(row['crs'],transform,320,320)
+        shape,grid,_=p.qa.output_grid(row['crs'],transform,size,size)
         crop=[37,61,224,224]
         arrays[rid],patch=crop_arrays(rgb,teacher,shape,grid,crop)
         results.append(dict(image_id=rid,oam_id=oid,official_split='train',validation_fold=fold,
@@ -65,7 +69,8 @@ def synthetic(tmp_path):
              source_hashes=hashes,source_hash_verification=(
                  'MATCHED_EXTERNAL_EXPECTED_SHA256' if rid==1 else 'SOURCE_AUTHENTICITY_NOT_EXTERNALLY_VERIFIED'),
              coco_categories=[1] if rid==2 else []))
-    for name,seq in [('train',rows[:2]),('test',rows[2:])]:
+    for name,seq in [(name,[r for r in rows if (r['validation_fold']==-1)==(name=='test')])
+                     for name in ('train','test')]:
         all_files[name].write_bytes(b''.join(p.canonical(r) for r in seq))
     all_files['coco'].write_bytes(p.canonical({'annotations':[{'image_id':2,'id':2,'category_id':1}]}))
     catalog={k:p.qa.sha(v) for k,v in all_files.items()}
