@@ -1,6 +1,6 @@
 # D6-A3-1 synthetic producer and reader
 
-The CLI is restricted to synthetic fixtures. It requires a synthetic plan, a cache marker containing `D6-A3-1 SYNTHETIC FIXTURE` plus a newline, and fixture scenes no larger than 512×512. A3-2 real imagery requires separate review and authorization. Keep all synthetic inputs and outputs outside the Git tree. The tests construct the full contract and fixtures.
+The original A3-1 CLI mode remains the default and is restricted to synthetic fixtures. It requires a synthetic plan, a cache marker containing `D6-A3-1 SYNTHETIC FIXTURE` plus a newline, and fixture scenes no larger than 512×512. A3-2 real imagery requires separate review and authorization. Keep all synthetic inputs and outputs outside the Git tree. The tests construct the full contract and fixtures.
 
 ```powershell
 python -B scripts/d6a3_produce.py --plan C:/synthetic/inputs/plan.json `
@@ -25,10 +25,6 @@ Each compressed TIFF is encoded in a GDAL MemoryFile and accepted for disk write
 
 The CLI needs no model weights, package download, cloud mount or CUDA. Review changes to the admission, protected-source, resource or crop policy separately.
 
-## A3-2 approval preflight
+## A3-2 real-pilot path
 
-The optional pair `--real-approval <reviewed-token.json>` and `--real-approval-sha256 <independent-pin>` checks a separately pinned `d6-real-pilot-plan-v1` and `d6-real-pilot-approval-v1` token. The token binds the exact plan SHA and one bounded real-output pilot. This command path is restricted to metadata verification. It stops before raster opens, staging or output, because a physical volume quota and whole-attempt coordinator guard have yet to be demonstrated. The ordinary CLI remains synthetic-only.
-
-The proposal binds two A1 report/contract pairs, official Train/Test/COCO hashes, historical v5 freeze/source index, STAC pins, exact source identities and original crops, a two-per-role cap, both authenticity classes under an explicit policy, and positive resource limits. Same-role historical Train reuse is tracked. Historic Val18 and official Test are protected. GT54 is deferred and geographic independence remains unverified. The approved stage generated A1 recipes for six fresh Val sources; no real output token was issued.
-
-For a future reviewer-approved implementation, use a dedicated, same-volume local NTFS staging/output root with a demonstrable 64 MiB physical cap. A provisioned size-bounded volume or an existing scoped enforced quota must be tested for allocated bytes, headroom and overflow on the intended volume. Retain MemoryFile logical reservations and explicit 4 MiB per stage / 16 MiB total logical ceilings. The proposed limits also require 6 GiB host available, at least 256 MiB free underlying headroom, 2.5 GiB worker commit, 2 GiB sampled-peak RSS cutoff, 120 s/source and a 600 s attempt cap. Reuse the Windows Job worker guard and add coordinator deadline/RAM coverage before enabling execution. Confirm same-volume hardlink/rename, junction rejection, kill/wait/reap and restart accounting with synthetic or fake-real inputs first. No host configuration change or real file generation was performed here.
+The optional real approval flags select the separately pinned and authorized real route. The reviewed implementation ran the four-source A3-2b pilot with the Windows Job and observed allocation control. See the [bounded pilot contract and result](D6A3_BOUNDED_PILOT.md) for the approval binding, measured resources and scope.
