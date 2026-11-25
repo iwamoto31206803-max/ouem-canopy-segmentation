@@ -1,5 +1,7 @@
-"""D6 research patch producer, restricted to synthetic A3-1 fixtures."""
+"""D6 research patch producer, using synthetic fixtures by default."""
 import argparse
+from contextlib import contextmanager, nullcontext
+import threading
 from collections import Counter
 import hashlib
 import json
@@ -252,10 +254,16 @@ def validate_source(folder, receipt, expected):
     return arrays
 
 
-def stage_source(root, stage, expected, row, allowance, hook=lambda _: None):
+def stage_source(root, stage, expected, row, allowance, hook=lambda _: None, *, real=False):
     paths=source_paths(root,row)
     need({k:qa.sha(p) for k,p in paths.items()}==expected['input_sha256'], 'INPUT_PIN_MISMATCH')
     rgb, teacher, shape, affine, gsd=qa.decode(row,paths,expected['categories'])
+    if real:
+        from research_patches import blocked_grid, component_report
+        x,y,w,h=expected['crop_xywh']
+        need(all(a<=b for a,b in zip(shape,teacher.shape)), 'UPSCALE_REQUIRED')
+        _, border, _=component_report(np.all(rgb==0,axis=2),teacher,4)
+        need(not blocked_grid(border,shape)[y:y+h,x:x+w].any(), 'CROP_INTERSECTS_BLACK_SUPPORT')
     arrays, transform=crop_arrays(rgb,teacher,shape,affine,expected['crop_xywh'])
     need(list(shape)==expected['a1_output_shape'] and list(transform)[:6]==expected['a1_crop_transform'],
          'A1_GRID_MISMATCH')
@@ -267,23 +275,82 @@ def stage_source(root, stage, expected, row, allowance, hook=lambda _: None):
     hook('source.json')
 
 
-def worker(root, stage, expected, row, allowance):
+def offline_worker():
     import sys
     def no_network(event, _args):
         if event.startswith('socket.') or event in ('subprocess.Popen','os.system'):
-            raise PermissionError('Synthetic offline worker')
+            raise PermissionError('D6 offline worker')
     sys.addaudithook(no_network)
+
+
+def worker(root, stage, expected, row, allowance):
+    offline_worker()
     stage_source(Path(root),Path(stage),qa.strict_json(expected),qa.strict_json(row),int(allowance))
 
 
+def output_scope(plan, root, evidence, output, extra=()):
+    need(not any(output.is_relative_to(p) or p.is_relative_to(output)
+                 for p in (root,evidence,REPO,plain(plan).parent,*extra)), 'PROTECTED_OUTPUT')
+
+
+@contextmanager
+def source_deadline(seconds):
+    # A killed coordinator intentionally leaves its claim and private stage for reconciliation.
+    timer = threading.Timer(seconds, os._exit, (124,))
+    timer.daemon = True
+    timer.start()
+    try:
+        yield
+    finally:
+        timer.cancel()
+        timer.join()
+
+
+def storage_check(output, limits):
+    from d6a3_guard import allocated_bytes
+
+    need(shutil.disk_usage(output.parent).free>=limits['free_bytes'], 'RESOURCE_STOP: free-space floor')
+    paths = []
+    def collect(directory):
+        for path in inventory(directory).values():
+            if path.is_dir():
+                collect(path)
+            else:
+                need(path.is_file(), 'OUTPUT_NOT_REGULAR')
+                paths.append(path)
+                need(len(paths)<=24, 'RESOURCE_STOP: output file count')
+    if output.exists():
+        collect(output)
+    # A staged and published manifest may briefly reference the same file.
+    sizes = {}
+    for path in paths:
+        sizes[(path.stat().st_dev,path.stat().st_ino)] = allocated_bytes(path)
+    allocated = sum(sizes.values())
+    need(allocated<=limits['physical_bytes'], 'RESOURCE_STOP: observed file allocation')
+    need(sum(path.stat().st_size for path in paths)<=limits['output_bytes'],
+         'RESOURCE_STOP: disk byte cap')
+    return allocated
+
+
 def produce(plan, pin, root, evidence, output, *, resume=False, guard=None, hook=lambda _: None):
+    root,evidence,output=map(plain,(root,evidence,output))
+    output_scope(plan,root,evidence,output)
+    inputs=preflight(plan,pin,root,evidence)
+    return publish(plan,pin,root,output,inputs,resume=resume,guard=guard,hook=hook)
+
+
+def publish(plan, pin, root, output, inputs, *, resume=False, guard=None, hook=lambda _: None, real=False):
     from d6a3_guard import watch
 
-    root,evidence,output=map(plain,(root,evidence,output))
-    need(not any(output.is_relative_to(p) or p.is_relative_to(output)
-                 for p in (root,evidence,REPO,plain(plan).parent)), 'PROTECTED_OUTPUT')
-    limits,sources,rows=preflight(plan,pin,root,evidence)
-    need(output.parent.is_dir() and shutil.disk_usage(output.parent).free>=limits['output_bytes'], 'DISK_HEADROOM')
+    limits,sources,rows=inputs
+    need(output.parent.is_dir() and shutil.disk_usage(output.parent).free>=
+         limits['output_bytes']+limits.get('free_bytes',0), 'DISK_HEADROOM')
+    peak_allocated=0
+    def check_storage(_=None):
+        nonlocal peak_allocated
+        if real:
+            peak_allocated=max(peak_allocated, storage_check(output,limits))
+    check_storage()
     if not resume:
         output.mkdir()
     claim=output/'.claim'
@@ -295,6 +362,7 @@ def produce(plan, pin, root, evidence, output, *, resume=False, guard=None, hook
             (output/'sources').mkdir()
             (output/'commits').mkdir()
         pinned(safe_path(output,'plan.json'),pin)
+        check_storage()
         root_names=set(inventory(output))
         need({'.claim','plan.json','sources','commits'} <= root_names <=
              {'.claim','plan.json','sources','commits','.manifest.partial','manifest.json'}, 'GENERATION_INVENTORY')
@@ -304,43 +372,53 @@ def produce(plan, pin, root, evidence, output, *, resume=False, guard=None, hook
         need(set(inventory(output/'commits')) <= {k+'.json' for k in allow}, 'UNEXPECTED_COMMIT_PATH')
         receipts=[]; telemetry=[]; skipped=0
         for source in sources:
-            key=source['source_key']; final=target/key; stage=target/('.stage-'+key)
-            commit=output/'commits'/(key+'.json')
-            need('manifest.json' not in root_names or final.is_dir(), 'FROZEN_SOURCE_MISSING')
-            need(not (final.exists() and stage.exists()), 'AMBIGUOUS_SOURCE_STATE')
-            need(not commit.exists() or final.exists() or stage.exists(), 'COMMITTED_SOURCE_MISSING')
-            if final.exists():
-                need(commit.is_file(), 'SOURCE_COMMIT_PIN_MISSING')
-                skipped+=1
-                folder=final
-            else:
-                folder=stage
-                if stage.exists():
-                    need(commit.is_file(), 'UNVERIFIED_STAGE_HOLD')
+            with source_deadline(limits['seconds']) if real else nullcontext():
+                key=source['source_key']; final=target/key; stage=target/('.stage-'+key)
+                commit=output/'commits'/(key+'.json')
+                need('manifest.json' not in root_names or final.is_dir(), 'FROZEN_SOURCE_MISSING')
+                need(not (final.exists() and stage.exists()), 'AMBIGUOUS_SOURCE_STATE')
+                need(not commit.exists() or final.exists() or stage.exists(), 'COMMITTED_SOURCE_MISSING')
+                if final.exists():
+                    need(commit.is_file(), 'SOURCE_COMMIT_PIN_MISSING')
+                    skipped+=1
+                    folder=final
                 else:
-                    remaining=min(limits['temporary_bytes'],limits['output_bytes']-tree_bytes(output))
-                    need(remaining>0,'RESOURCE_STOP: no reserved bytes')
-                    stage.mkdir()
-                    args=(root,stage,canonical(source).decode(),canonical(rows[source['image_id']]).decode(),remaining)
-                    telemetry.append((guard or watch)(args,limits))
-            raw=(folder/'source.json').read_bytes()
-            validate_source(folder,qa.strict_json(raw),source)
-            need(tree_bytes(output)<=limits['output_bytes']
-                 and (folder==final or tree_bytes(stage)<=limits['temporary_bytes']),'RESOURCE_STOP: disk limit')
-            ref=dict(source_key=key,sha256=hashlib.sha256(raw).hexdigest())
-            committed=canonical(dict(ref,plan_sha256=pin))
-            if commit.exists():
-                need(commit.read_bytes()==committed, 'SOURCE_COMMIT_PIN_MISMATCH')
-            else:
-                write_new(commit,committed,limits['output_bytes']-tree_bytes(output))
-                hook('source_verified')
-            if folder==stage:
-                need(not final.exists(),'PUBLISHED_SOURCE_EXISTS')
-                stage.rename(final)  # Same parent, exclusive writer, Windows non-replace.
-                hook('source_published')
-            receipts.append(ref)
+                    folder=stage
+                    if stage.exists():
+                        need(commit.is_file(), 'UNVERIFIED_STAGE_HOLD')
+                    else:
+                        remaining=min(limits['temporary_bytes'],limits['output_bytes']-tree_bytes(output))
+                        need(remaining>0,'RESOURCE_STOP: no reserved bytes')
+                        stage.mkdir()
+                        row=rows[source['image_id']]
+                        if real:
+                            stage_source(root,stage,source,row,remaining,check_storage,real=True)
+                        else:
+                            args=(root,stage,canonical(source).decode(),canonical(row).decode(),remaining)
+                            telemetry.append((guard or watch)(args,limits))
+                raw=(folder/'source.json').read_bytes()
+                validate_source(folder,qa.strict_json(raw),source)
+                need(tree_bytes(output)<=limits['output_bytes']
+                     and (folder==final or tree_bytes(stage)<=limits['temporary_bytes']),'RESOURCE_STOP: disk limit')
+                check_storage()
+                ref=dict(source_key=key,sha256=hashlib.sha256(raw).hexdigest())
+                committed=canonical(dict(ref,plan_sha256=pin))
+                if commit.exists():
+                    need(commit.read_bytes()==committed, 'SOURCE_COMMIT_PIN_MISMATCH')
+                else:
+                    write_new(commit,committed,limits['output_bytes']-tree_bytes(output))
+                    check_storage()
+                    hook('source_verified')
+                if folder==stage:
+                    need(not final.exists(),'PUBLISHED_SOURCE_EXISTS')
+                    stage.rename(final)  # Same parent, exclusive writer, Windows non-replace.
+                    hook('source_published')
+                check_storage()
+                receipts.append(ref)
         manifest=dict(schema=SCHEMA,plan_sha256=pin,source_receipts=receipts,
                       eligible_ids={r:[s['image_id'] for s in sources if s['split']==r] for r in ('train','val')})
+        if real:
+            manifest.update(mode='real-pilot', source_generation=qa.GENERATION)
         manifest['generation_id']=identifier(manifest)
         payload=canonical(manifest)
         partial=output/'.manifest.partial'
@@ -348,17 +426,20 @@ def produce(plan, pin, root, evidence, output, *, resume=False, guard=None, hook
         if published.exists():
             need(not partial.exists() and published.read_bytes()==payload,'FROZEN_MANIFEST_MISMATCH')
             return dict(manifest_sha256=qa.sha(published),generation_id=manifest['generation_id'],
-                        skipped_sources=skipped,worker_measurements=telemetry)
+                        skipped_sources=skipped,worker_measurements=telemetry,
+                        **(dict(peak_observed_allocation_bytes=peak_allocated) if real else {}))
         if partial.exists():
             need(partial.read_bytes()==payload,'INCOMPLETE_MANIFEST_STAGE')
         else:
             write_new(partial,payload,limits['output_bytes']-tree_bytes(output))
+        check_storage()
         hook('before_manifest')
         os.link(partial,published)
         partial.unlink()
         hook('after_manifest')
         return dict(manifest_sha256=qa.sha(output/'manifest.json'),generation_id=manifest['generation_id'],
-                    skipped_sources=skipped,worker_measurements=telemetry)
+                    skipped_sources=skipped,worker_measurements=telemetry,
+                    **(dict(peak_observed_allocation_bytes=peak_allocated) if real else {}))
     finally:
         claim.unlink()
 
@@ -369,9 +450,17 @@ def main():
         parser.add_argument('--'+name,type=Path,required=True)
     parser.add_argument('--plan-sha256',required=True)
     parser.add_argument('--resume',action='store_true')
+    parser.add_argument('--real-approval',type=Path)
+    parser.add_argument('--real-approval-sha256')
     args=parser.parse_args()
     try:
-        result=produce(args.plan,args.plan_sha256,args.root,args.evidence,args.output,resume=args.resume)
+        if args.real_approval is not None or args.real_approval_sha256 is not None:
+            from d6a32_gate import execute
+            need(args.real_approval is not None and args.real_approval_sha256, 'REAL_APPROVAL_REQUIRED')
+            result=execute(args.plan,args.plan_sha256,args.real_approval,args.real_approval_sha256,
+                           args.root,args.evidence,args.output,resume=args.resume)
+        else:
+            result=produce(args.plan,args.plan_sha256,args.root,args.evidence,args.output,resume=args.resume)
     except (ValueError,OSError,RuntimeError,KeyError,TypeError) as exc:
         parser.exit(1,f'D6 STOP: {type(exc).__name__}: {exc.args[0] if isinstance(exc,ValueError) else "inspect private stage"}\n')
     print(json.dumps(result))

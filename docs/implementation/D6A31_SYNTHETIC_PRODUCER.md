@@ -1,6 +1,6 @@
 # D6-A3-1 synthetic producer and reader
 
-The CLI is restricted to synthetic fixtures. It requires a synthetic plan, a cache marker containing `D6-A3-1 SYNTHETIC FIXTURE` plus a newline, and fixture scenes no larger than 512×512. A3-2 real imagery requires separate review and authorization. Keep all synthetic inputs and outputs outside the Git tree. The tests construct the full contract and fixtures.
+The original A3-1 CLI mode remains the default and is restricted to synthetic fixtures. It requires a synthetic plan, a cache marker containing `D6-A3-1 SYNTHETIC FIXTURE` plus a newline, and fixture scenes no larger than 512×512. A3-2 real imagery requires separate review and authorization. Keep all synthetic inputs and outputs outside the Git tree. The tests construct the full contract and fixtures.
 
 ```powershell
 python -B scripts/d6a3_produce.py --plan C:/synthetic/inputs/plan.json `
@@ -24,3 +24,7 @@ Each compressed TIFF is encoded in a GDAL MemoryFile and accepted for disk write
 - **FROZEN** — a flushed canonical manifest is published last using an exclusive hardlink. The caller supplies its SHA-256 to `D6Data`. The reader requires a complete exact inventory and matching source/manifest pins. A leftover claim from forced termination blocks resume until independently inspected. Use a local Windows filesystem supporting no-replace rename and hardlinks.
 
 The CLI needs no model weights, package download, cloud mount or CUDA. Review changes to the admission, protected-source, resource or crop policy separately.
+
+## A3-2 real-pilot path
+
+The optional real approval flags select the separately pinned and authorized real route. The reviewed implementation ran the four-source A3-2b pilot with the Windows Job and observed allocation control. See the [bounded pilot contract and result](D6A3_BOUNDED_PILOT.md) for the approval binding, measured resources and scope.
