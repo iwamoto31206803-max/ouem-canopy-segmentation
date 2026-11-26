@@ -306,7 +306,7 @@ def source_deadline(seconds):
         timer.join()
 
 
-def storage_check(output, limits):
+def storage_check(output, limits, file_limit=24):
     from d6a3_guard import allocated_bytes
 
     need(shutil.disk_usage(output.parent).free>=limits['free_bytes'], 'RESOURCE_STOP: free-space floor')
@@ -318,7 +318,7 @@ def storage_check(output, limits):
             else:
                 need(path.is_file(), 'OUTPUT_NOT_REGULAR')
                 paths.append(path)
-                need(len(paths)<=24, 'RESOURCE_STOP: output file count')
+                need(len(paths)<=file_limit, 'RESOURCE_STOP: output file count')
     if output.exists():
         collect(output)
     # A staged and published manifest may briefly reference the same file.
@@ -346,10 +346,16 @@ def publish(plan, pin, root, output, inputs, *, resume=False, guard=None, hook=l
     need(output.parent.is_dir() and shutil.disk_usage(output.parent).free>=
          limits['output_bytes']+limits.get('free_bytes',0), 'DISK_HEADROOM')
     peak_allocated=0
+    if real:
+        from d6a32_gate import SHARD
+        shard=pinned(plan,pin)['schema']==SHARD
+    else:
+        shard=False
+    file_limit=5*len(sources)+4 if shard else 24
     def check_storage(_=None):
         nonlocal peak_allocated
         if real:
-            peak_allocated=max(peak_allocated, storage_check(output,limits))
+            peak_allocated=max(peak_allocated, storage_check(output,limits,file_limit))
     check_storage()
     if not resume:
         output.mkdir()
@@ -418,7 +424,7 @@ def publish(plan, pin, root, output, inputs, *, resume=False, guard=None, hook=l
         manifest=dict(schema=SCHEMA,plan_sha256=pin,source_receipts=receipts,
                       eligible_ids={r:[s['image_id'] for s in sources if s['split']==r] for r in ('train','val')})
         if real:
-            manifest.update(mode='real-pilot', source_generation=qa.GENERATION)
+            manifest.update(mode='real-shard' if shard else 'real-pilot', source_generation=qa.GENERATION)
         manifest['generation_id']=identifier(manifest)
         payload=canonical(manifest)
         partial=output/'.manifest.partial'

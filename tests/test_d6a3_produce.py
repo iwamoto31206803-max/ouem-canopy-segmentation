@@ -18,7 +18,8 @@ from research_patches import crop_arrays
 
 @pytest.fixture
 def synthetic(tmp_path, request):
-    size = getattr(request, 'param', 320)
+    setting = getattr(request, 'param', 320)
+    size, count = setting if isinstance(setting, tuple) else (setting, 4 if setting==2048 else 2)
     inputs=tmp_path/'inputs'
     root,evidence=inputs/'cache',inputs/'stac'
     evidence.mkdir(parents=True)
@@ -29,8 +30,10 @@ def synthetic(tmp_path, request):
     for path in folders.values(): path.mkdir(parents=True)
     rows=[]; candidates=[]; results=[]; arrays={}
     cases = [(1,1,1000),(2,0,20000),(3,-1,40000)]
-    if size == 2048:
+    if count >= 4:
         cases += [(4,2,60000),(5,0,80000)]
+    if count >= 6:
+        cases += [(6,3,100000),(7,0,120000)]
     for rid,fold,x in cases:
         oid=f'fixture-{rid}'
         transform=from_origin(x,128,.47,.46)

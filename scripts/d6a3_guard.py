@@ -17,9 +17,11 @@ class Memory(ctypes.Structure):
                                            'nonpaged_peak', 'nonpaged', 'commit', 'commit_peak')]
 
 
-def watch(args, limits, *, attempt=False):
+def watch(args, limits, *, attempt=False, qa_attempt=False):
     if sys.platform != 'win32' or available_memory() < limits['host_available_bytes']:
         raise RuntimeError('RESOURCE_STOP: Windows enforcement or host RAM unavailable')
+    if qa_attempt and not attempt:
+        raise ValueError('QA requires a whole-attempt deadline')
     deadline = limits['attempt_seconds' if attempt else 'seconds']
     read = ctypes.WinDLL('psapi', use_last_error=True).GetProcessMemoryInfo
     read.argtypes = [wintypes.HANDLE, ctypes.POINTER(Memory), wintypes.DWORD]
@@ -32,7 +34,8 @@ def watch(args, limits, *, attempt=False):
         bootstrap = (
             "import sys; assert sys.stdin.buffer.read(1)==b'1'; "
             "sys.path[:0]=sys.argv[1:3]; "
-            + ("from d6a32_gate import run_guarded; run_guarded(*sys.argv[3:])" if attempt
+            + ("from d6a4 import qa_worker; qa_worker(*sys.argv[3:])" if qa_attempt
+               else "from d6a32_gate import run_guarded; run_guarded(*sys.argv[3:])" if attempt
                else "from d6a3_produce import worker; worker(*sys.argv[3:])")
         )
         site = Path(sys.prefix) / 'Lib' / 'site-packages'
