@@ -19,16 +19,18 @@ class D6Data:
         body = {k:v for k,v in manifest.items() if k != 'generation_id'}
         need(identifier(body) == manifest['generation_id'], 'GENERATION_ID_MISMATCH')
         plan = pinned(safe_path(self.root,'plan.json'), manifest['plan_sha256'])
-        from d6a32_gate import GT54, PLAN as REAL_PLAN, STORAGE_POLICY
-        real = plan['schema'] == REAL_PLAN
+        from d6a32_gate import GT54, PLAN as REAL_PLAN, SHARD, MAX_SHARD_SOURCES, STORAGE_POLICY
+        shard = plan['schema'] == SHARD
+        real = shard or plan['schema'] == REAL_PLAN
         need(plan['windows_per_source'] == {'train':1,'val':1} and (
              (not real and plan['schema'] == PLAN and plan['mode'] == 'synthetic' and 'mode' not in manifest)
-             or (real and manifest['mode']=='real-pilot'
+             or (real and manifest['mode']==('real-shard' if shard else 'real-pilot')
                  and manifest['source_generation']==plan['source_generation']==GENERATION
                  and plan['storage_policy']==STORAGE_POLICY and plan['gt54']==GT54)), 'D6_PLAN_BINDING')
         planned = {s['image_id']:s for s in plan['sources']} if real else {}
         if real:
-            need(len(planned)==len(plan['sources']) and len(planned)<=4, 'D6_PLAN_SCOPE')
+            need(len(planned)==len(plan['sources']) and 0<len(planned)<=(MAX_SHARD_SOURCES if shard else 4), 'D6_PLAN_SCOPE')
+        self.generation_plan = plan
         self.identity = dict(dataset_id=manifest['generation_id'], manifest_sha256=manifest_sha256,
                              source_generation=GENERATION, purpose='EXPLORATORY_RESEARCH_ONLY')
         refs = manifest['source_receipts']
@@ -70,7 +72,7 @@ class D6Data:
             self.crop_positions[rid] = [tuple(crop[:2])]
             self._records[rid] = (receipt,ref['sha256'],path)
         need(list(self.samples)==(list(planned) if real else plan['source_ids']) and roles==manifest['eligible_ids']
-             and roles['train'] and roles['val'], 'FROZEN_ALLOWLIST')
+             and (shard or roles['train'] and roles['val']), 'FROZEN_ALLOWLIST')
 
     def patch(self, item, split):
         rid = item['image_id']

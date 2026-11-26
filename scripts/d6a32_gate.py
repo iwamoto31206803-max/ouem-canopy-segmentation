@@ -11,6 +11,11 @@ from r1_dataset import safe_path
 
 PLAN = 'd6-real-pilot-plan-v1'
 APPROVAL = 'd6-real-pilot-approval-v1'
+SHARD = 'd6-real-campaign-shard-v1'
+SHARD_PURPOSE = 'ISSUE_116_BOUNDED_RESEARCH_SHARD'
+MAX_SHARD_SOURCES = 50
+MAX_GENERATION_SOURCES = 200
+ROSTER = 'd6-campaign-roster-v1'
 GT54 = ['GT54_EXTERNAL_EVALUATION_DEFERRED', 'GT54_GEOGRAPHIC_INDEPENDENCE_UNVERIFIED']
 FREEZE_SHA = 'd7a72bdf1c792678cee0030c72dded18d3cdd6639a800c12ebafc63ba3fa1978'
 SUBINDEX_SHA = '079d37349734c746038bab90144babf50ae75d20aacfbf8cda61b5aa1bd84dae'
@@ -20,37 +25,74 @@ LOCAL_SHA = 'SOURCE_AUTHENTICITY_NOT_EXTERNALLY_VERIFIED'
 MAXIMUMS = dict(commit_bytes=2560*1024**2, rss_bytes=2*1024**3, seconds=120,
                 attempt_seconds=600, temporary_bytes=4*1024**2,
                 output_bytes=16*1024**2, physical_bytes=64*1024**2)
+SHARD_MAXIMUMS = dict(MAXIMUMS, attempt_seconds=1800, output_bytes=24*1024**2,
+                      physical_bytes=96*1024**2)
 MINIMUMS = dict(host_available_bytes=6*1024**3, free_bytes=256*1024**2)
 
 
 def approval(plan_path, plan_sha, approval_path, approval_sha):
     plan_path, approval_path = map(plain, (plan_path, approval_path))
-    need(plan_path.stat().st_size<=65536 and approval_path.stat().st_size<=4096,
+    need(plan_path.stat().st_size<=131072 and approval_path.stat().st_size<=4096,
          'REAL_CONTROL_FILE_SIZE')
     plan = pinned(plan_path, plan_sha)
     token = pinned(approval_path, approval_sha)
+    shard=plan['schema']==SHARD
+    need(shard or plan_path.stat().st_size<=65536, 'REAL_CONTROL_FILE_SIZE')
+    purpose=SHARD_PURPOSE if shard else 'ONE_BOUNDED_REAL_OUTPUT_PILOT'
     need(set(token) == {'schema','approved','plan_sha256','purpose'} and token['approved'] is True
          and token == dict(schema=APPROVAL,approved=True,plan_sha256=plan_sha,
-                           purpose='ONE_BOUNDED_REAL_OUTPUT_PILOT'), 'REAL_APPROVAL_BINDING')
-    need(plan['schema']==PLAN and plan['source_generation']==qa.GENERATION
+                           purpose=purpose), 'REAL_APPROVAL_BINDING')
+    need(plan['schema'] in (PLAN,SHARD) and plan['source_generation']==qa.GENERATION
          and plan['storage_policy']==STORAGE_POLICY and plan['gt54']==GT54 and plan['windows_per_source']=={'train':1,'val':1},
          'REAL_PLAN_SCOPE')
+    maximums=SHARD_MAXIMUMS if shard else MAXIMUMS
     limits=plan['limits']
-    need(set(limits)==set(MAXIMUMS)|set(MINIMUMS)
-         and all(type(limits[k]) is int and 0<limits[k]<=v for k,v in MAXIMUMS.items())
+    need(set(limits)==set(maximums)|set(MINIMUMS)
+         and all(type(limits[k]) is int and 0<limits[k]<=v for k,v in maximums.items())
          and all(type(limits[k]) is int and limits[k]>=v for k,v in MINIMUMS.items())
          and limits['temporary_bytes']<=limits['output_bytes']<=limits['physical_bytes']
          and limits['rss_bytes']<=limits['commit_bytes'] and limits['seconds']<=limits['attempt_seconds'],
          'REAL_RESOURCE_LIMITS')
     sources=plan['sources']
     roles=Counter(s['split'] for s in sources)
-    need(set(roles)=={'train','val'} and all(1<=n<=2 for n in roles.values())
-         and all(type(s['image_id']) is int for s in sources)
-         and len({s['image_id'] for s in sources})==len(sources), 'REAL_COHORT_LIMIT')
+    need(all(type(s['image_id']) is int for s in sources)
+         and len({s['image_id'] for s in sources})==len(sources)
+         and (0<len(sources)<=MAX_SHARD_SOURCES and set(roles)<={'train','val'} if shard else
+              set(roles)=={'train','val'} and all(1<=n<=2 for n in roles.values())),
+         'REAL_COHORT_LIMIT')
+    if shard:
+        match_roster(plan, pinned(safe_path(plan_path.parent,plan['roster']['path']),plan['roster']['sha256']))
     need(plan['allow_authenticity'] and set(plan['allow_authenticity'])<=AUTH,'REAL_AUTHENTICITY_POLICY')
-    need(sum(s.get('source_hash_verification') == LOCAL_SHA for s in sources) <= 3,
+    need(shard or sum(s.get('source_hash_verification') == LOCAL_SHA for s in sources) <= 3,
          'REAL_LOCAL_ONLY_LIMIT')
     return plan
+
+
+def roster_sources(roster):
+    sources=roster['sources']
+    need(roster['schema']==ROSTER and 2<=len(sources)<=MAX_GENERATION_SOURCES
+         and {s['split'] for s in sources}=={'train','val'}
+         and all(type(s['image_id']) is int and qa.digest(s['source_object_sha256'])
+                 for s in sources), 'D6_ROSTER_SCOPE')
+    for keys in ([s['image_id'] for s in sources], [s['oam_id'].casefold() for s in sources],
+                 [s['source_object_sha256'] for s in sources]):
+        need(len(set(keys))==len(sources),'D6_ROSTER_DUPLICATE')
+    return sources
+
+
+def match_roster(plan, roster):
+    sources=roster_sources(roster)
+    start=plan['shard_start']
+    sizes=roster['shard_sizes']
+    need(all(type(n) is int and 1<=n<=MAX_SHARD_SOURCES for n in sizes)
+         and sum(sizes)==len(sources)-4, 'D6_ROSTER_SHARDS')
+    intervals=[]
+    offset=4
+    for size in sizes:
+        intervals.append((offset,size))
+        offset+=size
+    need(type(start) is int and (start,len(plan['sources'])) in intervals
+         and plan['sources']==sources[start:start+len(plan['sources'])], 'D6_SHARD_ROSTER_BINDING')
 
 
 def protected_lineage(row, group, protected):
@@ -106,8 +148,10 @@ def verify_evidence(plan, plan_sha, base, root, evidence):
              and row['oam_id']==previous['oam_id'] and qa.identity(row)==previous['alias']
              and groups[row['oam_id']]['wgs84_bounds']==previous['envelope'], 'OAM_PROTECTED_EVIDENCE')
     refs={}
-    for role in ('train','val'):
-        pair=plan['a1'][role]
+    shard=plan['schema']==SHARD
+    pairs=[(None,p) for p in plan['a1']] if shard else list(plan['a1'].items())
+    need(not shard or 1<=len(pairs)<=3, 'D6_A1_REPORT_COUNT')
+    for role,pair in pairs:
         contract,report=ref(pair['contract']),ref(pair['report'])
         need(contract['schema']==report['policy']==qa.POLICY
              and contract['source_generation']==report['source_generation']==qa.GENERATION
@@ -136,8 +180,14 @@ def verify_evidence(plan, plan_sha, base, root, evidence):
              and type(report['catalog_rows']) is int and report['catalog_rows']==len(rows)
              and report['crop_policy']==qa.CROP_POLICY and report['labels']==qa.LABEL_POLICY,
              'REAL_A1_ALLOWLIST')
-        refs[role]=(candidates,outcomes,eligible[role])
+        for actual_role in (('train','val') if role is None else (role,)):
+            for rid in eligible[actual_role]:
+                need(rid not in refs, 'D6_A1_DUPLICATE_RESULT')
+                refs[rid]=(candidates[rid],outcomes[rid])
     annotations=qa.coco_annotation_summary(paths['coco'], [s['image_id'] for s in plan['sources']])
+    if shard:
+        from d6a4 import validate_roster_catalog
+        validate_roster_catalog(ref(plan['roster']),rows,groups,prior)
     sources=[]
     seen=set()
     for s in plan['sources']:
@@ -150,11 +200,10 @@ def verify_evidence(plan, plan_sha, base, root, evidence):
              and type(row['width']) is int and type(row['height']) is int
              and 0<row['width']*row['height']<=qa.MAX_PIXELS,'REAL_SOURCE_IDENTITY')
         seen.update((alias,oid.casefold()))
-        candidates,outcomes,eligible=refs[role]
-        a,c=outcomes[s['image_id']],candidates[s['image_id']]
+        c,a=refs[s['image_id']]
         reuse=protected_lineage(row,groups[oid],prior)
         need(s['historical_train_reuse'] is reuse and a['final_decision']['status']==qa.ELIGIBLE
-             and s['image_id'] in eligible and a['split']==role
+             and a['split']==role
              and a['official_split']=='train' and a['oam_id']==c['oam_id']==oid
              and a['validation_fold']==c['validation_fold']==row['validation_fold']
              and type(a['selected_black_support_cells']) is int and a['selected_black_support_cells']==0
