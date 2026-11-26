@@ -49,3 +49,19 @@ Use [the copy/paste Notebook](../../notebooks/OUEM_D6_Segmented_Satlas_Training.
 A D5 checkpoint measured 1,066,503,375 bytes. Two retained recovery points plus a new upload would require about 3.2 GB for checkpoint files alone. Include the separate initializer, data archive, scratch working and remote-readback copies, and evidence. The Notebook proposes a 4 GB Drive free allowance and 6 GiB scratch floor as initial planning values. Check actual Drive quota, available runtime, VRAM and scratch before execution; measure new checkpoint bytes, stage/upload/remote-readback throughput, updates/second, total session time and any lost work. Free-tier allocation and capacity can change. No paid services or quota workarounds are included.
 
 Milestone PASS requires one frozen run completing 700 updates across at least two genuinely distinct GPU sessions, verified remote bytes and a cold restore that continues from the recorded schedule position. Confirm no duplicate/skipped committed updates and archive the final checkpoint, separate validation results and logs with verification on Drive and GEEKOM. Comparing environments and numerical portability is part of the report; GPU equal-bit continuity is unverified. Local CPU surrogate results alone cannot satisfy this milestone. Formal R1 remains HOLD and GT54 stays deferred/unverified.
+
+## Local preparation record
+
+On GEEKOM-A6 the staged proposal archive was **31,331,482 bytes** with 1,078 payload files and 32,980,057 bytes after extraction including its control file. The separately cached initializer was **504,439,674 bytes**, with its official SHA verified. Archive build took 7.83 s and extraction with CPU Reader/schedule checks took 28.62 s. The relocated Reader supplied all 175 Train, 25 fresh Val and 18 separate historical Val patches, and the proposed 700-update schedule visited each Train group once per cycle. These measurements cover local storage and CPU readback, while Notebook staging, remote durability and GPU resources remain for the authorized run.
+
+| Local proposal pin | Value |
+| --- | --- |
+| Executable Git revision | `9ad5d74c6cc5dfc0c6c7fd3354dba4ef13e9af45` |
+| ZIP SHA-256 | `0066fe8f800e43c7625cdd42498935ed8fdbd2e687079247329c9118ec57b5db` |
+| Extracted bundle control SHA-256 | `b2229155ceeb24be4b798b11c0dbe3c0b2133fd79775429af48adff436165667` |
+| Proposed run plan SHA-256 | `37818de053c5668e19feddb9196ae8d5233720bf2b9c9272d7d8ea2152bfa168` |
+| Schedule SHA-256 | `916e46817e0f24d3007711f81f8c0ea1d9f44a5999b57751d42dcbb9607ff532` |
+
+If the approved code pin or experiment settings change during review or squash merge, build a new local ZIP/control/plan receipt for the approved revision before the first run. Preserve the staged proposal and never change these pins within an active lineage.
+
+Windows validation passed **791 tests**, with two existing symlink-privilege skips and zero failures. The focused D6-B/A5/D5 tests passed 18. CPU tests covered split versus uninterrupted state fingerprints, reloading from a different path after deleting the old scratch, corruption/config/session mismatch, time reserve, interruption with last-good preservation, and A5 path relocation. The Notebook's seven code cells passed static compilation, with no executed cells. The full suite's one visible warning was the expected duplicate-ZIP fixture; pending deprecation warnings were filtered.

@@ -1,7 +1,7 @@
 # D6 planning baseline — deterministic preprocessing and restartable GPU operations
 
 **Date:** 2026-11-21 (JST)  
-**State:** **PLANNING BASELINE (reviewed decision update 2026-11-21)**. **D6-A preprocessing is the next implementation/design focus; D6-B implementation is deferred to the next separately approved training experiment, after D6-A.** D6-B tasks are captured in [Issue #100](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/100). This document does not approve new data acquisition/processing, GPU training, expenditure, model/label changes or Formal R1 promotion.  
+**State:** D6-A complete, D6-B local preparation ready for review. Use the [D6-B segmented training runbook](implementation/D6B_SEGMENTED_TRAINING.md). [Issue #100](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/100). This document retains the earlier design context. GPU execution, data transfer, expenditures and Formal R1 promotion require their own decisions.
 **Authority:** [Project Charter](PROJECT_CHARTER.md), [Design Principles](DESIGN_PRINCIPLES.md), [Satlas-first ADR](decisions/ADR_20261101_SATLAS_FIRST.md); for actual execution status use [Current State](CURRENT_STATE.md). D6-A/B are **research workstream names**, not changes to the Charter's D0–D5 acceptance gates.
 
 ## 1. Motivation and immutable starting point
@@ -28,6 +28,8 @@ The D5 exploratory research run `d5-v5-main280-01` completed **280 training upda
 **D6-A4 (2026-11-26).** The cached-data campaign froze and verified 80 distinct groups (75 Train, 5 fresh Val), including four reused pilot patches. Three serial shards generated 76 new patches; the unified Reader verified all 240 TIFFs and a CPU source-balanced schedule. Cached documentary evidence and fresh-Val availability limited the cohort below the 200-group target. [D6-A4 result and Reader contract](implementation/D6A4_CACHED_GENERATION.md). [Issue #116](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/116).
 
 **D6-A5 (2026-11-26).** The reusable inventory covers 541 official catalog groups, with 4,169 cached official Train pairs and STAC evidence for 414 groups. The research generation contains **175 Train and 25 fresh Val**. It references all 80 A4 patches in place and adds 120 patches from groups new to v5. All 600 TIFFs and one complete CPU schedule cycle were verified. [Inventory rebuild and generation record](implementation/D6A5_OAM_INVENTORY.md). [Issue #118](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/118).
+
+**D6-B preparation (2026-11-26).** The proposed run uses the fixed A5 175 Train / 25 fresh Val and a separate historical Val18, with 700 updates across multiple Notebook sessions. The portable bundle, segmented Trainer and Drive relay procedures are ready for implementation review. The CPU surrogate recovery test and local staging checks cover their respective boundaries. Cloud transfer and GPU execution await a separate decision. [D6-B segmented training runbook](implementation/D6B_SEGMENTED_TRAINING.md). [Issue #100](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/100).
 
 ### Existing foundation
 
@@ -60,7 +62,7 @@ The D5 exploratory research run `d5-v5-main280-01` completed **280 training upda
 
 ## 3. D6-B — free-tier-aware, durable and resumable GPU workflow
 
-**Objective (deferred implementation):** run larger training while treating a free Notebook GPU and its local filesystem as **ephemeral**, without making free GPU-hours, a fixed GPU model, a persistent session or free cloud capacity an assumption. **Owner's preferred policy:** exhaust practical, permitted free GPU sessions first, pausing at verified checkpoints and resuming whenever quota permits; evaluate a paid GPU only if measured waiting/overhead is excessive, under a new owner-approved budget. **Google Drive is the intended relay/short-term recovery store (not Google Cloud Storage); GEEKOM-A6/external storage is the long-term archive.** No D6-B code is needed until the next training campaign is designed. See [deferred implementation checklist, Issue #100](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/100).
+**Objective:** run larger training while treating a free Notebook GPU and its local filesystem as **ephemeral**, without making free GPU-hours, a fixed GPU model, a persistent session or free cloud capacity an assumption. **Owner's preferred policy:** exhaust practical, permitted free GPU sessions first, pausing at verified checkpoints and resuming whenever quota permits; evaluate a paid GPU only if measured waiting/overhead is excessive, under a new owner-approved budget. **Google Drive is the intended relay/short-term recovery store (not Google Cloud Storage); GEEKOM-A6/external storage is the long-term archive.** See the [original implementation checklist, Issue #100](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/100).
 
 ### Separation of responsibilities
 
@@ -82,7 +84,7 @@ The D5 exploratory research run `d5-v5-main280-01` completed **280 training upda
 5. **Interruption drill:** intentionally stop a **small, separately authorized** CUDA run, discard scratch/session, restore from the last independently verified remote checkpoint on a fresh runtime and compare required state/sampler continuity and permissible numerical differences. A differing environment is an explicit compatibility evaluation, not automatic proof of bitwise equality.
 6. **Fallback policy:** if free tier cannot hold input/shards/checkpoints or measured training exceeds reliable run windows, report a costed alternative (different shard strategy, retention policy, provider or paid GPU). **No payment/provider switch without owner approval.**
 
-**Gate D6-B:** `RESOURCE_BUDGET_MEASURED`, `CHECKPOINT_REMOTE_READBACK_PASS` and `INTERRUPTED_RESUME_DEMONSTRATED` on a small controlled GPU pilot (proposed; not yet PASS). Training scale and any full GPU campaign require subsequent separate owner approval.
+**Gate D6-B:** `RESOURCE_BUDGET_MEASURED`, `CHECKPOINT_REMOTE_READBACK_PASS` and `INTERRUPTED_RESUME_DEMONSTRATED` across the first and second segments of the same proposed run. The GPU milestone has not yet been executed.
 
 ## 4. Execution decision, evidence hierarchy and stop rules
 
@@ -93,7 +95,7 @@ The D5 exploratory research run `d5-v5-main280-01` completed **280 training upda
 | D5 Step280 initial-learning feasibility | Achieved in the bounded exploratory sense; not practical accuracy |
 | D5 Step280 full Val18 evidence and remote preservation | **PASS**, frozen [archival record](implementation/D5B2B_STEP280_VAL18_RECOVERY_RECORD.md) |
 | D6-A objective auto-QA rule and scalable preprocessing | **A1 implemented; A2 research-only QA pilot complete; A3-0 complete; A3-1 synthetic producer merged; A3-2b four-source real research pilot PASS**, [Issue #106](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/106), [Issue #108](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/108), [Issue #110](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/110), [Issue #113](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/113). A5 verified 200 groups with reusable inventory; GPU work remains pending |
-| D6-B interruption/resume + resource budget trial | **DEFERRED: implement/test when next approved training experiment is prepared** ([Issue #100](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/100)) |
+| D6-B interruption/resume + resource budget trial | **Local preparation complete; cloud/GPU authorization pending** ([Issue #100](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/100)) |
 | New dataset/source rights/label acceptance | **PENDING**, no automatic promotion |
 | Enlarged GPU training campaign | **NOT AUTHORIZED** |
 | Japanese positive-tree independent validation | **PENDING** |
