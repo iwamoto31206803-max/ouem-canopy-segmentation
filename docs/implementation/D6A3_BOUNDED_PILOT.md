@@ -26,7 +26,7 @@ Every source is exclusively staged, read back and pinned before publication. Com
 
 ## Reviewed Windows invocation
 
-After independent review of this implementation and private plan, with separate authorization for real output, use the existing venv and explicit plan/approval SHA pins. The following placeholders are intentionally non-executable.
+Independent review covered the implementation. The owner authorized the exact four-source scope, and Codex reconciled the private plan and evidence pins locally. Real runs use the existing venv and independently retained plan/approval SHAs. The following placeholders are intentionally non-executable.
 
 ```powershell
 .\.venv\Scripts\python.exe -B scripts/d6a3_produce.py `
@@ -49,7 +49,9 @@ Capture the printed manifest SHA and resource readings. Validate the output with
 | Logical generation / TIFF bytes | 595,961 B / 578,917 B |
 | Peak observed regular-file allocation | 627,648 B |
 
-## Proposed next CPU batch
+## Historical next-batch proposal
+
+The bounded follow-up is recorded in [D6-A4 cached generation](D6A4_CACHED_GENERATION.md).
 
 Use cached official Train inputs. A filename presence check found both originals for all 3,341 training-fold and 828 fold-0 catalog rows. The prior documentary inventory found 729 Train and 175 Val rows passing its metadata screen; the later fresh-Val screen recorded 40 known-clear rows before selecting six for QA. These are candidate counts. Accepted yield depends on rights, identity, independence, geometry and input bytes.
 
