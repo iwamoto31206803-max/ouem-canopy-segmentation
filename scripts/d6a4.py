@@ -72,9 +72,10 @@ def qa_worker(root, evidence, contract, pin, output):
 
 class D6Shards:
     """A frozen dataset-level index over existing D6 generations."""
-    def __init__(self, manifest, manifest_sha256, *, _allow_parent=True):
+    def __init__(self, manifest, manifest_sha256, *, resolve=None, _allow_parent=True):
         from d6a3_data import D6Data
 
+        resolve=resolve or (lambda ref, _kind: Path(ref['path']))
         manifest=plain(Path(manifest))
         self._manifest=manifest
         doc=pinned(manifest,manifest_sha256)
@@ -96,7 +97,7 @@ class D6Shards:
         if composed:
             ref=doc['parent']
             need(ref['sha256']==roster['parent_sha256'],'D6_PARENT_PIN')
-            parent=D6Shards(ref['path'],ref['sha256'],_allow_parent=False)
+            parent=D6Shards(resolve(ref,'aggregate'),ref['sha256'],resolve=resolve,_allow_parent=False)
             count=roster['parent_count']
             need(parent.complete and type(count) is int and len(parent.samples)==count
                  and parent.sources==expected[:count],'D6_PARENT_SOURCE_SCOPE')
@@ -107,7 +108,7 @@ class D6Shards:
             records.extend(parent.samples)
             patch_ids.update(r['patch_id'] for r in parent.records.values())
         for i,ref in enumerate(doc['shards']):
-            root=plain(Path(ref['path']))
+            root=plain(resolve(ref,'shard'))
             need(root not in shard_roots, 'D6_DUPLICATE_SHARD')
             shard_roots.add(root)
             reader=D6Data(root,ref['sha256'])
