@@ -189,7 +189,7 @@ def main(argv=None):
     index,order=rebuild(config,evidence)
     if args.lookups:
         collect(order,evidence,plain(args.fetch_log),args.lookups)
-        index,_=rebuild(config,evidence)
+        index,order=rebuild(config,evidence)
     if args.fetch_log:
         attempts={record['oam_id']:record for record in (
             qa.strict_json(line) for line in plain(args.fetch_log).read_bytes().splitlines())}

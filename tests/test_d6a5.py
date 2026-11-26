@@ -1,4 +1,5 @@
 from pathlib import Path
+import shutil
 
 import pytest
 
@@ -44,6 +45,27 @@ def test_composed_dataset_pins_old_generation(fake_real, monkeypatch):
 
     data=read([shard])
     assert data.complete and len(data.samples)==8
+    # Move immutable bytes to scratch under unrelated names and resolve only
+    # by the pinned references. The original parent and shard JSON is unchanged.
+    slots={}
+    for ref,kind in ((parent,'aggregate'),(pilot,'shard'),(a4,'shard'),(shard,'shard')):
+        original=Path(ref['path'])
+        dest=out.with_name('relocated-'+kind+'-'+str(len(slots)))
+        if kind=='aggregate':
+            shutil.copytree(original.parent,dest)
+            dest=dest/original.name
+        else:
+            original.rename(dest)
+        slots[(ref['path'],ref['sha256'],kind)]=dest
+    current=write('aggregate.json',aggregate_document(link,roster,[shard],8,parent=parent))
+    portable=D6Shards(base/current['path'],current['sha256'],
+                      resolve=lambda ref,kind:slots[(ref['path'],ref['sha256'],kind)])
+    assert portable.samples==data.samples and portable.crop_positions==data.crop_positions
+    val=make_plan(portable,steps=4)['val']
+    assert all(portable.patch(item,'val')[0].shape==(1,3,224,224) for item in val)
+    for (original,_pin,kind),dest in slots.items():
+        if kind=='shard':
+            dest.rename(original)
     schedule=make_plan(data,steps=4)
     for split in ('train','val'):
         assert len(schedule[split])==4
@@ -104,3 +126,17 @@ def test_transport_uses_one_official_get_and_bounds_read():
     assert calls==[('GET','/stac/collections/openaerialmap/items/'+oid),'closed']
     with pytest.raises(ValueError):
         response('../other-host',Connection)
+
+
+def test_inventory_refresh_counts_only_remaining(monkeypatch,tmp_path,capsys):
+    import json
+    import d6a5_inventory as inv
+    path=tmp_path/'config.json'
+    path.write_bytes(b'{}')
+    rows=[dict(state='DOCUMENTARY_ELIGIBLE',oam_id='x')]
+    refreshes=iter(((rows,[{'oam_id':'x'}]),(rows,[])))
+    monkeypatch.setattr(inv,'rebuild',lambda *_:next(refreshes))
+    monkeypatch.setattr(inv,'collect',lambda _rows,_evidence,log,_cap:log.write_bytes(b''))
+    inv.main(['--config',str(path),'--config-sha256',p.qa.sha(path),'--evidence',str(tmp_path),
+              '--out',str(tmp_path/'inventory.jsonl'),'--lookups','1','--fetch-log',str(tmp_path/'log.jsonl')])
+    assert json.loads(capsys.readouterr().out)['missing_lookup_candidates']==0
