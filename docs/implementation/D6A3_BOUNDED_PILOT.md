@@ -9,7 +9,7 @@ The preceding integrated review recorded a Windows baseline of 768 passed and 2 
 - Keep the frozen 2 Train / 2 fresh Val, with one A1-selected 224×224 window per source in full-grid coordinates. Reuse completed A1/A2 evidence. Preserve exact source IDs, folds, crop locations and A1 results. The implementation caps execution at two sources per split.
 - The reviewed historical freeze and its exact v5/Val18 subindex have independent SHA pins in the code. Validate all 88 historical memberships against the pinned catalog, including aliases and envelopes. Historical Train reuse is permitted only in the same role and is recorded in receipts. Fixed Val18 and official Test stay separate. Envelopes and the 1 km proximity guard describe known catalog geography. GT54 is reserved for future external evaluation and its geographical independence remains unverified.
 - Keep external-expected-SHA and local-observed SHA separate. Up to three sources may use the local-observed class for this pilot. Both classes require pinned provenance, applicable source/dataset/annotation rights evidence, and current input byte matches. Local-observed hashes support reproducibility and carry no independent publisher authentication. The writer decodes and rechecks the selected window against outer-connected exact-black support, without choosing a new crop or applying color-based NoData to white pixels.
-- The approved plan binds exact A1 contracts, reports, candidate/result membership and allowlists, catalog and per-source source/crop/grid fields. Complete the private plan with `storage_policy: BOUNDED_WRITES_AND_OBSERVED_ALLOCATION`, exact `locations` (cache, evidence, output), `protected_roots`, and each selected source's `output_shape` and `crop_transform` from its pinned report. Keep the frozen proposal as historical evidence. The final reviewed plan and approval SHA must originate from the independent review, not from the files being checked for execution.
+- The approved plan binds exact A1 contracts, reports, candidate/result membership and allowlists, catalog and per-source source/crop/grid fields. Complete the private plan with `storage_policy: BOUNDED_WRITES_AND_OBSERVED_ALLOCATION`, exact `locations` (cache, evidence, output), `protected_roots`, and each selected source's `output_shape` and `crop_transform` from its pinned report. Keep the frozen proposal as historical evidence. Retain the final plan and approval SHA separately before execution and supply those expected pins to the CLI. The reviewer covered the implementation, the owner authorized the scope, and Codex reconciled the private pins locally.
 
 ## Resource limits and recovery
 
@@ -30,7 +30,7 @@ Independent review covered the implementation. The owner authorized the exact fo
 
 ```powershell
 .\.venv\Scripts\python.exe -B scripts/d6a3_produce.py `
-  --plan "<reviewed private plan>" --plan-sha256 "<independently retained plan SHA>" `
+  --plan "<authorized private plan>" --plan-sha256 "<independently retained plan SHA>" `
   --root "<bound cache>" --evidence "<bound STAC directory>" --output "<bound fresh external output>" `
   --real-approval "<separately authorized token>" --real-approval-sha256 "<independently retained token SHA>"
 ```
