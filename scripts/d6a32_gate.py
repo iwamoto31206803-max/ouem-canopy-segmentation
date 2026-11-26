@@ -16,6 +16,7 @@ SHARD_PURPOSE = 'ISSUE_116_BOUNDED_RESEARCH_SHARD'
 MAX_SHARD_SOURCES = 50
 MAX_GENERATION_SOURCES = 200
 ROSTER = 'd6-campaign-roster-v1'
+EXTENDED_ROSTER = 'd6-campaign-roster-v2'
 GT54 = ['GT54_EXTERNAL_EVALUATION_DEFERRED', 'GT54_GEOGRAPHIC_INDEPENDENCE_UNVERIFIED']
 FREEZE_SHA = 'd7a72bdf1c792678cee0030c72dded18d3cdd6639a800c12ebafc63ba3fa1978'
 SUBINDEX_SHA = '079d37349734c746038bab90144babf50ae75d20aacfbf8cda61b5aa1bd84dae'
@@ -38,7 +39,9 @@ def approval(plan_path, plan_sha, approval_path, approval_sha):
     token = pinned(approval_path, approval_sha)
     shard=plan['schema']==SHARD
     need(shard or plan_path.stat().st_size<=65536, 'REAL_CONTROL_FILE_SIZE')
-    purpose=SHARD_PURPOSE if shard else 'ONE_BOUNDED_REAL_OUTPUT_PILOT'
+    roster=pinned(safe_path(plan_path.parent,plan['roster']['path']),plan['roster']['sha256']) if shard else None
+    purpose=('ISSUE_118_BOUNDED_RESEARCH_SHARD' if roster['schema']==EXTENDED_ROSTER else SHARD_PURPOSE
+             ) if shard else 'ONE_BOUNDED_REAL_OUTPUT_PILOT'
     need(set(token) == {'schema','approved','plan_sha256','purpose'} and token['approved'] is True
          and token == dict(schema=APPROVAL,approved=True,plan_sha256=plan_sha,
                            purpose=purpose), 'REAL_APPROVAL_BINDING')
@@ -61,7 +64,7 @@ def approval(plan_path, plan_sha, approval_path, approval_sha):
               set(roles)=={'train','val'} and all(1<=n<=2 for n in roles.values())),
          'REAL_COHORT_LIMIT')
     if shard:
-        match_roster(plan, pinned(safe_path(plan_path.parent,plan['roster']['path']),plan['roster']['sha256']))
+        match_roster(plan,roster)
     need(plan['allow_authenticity'] and set(plan['allow_authenticity'])<=AUTH,'REAL_AUTHENTICITY_POLICY')
     need(shard or sum(s.get('source_hash_verification') == LOCAL_SHA for s in sources) <= 3,
          'REAL_LOCAL_ONLY_LIMIT')
@@ -70,7 +73,7 @@ def approval(plan_path, plan_sha, approval_path, approval_sha):
 
 def roster_sources(roster):
     sources=roster['sources']
-    need(roster['schema']==ROSTER and 2<=len(sources)<=MAX_GENERATION_SOURCES
+    need(roster['schema'] in (ROSTER,EXTENDED_ROSTER) and 2<=len(sources)<=MAX_GENERATION_SOURCES
          and {s['split'] for s in sources}=={'train','val'}
          and all(type(s['image_id']) is int and qa.digest(s['source_object_sha256'])
                  for s in sources), 'D6_ROSTER_SCOPE')
@@ -84,10 +87,12 @@ def match_roster(plan, roster):
     sources=roster_sources(roster)
     start=plan['shard_start']
     sizes=roster['shard_sizes']
+    prefix=roster['parent_count'] if roster['schema']==EXTENDED_ROSTER else 4
+    need(type(prefix) is int and 4<=prefix<=len(sources), 'D6_ROSTER_PREFIX')
     need(all(type(n) is int and 1<=n<=MAX_SHARD_SOURCES for n in sizes)
-         and sum(sizes)==len(sources)-4, 'D6_ROSTER_SHARDS')
+         and sum(sizes)==len(sources)-prefix, 'D6_ROSTER_SHARDS')
     intervals=[]
-    offset=4
+    offset=prefix
     for size in sizes:
         intervals.append((offset,size))
         offset+=size
@@ -150,7 +155,8 @@ def verify_evidence(plan, plan_sha, base, root, evidence):
     refs={}
     shard=plan['schema']==SHARD
     pairs=[(None,p) for p in plan['a1']] if shard else list(plan['a1'].items())
-    need(not shard or 1<=len(pairs)<=3, 'D6_A1_REPORT_COUNT')
+    max_reports=4 if shard and ref(plan['roster'])['schema']==EXTENDED_ROSTER else 3
+    need(not shard or 1<=len(pairs)<=max_reports, 'D6_A1_REPORT_COUNT')
     for role,pair in pairs:
         contract,report=ref(pair['contract']),ref(pair['report'])
         need(contract['schema']==report['policy']==qa.POLICY

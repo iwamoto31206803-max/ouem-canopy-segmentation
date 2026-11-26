@@ -2,6 +2,8 @@
 
 [Issue #116](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/116) authorized one bounded CPU campaign. The immutable dataset readback passed at **80 original groups (75 Train, 5 fresh Val)**. The 200-group target remains short by 120. The available local STAC evidence covered 122 distinct groups before eligibility screening. Official Train cache availability covered 3,341 training-fold and 828 fold-0 tiles. The tile counts describe files, while the group counts determine independent sampling units.
 
+The subsequent [D6-A5 research generation](D6A5_OAM_INVENTORY.md) references this original aggregate in place. This run record retains the historical 80-group result.
+
 ## Candidate selection and results
 
 The common candidate roster was frozen before any new pixel QA. The metadata screen used the pinned official catalog, existing STAC source identity and rights, same-source aliases and known envelopes, the 1 km guard, and historical v5/Val18 separation. When an earlier eligible A1 result matched, its candidate was preferred within the group. The seed was 116, with seeded ordering within 15° catalog center cells and rotation across cells. New source groups ranked ahead of historical Train reuse within each role. Train and Val kept official folds. There was no model-dependent selection or per-image visual gate.

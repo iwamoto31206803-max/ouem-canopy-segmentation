@@ -27,6 +27,8 @@ The D5 exploratory research run `d5-v5-main280-01` completed **280 training upda
 
 **D6-A4 (2026-11-26).** The cached-data campaign froze and verified 80 distinct groups (75 Train, 5 fresh Val), including four reused pilot patches. Three serial shards generated 76 new patches; the unified Reader verified all 240 TIFFs and a CPU source-balanced schedule. Cached documentary evidence and fresh-Val availability limited the cohort below the 200-group target. [D6-A4 result and Reader contract](implementation/D6A4_CACHED_GENERATION.md). [Issue #116](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/116).
 
+**D6-A5 (2026-11-26).** The reusable inventory covers 541 official catalog groups, with 4,169 cached official Train pairs and STAC evidence for 414 groups. The research generation contains **175 Train and 25 fresh Val**. It references all 80 A4 patches in place and adds 120 patches from groups new to v5. All 600 TIFFs and one complete CPU schedule cycle were verified. [Inventory rebuild and generation record](implementation/D6A5_OAM_INVENTORY.md). [Issue #118](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/118).
+
 ### Existing foundation
 
 - `scripts/research_patches.py`: deterministic per-ID/seed crop positions, geometric black-support exclusions, area resampling, fraction/binary mask, product readback/hashes. It currently creates `coverage_review=PENDING_VISUAL_REVIEW`.
@@ -52,6 +54,7 @@ The D5 exploratory research run `d5-v5-main280-01` completed **280 training upda
 - **A3-1, SYNTHETIC IMPLEMENTATION COMPLETE —** [Issue #110](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/110) closed and [PR #112](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/pull/112) merged; K=1 A1 original crop, source/manifest hash publication, synthetic Windows Job and guarded recovery/reader tests. Source inputs still require synthetic marker/mode and width/height <=512.
 - **A3-2a/b, LIMITED PILOT COMPLETE** — reviewed real Producer/Reader, pinned historical evidence, source/crop policy and a guarded Windows attempt. Owner-authorized execution and 12-TIFF readback passed on four sources. See the [batch proposal](implementation/D6A3_BOUNDED_PILOT.md) for the next CPU-only scope.
 - **A4, CACHED GENERATION VERIFIED** — see [D6-A4 result and Reader contract](implementation/D6A4_CACHED_GENERATION.md). [Issue #116](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/116).
+- **A5, 200-SOURCE GENERATION VERIFIED** — [Inventory rebuild and generation record](implementation/D6A5_OAM_INVENTORY.md). [Issue #118](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/118).
 
 **Proposed D6-A gate (not yet PASS):** `OBJECTIVE_RESEARCH_ADMISSION_POLICY_REVIEWED` + `NO_PER_IMAGE_VISUAL_GATE_TESTED` + `RULE_REASON_AND_FAIL_CLOSED_TESTS_PASS` + `BATCH_YIELD_AND_IDEMPOTENCE_MEASURED`. No acceptance claim is made by this document.
 
@@ -89,7 +92,7 @@ The D5 exploratory research run `d5-v5-main280-01` completed **280 training upda
 | --- | --- |
 | D5 Step280 initial-learning feasibility | Achieved in the bounded exploratory sense; not practical accuracy |
 | D5 Step280 full Val18 evidence and remote preservation | **PASS**, frozen [archival record](implementation/D5B2B_STEP280_VAL18_RECOVERY_RECORD.md) |
-| D6-A objective auto-QA rule and scalable preprocessing | **A1 implemented; A2 research-only QA pilot complete; A3-0 complete; A3-1 synthetic producer merged; A3-2b four-source real research pilot PASS**, [Issue #106](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/106), [Issue #108](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/108), [Issue #110](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/110), [Issue #113](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/113). A4 verified 80 cached original groups; the next enlargement and GPU work remain pending |
+| D6-A objective auto-QA rule and scalable preprocessing | **A1 implemented; A2 research-only QA pilot complete; A3-0 complete; A3-1 synthetic producer merged; A3-2b four-source real research pilot PASS**, [Issue #106](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/106), [Issue #108](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/108), [Issue #110](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/110), [Issue #113](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/113). A5 verified 200 groups with reusable inventory; GPU work remains pending |
 | D6-B interruption/resume + resource budget trial | **DEFERRED: implement/test when next approved training experiment is prepared** ([Issue #100](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/100)) |
 | New dataset/source rights/label acceptance | **PENDING**, no automatic promotion |
 | Enlarged GPU training campaign | **NOT AUTHORIZED** |

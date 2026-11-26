@@ -34,6 +34,8 @@ def synthetic(tmp_path, request):
         cases += [(4,2,60000),(5,0,80000)]
     if count >= 6:
         cases += [(6,3,100000),(7,0,120000)]
+    if count >= 8:
+        cases += [(8,4,140000),(9,0,160000)]
     for rid,fold,x in cases:
         oid=f'fixture-{rid}'
         transform=from_origin(x,128,.47,.46)

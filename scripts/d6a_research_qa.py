@@ -125,7 +125,7 @@ def load_catalog(paths):
     return rows, envelopes, object_folds
 
 
-def source_preflight(row, candidate, groups, object_folds, duplicates, evidence):
+def catalog_preflight(row, candidate, groups, object_folds, duplicates):
     check(row['official_split'] == 'train', EXCLUDE, 'OFFICIAL_TEST_OR_HOLDOUT')
     check(all(row[k] == candidate[k] for k in ('oam_id', 'validation_fold')),
           HOLD, 'CANDIDATE_IDENTITY_CONFLICT')
@@ -148,6 +148,11 @@ def source_preflight(row, candidate, groups, object_folds, duplicates, evidence)
         if reason not in {'HOLD_CROSS_SPLIT_FOOTPRINT', 'HOLD_NEAR_OPPOSITE_SOURCE_WITHIN_1KM'}:
             reason = 'CATALOG_SPATIAL_CONFLICT'
         raise Decision(HOLD, reason, {'proximity_guard_m': 1000}) from None
+    return source, guard
+
+
+def source_preflight(row, candidate, groups, object_folds, duplicates, evidence):
+    source, guard = catalog_preflight(row,candidate,groups,object_folds,duplicates)
     pin = candidate.get('stac_sha256')
     check(digest(pin), HOLD, 'STAC_PIN_MISSING')
     path = local_file(evidence, row['oam_id'] + '-stac.json')

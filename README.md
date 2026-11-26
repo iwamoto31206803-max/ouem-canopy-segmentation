@@ -4,7 +4,7 @@ Engineering repository for a practical **RGB tree-canopy semantic-segmentation c
 
 **Goal:** Use Japanese GSI aerial RGB imagery at approximately 0.5–0.6 m/ground pixel to produce usable 2D tree-canopy masks for OUEM's simplified 3D canopy, shade/heat and landscape workflows. The priority is a maintainable, reproducible implementation with documented rights and limitations—not a state-of-the-art benchmark or individual-tree delineation.
 
-## Current state — 2026-11-26 D5 research milestone and D6 cached generation
+## Current state — 2026-11-26 D5 research milestone and D6 200-source research generation
 
 **A major exploratory milestone has been reached:** the frozen v5 SatlasPretrain SwinB + FPN + 2-class SEGMENT run `d5-v5-main280-01` completed **280 GPU updates**, and its Step280 checkpoint was subsequently hash-pinned and recovered on GEEKOM-A6 **CPU**. Some original-source validation images show spatially meaningful tree-canopy extraction rather than the all-background historical Step20 behavior. This establishes **initial learning feasibility**, not practical model accuracy or a numerically controlled improvement over the previous experiment.
 
@@ -17,6 +17,8 @@ Research v5 remains **Train 70 originals / 139 windows; Val 18 originals / 18 fi
 **A3-2b update (2026-11-25).** The owner-authorized Windows CPU pilot passed on exactly two new Train and two fresh Val sources. D6Data verified all four 224×224 patches and 12 GeoTIFFs. The CLI took 18.78 s with 766 MiB peak working set and about 0.60 MiB peak observed file allocation. One source had an external expected SHA and three had locally observed SHA only. Fixed Val18 and official Test remain protected. GT54 is deferred with geographic independence unverified. Formal R1 remains HOLD. [Pilot record and batch proposal](docs/implementation/D6A3_BOUNDED_PILOT.md). [Issue #113](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/113).
 
 **D6-A4 (2026-11-26).** The cached-data campaign froze and verified 80 distinct groups (75 Train, 5 fresh Val), including four reused pilot patches. Three serial shards generated 76 new patches; the unified Reader verified all 240 TIFFs and a CPU source-balanced schedule. Cached documentary evidence and fresh-Val availability limited the cohort below the 200-group target. [D6-A4 result and Reader contract](docs/implementation/D6A4_CACHED_GENERATION.md). [Issue #116](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/116).
+
+**D6-A5 (2026-11-26).** The reusable inventory covers 541 official catalog groups, with 4,169 cached official Train pairs and STAC evidence for 414 groups. The research generation contains **175 Train and 25 fresh Val**. It references all 80 A4 patches in place and adds 120 patches from groups new to v5. All 600 TIFFs and one complete CPU schedule cycle were verified. [Inventory rebuild and generation record](docs/implementation/D6A5_OAM_INVENTORY.md). [Issue #118](https://github.com/iwamoto31206803-max/ouem-canopy-segmentation/issues/118).
 
 **Formal R1 remains HOLD (0/150 accepted);** Japanese positive-tree validation, real-GSI accuracy, commercial sign-off and OUEM production suitability are **NOT VERIFIED**. The research CLEAR/frozen status is not an R1 acceptance. [Current State](docs/CURRENT_STATE.md) is the operational status reference; dated stage snapshots below are historical.
 
